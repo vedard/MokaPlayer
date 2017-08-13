@@ -13,7 +13,7 @@ class Configuration(object):
     APPLICATION_NAME = 'MusicPlayer'
     APPLICATION_VERSION = '0.0.0.1'
     APPLICATION_CONFIG_FILE = "musicplayer.yaml"
-    APPLICATION_DEFAULT_CONFIG_PATH = 'musicplayer/data/default_configuration.yaml'
+    APPLICATION_DEFAULT_CONFIG_PATH = 'musicplayer/resources/default_configuration.yaml'
     USER_DIRECTORY = appdirs.user_data_dir(APPLICATION_NAME, 
                                            version=APPLICATION_VERSION)
     CACHE_DIRECTORY = appdirs.user_cache_dir(APPLICATION_NAME, 

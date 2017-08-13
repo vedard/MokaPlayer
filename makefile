@@ -1,5 +1,5 @@
 run:
-	python3 musicplayer/application.py
+	python3 application.py
 
 clean:
 	find . -type f -name "*.py[co]" -delete 
