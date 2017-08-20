@@ -1,22 +1,13 @@
-import peewee
 import datetime
+import logging
+import peewee
+import taglib
 
 DB = peewee.SqliteDatabase(None)
 
-class Database(object):
-    """ PeeWee wrapper to save songs, artists, albums, lyrics and etc...
-    """
-    @staticmethod
-    def connect(database_path):
-        DB.init(database_path)
-        Song.create_table(True)
-        Album.create_table(True)
-        Artist.create_table(True)
-
-
 class Song(peewee.Model):
     songId = peewee.PrimaryKeyField()
-    Url = peewee.CharField(index=True)
+    Path = peewee.CharField(index=True)
     Title = peewee.CharField(null=True, index=True)
     Album = peewee.CharField(null=True, index=True)
     Artist = peewee.CharField(null=True, index=True)
@@ -37,6 +28,32 @@ class Song(peewee.Model):
 
     class Meta:
         database = DB
+    
+    def __get_tag_value(self, tags, name):
+        l = tags.get(name, [''])
+        return l[0] if any(l) else ''
+
+    def read_tags(self):
+        """ Read tags from the file
+        """
+        try:
+            fileref = taglib.File(self.Path)
+            self.Title = self.__get_tag_value(fileref.tags, 'TITLE')
+            self.Album = self.__get_tag_value(fileref.tags, 'ALBUM')
+            self.Artist = self.__get_tag_value(fileref.tags, 'ARTIST')
+            self.AlbumArtist = self.__get_tag_value(fileref.tags, 'ALBUMARTIST')
+            self.Tracknumber = self.__get_tag_value(fileref.tags, 'TRACKNUMBER')
+            self.Discnumber = self.__get_tag_value(fileref.tags, 'DISCNUMBER')
+            self.Comment = self.__get_tag_value(fileref.tags, 'COMMENT')
+            self.Year = self.__get_tag_value(fileref.tags, 'DATE')[:4]
+            self.Label = self.__get_tag_value(fileref.tags, 'LABEL')
+            self.Lyrics = self.__get_tag_value(fileref.tags, 'LYRICS')
+            self.Genre = self.__get_tag_value(fileref.tags, 'GENRE')
+            self.Length = fileref.length
+            self.Channels = fileref.channels
+            self.Bitrate = fileref.bitrate
+        except:
+            logging.exception('Could not read tag from ' + self.Path)
 
 
 class Album(peewee.Model):
@@ -60,3 +77,10 @@ class Artist(peewee.Model):
     class Meta:
         database = DB
 
+class Playlist(peewee.Model):
+    PlaylistId = peewee.PrimaryKeyField()
+    Name = peewee.CharField(index=True)
+    Path = peewee.CharField()
+
+    class Meta:
+        database = DB

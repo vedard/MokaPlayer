@@ -1,7 +1,8 @@
 database:
   file: musicplayer.db
-music:
-  directory: 
+library:
+  music_directory: 
+  playlist_directory:
 player:
   restore_state: Yes
 lastfm:

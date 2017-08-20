@@ -1,10 +1,6 @@
 from musicplayer.core.configuration import Configuration
-from musicplayer.core.database import Database
-from musicplayer.core.database import Artist
+from musicplayer.core.library import Library
 
 c = Configuration()
-Database.connect(c["database"]["file"])
-Artist(Name='test').save()
-
-for a in Artist.select():
-    print(a.Name)
+l = Library(c["database"]["file"], c["library"]["music_directory"])
+l.sync()
