@@ -86,7 +86,9 @@ class Streamer(object):
 
     @stream.setter
     def stream(self, value):
-        if not value.startswith('file://'):
+        if not value:
+            self._playbin.props.uri = ''
+        elif not value.startswith('file://'):
             self._playbin.props.uri = pathlib.Path(value).as_uri()
         else:
             self._playbin.props.uri = value

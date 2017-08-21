@@ -1,6 +1,10 @@
-from musicplayer.core.configuration import Configuration
-from musicplayer.core.library import Library
+from musicplayer.core.player import Player
+from musicplayer.core.database import Song
 
-c = Configuration()
-l = Library(c["database"]["file"], c["library"]["music_directory"])
-l.sync()
+p = Player()
+
+p.queue.append([x.Path for x in p.library.search_song('ayreon')])
+p.play()
+
+while True:
+    pass

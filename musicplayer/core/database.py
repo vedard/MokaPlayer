@@ -12,11 +12,11 @@ class Song(peewee.Model):
     Album = peewee.CharField(null=True, index=True)
     Artist = peewee.CharField(null=True, index=True)
     AlbumArtist = peewee.CharField(null=True, index=True)
-    Tracknumber = peewee.CharField(null=True)
+    Tracknumber = peewee.IntegerField(null=True, index=True)
     Genre = peewee.CharField(null=True)
-    Discnumber = peewee.CharField(null=True)
+    Discnumber = peewee.IntegerField(null=True)
     Comment = peewee.CharField(null=True)
-    Year = peewee.CharField(null=True)
+    Year = peewee.CharField(null=True, index=True)
     Label = peewee.CharField(null=True)
     Lyrics = peewee.CharField(null=True)
     Added = peewee.DateTimeField(default=datetime.datetime.now, index=True)
@@ -41,17 +41,31 @@ class Song(peewee.Model):
             self.Title = self.__get_tag_value(fileref.tags, 'TITLE')
             self.Album = self.__get_tag_value(fileref.tags, 'ALBUM')
             self.Artist = self.__get_tag_value(fileref.tags, 'ARTIST')
-            self.AlbumArtist = self.__get_tag_value(fileref.tags, 'ALBUMARTIST')
-            self.Tracknumber = self.__get_tag_value(fileref.tags, 'TRACKNUMBER')
             self.Discnumber = self.__get_tag_value(fileref.tags, 'DISCNUMBER')
             self.Comment = self.__get_tag_value(fileref.tags, 'COMMENT')
             self.Year = self.__get_tag_value(fileref.tags, 'DATE')[:4]
             self.Label = self.__get_tag_value(fileref.tags, 'LABEL')
             self.Lyrics = self.__get_tag_value(fileref.tags, 'LYRICS')
             self.Genre = self.__get_tag_value(fileref.tags, 'GENRE')
+            self.Tracknumber = self.__get_tag_value(fileref.tags, 'TRACKNUMBER')
+            self.AlbumArtist = self.__get_tag_value(fileref.tags, 'ALBUMARTIST') 
             self.Length = fileref.length
             self.Channels = fileref.channels
             self.Bitrate = fileref.bitrate
+
+            try:
+                self.Tracknumber = int(self.Tracknumber.split('/')[0])
+            except ValueError:
+                self.Tracknumber = 0
+
+            try:
+                self.Discnumber = int(self.Discnumber.split('/')[0])
+            except ValueError:
+                self.Discnumber = 0
+
+            self.AlbumArtist = self.AlbumArtist or self.Artist
+
+
         except:
             logging.exception('Could not read tag from ' + self.Path)
 

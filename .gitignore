@@ -1,1 +1,4 @@
 __pycache__
+*.ui~
+*.db
+.vscode

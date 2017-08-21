@@ -2,8 +2,9 @@ import logging
 import mimetypes
 import pathlib
 
-from musicplayer.core.database import DB,Song, Album, Artist, Playlist
+from musicplayer.core.database import DB, Song, Album, Artist, Playlist
 from musicplayer.core.playlist_m3u import PlaylistM3u
+
 
 class Library(object):
     """Explore the music folder and extract songs, album, artist into the database
@@ -13,18 +14,35 @@ class Library(object):
         _playlist_folder: A string indicating where the playlists is located
 
     """
-    
+
     def __init__(self, database_path, musics_folder=None, playlists_folder=None):
         DB.init(database_path)
-        
+
         Song.create_table(True)
         Album.create_table(True)
         Artist.create_table(True)
         Playlist.create_table(True)
-        
+
         self._musics_folder = musics_folder
         self._playlists_folder = playlists_folder
-    
+
+    def search_song(self, text=None):
+        if text:
+            text = f'%{text}%' 
+            query = Song.select().where(Song.Title ** text
+                               | Song.AlbumArtist ** text
+                               | Song.Album ** text
+                               | Song.Year ** text
+                               | Song.Artist ** text)
+        else:
+            query = Song.select()
+
+        return query.order_by(Song.AlbumArtist or Song.Artist,
+                              Song.Year,
+                              Song.Album,
+                              Song.Discnumber,
+                              Song.Tracknumber)
+
     def sync(self):
         """Synchronize data from library and actual data in the musics folder
 
@@ -39,12 +57,15 @@ class Library(object):
         self.__sync_artists()
         self.__sync_albums()
         logging.debug('Library sync ended')
-    
+
     def __sync_songs(self):
-        list_all_path = set(str(x.resolve(False)) for x in pathlib.Path(self._musics_folder).glob('**/*') if not x.is_dir())
+        list_all_path = set(str(x.resolve(False)) for x in pathlib.Path(
+            self._musics_folder).glob('**/*') if not x.is_dir())
         list_known_path = set([x.Path for x in Song.select(Song.Path)])
-        list_new_path = set([x for x in list_all_path if x not in list_known_path])
-        list_deleted_song = set([x for x in list_known_path if x not in list_all_path])
+        list_new_path = set(
+            [x for x in list_all_path if x not in list_known_path])
+        list_deleted_song = set(
+            [x for x in list_known_path if x not in list_all_path])
 
         with DB.atomic():
             for index, path in enumerate(list_new_path):
@@ -63,13 +84,13 @@ class Library(object):
         if self._playlists_folder is None or not pathlib.Path(self._playlists_folder).is_dir():
             return
 
-        list_path = set(str(x) for x in pathlib.Path(self._playlists_folder).glob('**/*m3u'))
+        list_path = set(str(x) for x in pathlib.Path(
+            self._playlists_folder).glob('**/*m3u'))
 
         with DB.atomic():
             for path in list_path:
                 playlist = PlaylistM3u(path)
                 Playlist(Name=playlist.name, Path=playlist.location).save()
-            
 
     def __sync_artists(self):
         DB.execute_sql("""
