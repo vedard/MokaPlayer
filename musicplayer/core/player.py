@@ -6,12 +6,12 @@ from musicplayer.core.configuration import Configuration
 
 
 class Player(object):
-    def __init__(self):
+    def __init__(self, audio_changed=None, notify_volume=None):
         self.configuration = Configuration()
         self.queue = Queue()
         self.streamer = Streamer(about_to_finish=self.__about_to_finish,
-                                 audio_changed=self.__audio_changed, 
-                                 notify_volume=self.__notify_volume)
+                                 audio_changed=audio_changed, 
+                                 notify_volume=notify_volume)
                                  
         self.library = Library(self.configuration["database"]["file"],
                                self.configuration["library"]["music_directory"],
@@ -20,8 +20,8 @@ class Player(object):
     def play(self):
         if self.streamer.state == Streamer.State.PAUSED:
             self.streamer.resume()
-        elif self.streamer.state == Streamer.State.STOPED:
-            self.next()
+        elif self.streamer.state == Streamer.State.STOPED and self.queue.peek():
+            self.streamer.play(self.queue.peek())
 
     def seek(self, path):
         self.queue.seek(path)
@@ -39,23 +39,19 @@ class Player(object):
             self.streamer.pause()
         elif self.streamer.state == Streamer.State.PAUSED:
             self.streamer.resume()
+        elif self.streamer.state == Streamer.State.STOPED and self.queue.peek():
+            self.streamer.play(self.queue.peek())
 
     def next(self):
-        if self.queue:
+        if len(self.queue):
             self.queue.next()
             self.streamer.play(self.queue.peek())
 
     def prev(self):
-        if self.queue:
+        if len(self.queue):
             self.queue.prev()
             self.streamer.play(self.queue.peek())
     
     def __about_to_finish(self, data):
         self.queue.next()
         self.streamer.stream = self.queue.peek()
-
-    def __audio_changed(self, data):
-        pass
-
-    def __notify_volume(self, data1, data2):
-        pass

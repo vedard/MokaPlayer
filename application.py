@@ -1,10 +1,10 @@
-from musicplayer.core.player import Player
-from musicplayer.core.database import Song
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from musicplayer.ui.gtk.main_window import MainWindow
+import datetime
 
-p = Player()
-
-p.queue.append([x.Path for x in p.library.search_song('ayreon')])
-p.play()
-
-while True:
-    pass
+if __name__ == '__main__':
+    window = MainWindow()
+    window.show_all()
+    Gtk.main()

@@ -25,6 +25,12 @@ class Library(object):
 
         self._musics_folder = musics_folder
         self._playlists_folder = playlists_folder
+    
+    def get_song(self, path):
+        try:
+            return Song.get(Song.Path==path)
+        except:
+            return None
 
     def search_song(self, text=None):
         if text:
