@@ -6,6 +6,7 @@ from musicplayer.ui.gtk.about_window import AboutWindow
 import threading
 import time
 import datetime
+import arrow
 
 class MainWindow(Gtk.Window):
     def __init__(self):
@@ -21,6 +22,8 @@ class MainWindow(Gtk.Window):
 
         self.gridview.set_model(AdapterSong.create_store())
         self.__set_current_song_info()
+
+        GObject.timeout_add(500, self.on_tick, None)
  
     def __fetch_data(self):
         model = AdapterSong.create_store()
@@ -48,6 +51,8 @@ class MainWindow(Gtk.Window):
         self.img_play = self.builder.get_object('img_play')
         self.img_pause = self.builder.get_object('img_pause')
         self.txt_search = self.builder.get_object('txt_search')
+        self.lbl_current_time = self.builder.get_object('lbl_current_time')
+        self.prb_current_time = self.builder.get_object('prb_current_time')
         self.add(self.content)
     
     def __set_current_song_info(self):
@@ -85,8 +90,8 @@ class MainWindow(Gtk.Window):
         self.player.prev()
     
     def on_audio_changed(self, data):
-        self.__set_current_song_info()
-        self.__set_current_play_icon()
+        GObject.idle_add(self.__set_current_song_info)
+        GObject.idle_add(self.__set_current_play_icon)
 
     def on_volume_changed(self, data1, data2):
         self.volume_scale.set_value(self.player.streamer.volume * 100)
@@ -124,3 +129,20 @@ class MainWindow(Gtk.Window):
         about_window = AboutWindow.get_diaglog()
         about_window.set_transient_for(self)
         about_window.show()
+    
+    def on_prp_current_time_click(self, widget, event):
+        width = self.prb_current_time.get_allocated_width()
+        duration = self.player.streamer.duration
+        self.player.streamer.position = duration * event.x / width
+
+    def on_tick(self, data):
+        position = self.player.streamer.position
+        duration = self.player.streamer.duration
+        fraction = position / duration if duration else 0  
+        position_text = arrow.get(0).shift(seconds=position).format('mm:ss')
+        duration_text = arrow.get(0).shift(seconds=duration).format('mm:ss')
+
+        self.lbl_current_time.set_text(f'{position_text} / {duration_text}')
+        self.prb_current_time.set_fraction(fraction)
+
+        return True    
