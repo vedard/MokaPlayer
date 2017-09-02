@@ -73,6 +73,7 @@ class Song(peewee.Model):
 class Album(peewee.Model):
     AlbumId= peewee.PrimaryKeyField()
     Name = peewee.CharField(index=True) 
+    Path = peewee.CharField(index=True) 
     Year = peewee.CharField(null=True)
     Cover = peewee.CharField(null=True)
     Description = peewee.CharField(null=True)

@@ -1,3 +1,5 @@
+import pathlib
+
 from musicplayer.core.queue import Queue
 from musicplayer.core.configuration import Configuration
 from musicplayer.core.library import Library
@@ -15,7 +17,8 @@ class Player(object):
                                  
         self.library = Library(self.configuration["database"]["file"],
                                self.configuration["library"]["music_directory"],
-                               self.configuration["library"]["playlist_directory"])
+                               self.configuration["library"]["playlist_directory"],
+                               pathlib.Path(self.configuration.CACHE_DIRECTORY) / 'artworks' )
 
     def play(self):
         if self.streamer.state == Streamer.State.PAUSED:

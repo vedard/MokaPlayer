@@ -1,8 +1,10 @@
 from gi.repository import Gtk
 from gi.repository import GObject
 from musicplayer.core.player import Player
+from musicplayer.core.configuration import Configuration
 from musicplayer.ui.gtk.adapter_song import AdapterSong
 from musicplayer.ui.gtk.about_window import AboutWindow
+from musicplayer.ui.gtk import image_helper
 import threading
 import time
 import datetime
@@ -11,6 +13,7 @@ import arrow
 class MainWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Music Player", default_width=1366, default_height=768)
+        self.configuration = Configuration()
         self.connect("destroy", self.on_window_destroy)
         self.builder = Gtk.Builder()
         self.builder.add_from_file('musicplayer/ui/gtk/resources/main_window.ui')
@@ -18,16 +21,16 @@ class MainWindow(Gtk.Window):
         self.__get_object()
 
         self.player = Player(self.on_audio_changed, self.on_volume_changed)
-        threading.Thread(target=self.__fetch_data).start()
+        threading.Thread(target=lambda:self.__create_model(self.player.library.search_song())).start()
 
         self.gridview.set_model(AdapterSong.create_store())
         self.__set_current_song_info()
 
         GObject.timeout_add(500, self.on_tick, None)
  
-    def __fetch_data(self):
+    def __create_model(self, data):
         model = AdapterSong.create_store()
-        for x in self.player.library.search_song():
+        for x in data:
             model.append(AdapterSong.create_row(x))
         GObject.idle_add(lambda: self.__set_model(model))
     
@@ -56,13 +59,21 @@ class MainWindow(Gtk.Window):
         self.add(self.content)
     
     def __set_current_song_info(self):
-        s = self.player.library.get_song(self.player.queue.peek())
-        if s:
-            self.lbl_current_song_infos.set_text(f'{s.Artist} - {s.Album} ({s.Year})')
-            self.lbl_current_title.set_text(s.Title)
+        song = self.player.library.get_song(self.player.queue.peek())
+        album = None
+
+        if song:
+            album = self.player.library.get_album(song.Album)
+            self.lbl_current_song_infos.set_text(f'{song.Artist} - {song.Album} ({song.Year})')
+            self.lbl_current_title.set_text(song.Title)
         else:
             self.lbl_current_title.set_text('')
             self.lbl_current_song_infos.set_text('')
+
+        if album:
+            self.img_current_album.set_from_pixbuf(image_helper.load(album.Cover, 100, 100))
+        else:
+            self.img_current_album.set_from_pixbuf(image_helper.load(None, 100, 100))
     
     def __set_current_play_icon(self):
         if self.player.streamer.state == self.player.streamer.State.PLAYING:
@@ -112,12 +123,15 @@ class MainWindow(Gtk.Window):
         Gtk.main_quit()
 
     def on_library_scan_activate(self, event):
-        self.player.library.sync()
+        threading.Thread(target=self.player.library.sync).start() 
+
+    def on_library_artworks_activate(self, event):
+        threading.Thread(target=lambda: self.player.library.sync_artwork(self.configuration['lastfm']['api_key'])).start() 
 
     def on_queue_add_activate(self, event):
         self.player.queue.clear()
         self.player.queue.append([x.Path for x in self.player.library.search_song()])
-        self.player.queue.seek(self.player.queue.peek())
+        self.player.queue.seek(self.player.queue.pop())
 
     def on_queue_clear_activate(self, event):
         self.player.queue.clear()
@@ -146,3 +160,10 @@ class MainWindow(Gtk.Window):
         self.prb_current_time.set_fraction(fraction)
 
         return True    
+
+    def on_leftmenu_selected_rows_changed(self, widget):
+        label = widget.get_selected_row().get_children()[0]
+        # if label.get_text() == "Local":
+        #     threading.Thread(target=lambda:self.__create_model(self.player.library.search_song())).start()
+        # elif label.get_text() == "Queue":
+        #     threading.Thread(target=lambda:self.__create_model(self.player.library.get_songs([x for x in self.player.queue]))).start()
