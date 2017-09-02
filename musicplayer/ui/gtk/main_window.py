@@ -13,14 +13,21 @@ import arrow
 class MainWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Music Player", default_width=1366, default_height=768)
+        
         self.configuration = Configuration()
+        
         self.connect("destroy", self.on_window_destroy)
+        
         self.builder = Gtk.Builder()
         self.builder.add_from_file('musicplayer/ui/gtk/resources/main_window.ui')
         self.builder.connect_signals(self)
+        
         self.__get_object()
 
         self.player = Player(self.on_audio_changed, self.on_volume_changed)
+        self.player.restore()
+
+        threading.Thread(target=lambda:self.player.restore()).start()
         threading.Thread(target=lambda:self.__create_model(self.player.library.search_song())).start()
 
         self.gridview.set_model(AdapterSong.create_store())
@@ -85,6 +92,7 @@ class MainWindow(Gtk.Window):
         return AdapterSong.search(self.txt_search.get_text(), model[iter])
     
     def on_window_destroy(self, widget):
+        self.player.save()
         Gtk.main_quit()
     
     def on_gridview_row_activated(self, widget, path, column):
