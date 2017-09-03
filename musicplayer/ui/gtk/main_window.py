@@ -1,3 +1,8 @@
+import threading
+import time
+import datetime
+import arrow
+
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
@@ -7,10 +12,6 @@ from musicplayer.ui.gtk.adapter_song import AdapterSong
 from musicplayer.ui.gtk.about_window import AboutWindow
 from musicplayer.ui.gtk.help_shortcuts_window import HelpShortcutsWindow
 from musicplayer.ui.gtk import image_helper
-import threading
-import time
-import datetime
-import arrow
 
 class MainWindow(Gtk.Window):
     def __init__(self):
@@ -40,8 +41,9 @@ class MainWindow(Gtk.Window):
  
     def __create_model(self, data):
         model = AdapterSong.create_store()
-        for x in data:
-            model.append(AdapterSong.create_row(x))
+        for x in reversed(data):
+            model.insert_with_valuesv(0, [0,1,2,3,4,5,6], AdapterSong.create_row(x))
+
         GObject.idle_add(lambda: self.__set_model(model))
     
     def __set_model(self, model):
