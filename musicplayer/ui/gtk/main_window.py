@@ -1,4 +1,5 @@
 from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import GObject
 from musicplayer.core.player import Player
 from musicplayer.core.configuration import Configuration
@@ -17,6 +18,7 @@ class MainWindow(Gtk.Window):
         self.configuration = Configuration()
         
         self.connect("destroy", self.on_window_destroy)
+        self.connect("key-press-event", self.on_window_key_press)
         
         self.builder = Gtk.Builder()
         self.builder.add_from_file('musicplayer/ui/gtk/resources/main_window.ui')
@@ -27,11 +29,11 @@ class MainWindow(Gtk.Window):
         self.player = Player(self.on_audio_changed, self.on_volume_changed)
         self.player.restore()
 
+        self.__set_model(AdapterSong.create_store())
+        self.__set_current_song_info()
+
         threading.Thread(target=lambda:self.player.restore()).start()
         threading.Thread(target=lambda:self.__create_model(self.player.library.search_song())).start()
-
-        self.gridview.set_model(AdapterSong.create_store())
-        self.__set_current_song_info()
 
         GObject.timeout_add(500, self.on_tick, None)
  
@@ -91,9 +93,35 @@ class MainWindow(Gtk.Window):
     def __model_filter_func(self, model, iter, data):
         return AdapterSong.search(self.txt_search.get_text(), model[iter])
     
+    def __focus_song(self, path):
+        for row in self.model:
+            if row[0] == path:
+                self.gridview.get_selection().select_path(row.path)
+                self.gridview.set_cursor(row.path)
+                self.gridview.scroll_to_cell(row.path, use_align=True)
+                break
+
+    
     def on_window_destroy(self, widget):
         self.player.save()
         Gtk.main_quit()
+    
+    def on_window_key_press(self, widget, event):
+        keyval_name = Gdk.keyval_name(event.keyval)
+        ctrl = (event.state & Gdk.ModifierType.CONTROL_MASK)
+
+        if ctrl and keyval_name == 'f':
+            self.txt_search.grab_focus()
+        elif ctrl and keyval_name == 'o':
+            self.__focus_song(self.player.queue.peek())
+        elif ctrl and keyval_name == 'Left':
+            self.player.streamer.volume -= 0.05
+        elif ctrl and keyval_name == 'Right':
+            self.player.streamer.volume += 0.05
+        else:
+            return False
+
+        return True
     
     def on_gridview_row_activated(self, widget, path, column):
         self.player.seek(self.model[path][0])
