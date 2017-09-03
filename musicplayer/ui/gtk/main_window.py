@@ -5,6 +5,7 @@ from musicplayer.core.player import Player
 from musicplayer.core.configuration import Configuration
 from musicplayer.ui.gtk.adapter_song import AdapterSong
 from musicplayer.ui.gtk.about_window import AboutWindow
+from musicplayer.ui.gtk.help_shortcuts_window import HelpShortcutsWindow
 from musicplayer.ui.gtk import image_helper
 import threading
 import time
@@ -174,6 +175,11 @@ class MainWindow(Gtk.Window):
 
     def on_queue_shuffle_activate(self, event):
         self.player.queue.shuffle()
+    
+    def on_help_shortcuts_activate(self, event):
+        shortcuts_window = HelpShortcutsWindow.get_diaglog()
+        shortcuts_window.set_transient_for(self)
+        shortcuts_window.show()
 
     def on_help_about_activate(self, event):
         about_window = AboutWindow.get_diaglog()

@@ -163,6 +163,15 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
+                  <object class="GtkMenuItem" id="help_shortcuts">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Shortcuts</property>
+                    <property name="use_underline">True</property>
+                    <signal name="activate" handler="on_help_shortcuts_activate" swapped="no"/>
+                  </object>
+                </child>
+                <child>
                   <object class="GtkMenuItem" id="help_about">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>

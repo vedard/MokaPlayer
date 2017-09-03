@@ -95,6 +95,11 @@ class Streamer(object):
 
     @volume.setter
     def volume(self, value):
+        if value > 1:
+            value = 1
+        elif value < 0:
+            value = 0
+
         self._playbin.set_volume(GstAudio.StreamVolumeFormat.CUBIC, value)
 
     @position.setter
