@@ -8,7 +8,6 @@ from gi.repository import Gdk
 from gi.repository import GObject
 from musicplayer.core.player import Player
 from musicplayer.core.configuration import Configuration
-from musicplayer.core.fetchers import lyrics
 from musicplayer.ui.gtk.adapter_song import AdapterSong
 from musicplayer.ui.gtk.about_window import AboutWindow
 from musicplayer.ui.gtk.lyrics_window import LyricsWindow
@@ -121,7 +120,6 @@ class MainWindow(Gtk.Window):
             song = self.player.library.get_song(self.player.queue.peek())
             w = LyricsWindow()
             w.start_fetch(song)
-            w.get_window().set_modal(self)
             w.get_window().set_transient_for(self)
             w.get_window().show()
         elif ctrl and keyval_name == 'o':

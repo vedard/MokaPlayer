@@ -1,8 +1,10 @@
+import datetime
 import time
 import pathlib
 import logging
 import json
 import gzip
+from threading import Thread
 
 from musicplayer.core.queue import Queue
 from musicplayer.core.configuration import Configuration
@@ -34,10 +36,12 @@ class Player(object):
             self.streamer.play(self.queue.peek())
 
     def seek(self, path):
+        self.__set_play_count()
         self.queue.seek(path)
         self.streamer.play(path)
 
     def stop(self):
+        self.__set_play_count()
         self.streamer.stop()
         self.queue.pop()
 
@@ -54,11 +58,13 @@ class Player(object):
 
     def next(self):
         if len(self.queue):
+            self.__set_play_count()
             self.queue.next()
             self.streamer.play(self.queue.peek())
 
     def prev(self):
         if len(self.queue):
+            self.__set_play_count()
             self.queue.prev()
             self.streamer.play(self.queue.peek())
     
@@ -93,3 +99,15 @@ class Player(object):
     def __about_to_finish(self, data):
         self.queue.next()
         self.streamer.stream = self.queue.peek()
+    
+    def __set_play_count(self):
+        song = self.library.get_song(self.queue.peek())
+        try:
+            percent = self.streamer.position / self.streamer.duration
+        except ZeroDivisionError:
+            percent = 0
+        
+        if song is not None and percent > 0.85:
+            song.Played += 1
+            song.Last_played = datetime.datetime.now()
+            Thread(target=song.save).start()
