@@ -7,9 +7,9 @@ class AdapterSong:
     def create_row(song):
         return [
             song.Path,
-            song.Title,
-            song.AlbumArtist,
-            song.Album,
+            song.Title or 'Unknown',
+            song.AlbumArtist or 'Unknown',
+            song.Album or 'Unknown',
             arrow.get(0).shift(seconds=song.Length).format('mm:ss'),
             song.Year,
             arrow.get(song.Added).humanize()

@@ -9,7 +9,7 @@ class ProviderGenius(ProviderBase):
                                                         self.encode(title))
 
     def get_xpath(self, title, artist, album):
-        return '//lyrics[@class="lyrics"]//text()'
+        return '//div[@class="lyrics"]//text()'
 
     def get_regex(self, title, artist, album):
         return ''

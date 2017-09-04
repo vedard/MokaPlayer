@@ -13,7 +13,7 @@ class ProviderDarkLyrics(ProviderBase):
         return '//div[@class="lyrics"]//text()'
 
     def get_regex(self, title, artist, album):
-        return '\d+\.\s{self.encode_url_parameters(title)}([\S\s]*?)(\d+\.\s|$)'
+        return f'\d+\.\s{title.lower()}([\S\s]*?)(\d+\.\s|$)'
 
     def get_node_separator(self):
         return ''

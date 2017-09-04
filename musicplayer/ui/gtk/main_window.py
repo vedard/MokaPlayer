@@ -8,8 +8,10 @@ from gi.repository import Gdk
 from gi.repository import GObject
 from musicplayer.core.player import Player
 from musicplayer.core.configuration import Configuration
+from musicplayer.core.fetchers import lyrics
 from musicplayer.ui.gtk.adapter_song import AdapterSong
 from musicplayer.ui.gtk.about_window import AboutWindow
+from musicplayer.ui.gtk.lyrics_window import LyricsWindow
 from musicplayer.ui.gtk.help_shortcuts_window import HelpShortcutsWindow
 from musicplayer.ui.gtk import image_helper
 
@@ -86,7 +88,7 @@ class MainWindow(Gtk.Window):
             self.img_current_album.set_from_pixbuf(image_helper.load(album.Cover, 100, 100))
         else:
             self.img_current_album.set_from_pixbuf(image_helper.load(None, 100, 100))
-    
+        
     def __set_current_play_icon(self):
         if self.player.streamer.state == self.player.streamer.State.PLAYING:
             self.btn_play.set_image(self.img_pause)
@@ -102,9 +104,9 @@ class MainWindow(Gtk.Window):
                 self.gridview.get_selection().select_path(row.path)
                 self.gridview.set_cursor(row.path)
                 self.gridview.scroll_to_cell(row.path, use_align=True)
+                self.gridview.grab_focus()
                 break
 
-    
     def on_window_destroy(self, widget):
         self.player.save()
         Gtk.main_quit()
@@ -115,6 +117,13 @@ class MainWindow(Gtk.Window):
 
         if ctrl and keyval_name == 'f':
             self.txt_search.grab_focus()
+        elif ctrl and keyval_name == 'l':
+            song = self.player.library.get_song(self.player.queue.peek())
+            w = LyricsWindow()
+            w.start_fetch(song)
+            w.get_window().set_modal(self)
+            w.get_window().set_transient_for(self)
+            w.get_window().show()
         elif ctrl and keyval_name == 'o':
             self.__focus_song(self.player.queue.peek())
         elif ctrl and keyval_name == 'Left':
@@ -149,6 +158,10 @@ class MainWindow(Gtk.Window):
     def on_volume_scale_value_changed(self, widget):
         self.player.streamer.volume = self.volume_scale.get_value() / 100
     
+    def on_txt_search_activate(self, widget):
+        if any(self.model):
+            self.__focus_song(self.model[0][0])
+
     def on_txt_search_search_changed(self, widget):
         self.model.refilter()
 

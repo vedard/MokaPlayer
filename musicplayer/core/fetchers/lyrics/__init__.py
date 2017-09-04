@@ -23,8 +23,8 @@ def get(title, artist, album=''):
         lyrics = provider.get_lyrics(title, artist, album)
 
         if lyrics:
-            return lyrics + "\n\nfrom " + provider.get_name()
+            return True, lyrics + "\n\nfrom " + provider.get_name()
 
-    return ("Lyrics not found, try this: " +
-            "https://google.ca/search?q=" +
-            requests.utils.quote('{} {} lyrics').format(artist, title))
+    return False, ("Lyrics not found, try this: " +
+                   "https://google.ca/search?q=" +
+                   requests.utils.quote('{} {} lyrics').format(artist, title))
