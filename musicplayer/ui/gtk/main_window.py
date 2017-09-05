@@ -42,8 +42,15 @@ class MainWindow(Gtk.Window):
  
     def __create_model(self, data):
         model = AdapterSong.create_store()
-        for x in reversed(data):
-            model.insert_with_valuesv(0, [0,1,2,3,4,5,6], AdapterSong.create_row(x))
+        start = time.perf_counter()
+
+        for row in reversed(data):
+            model.insert_with_valuesv(0, 
+                                      AdapterSong.create_col_number(),
+                                      AdapterSong.create_row(row))
+
+        end = time.perf_counter()
+        print(end - start)
 
         GObject.idle_add(lambda: self.__set_model(model))
     
@@ -69,6 +76,14 @@ class MainWindow(Gtk.Window):
         self.txt_search = self.builder.get_object('txt_search')
         self.lbl_current_time = self.builder.get_object('lbl_current_time')
         self.prb_current_time = self.builder.get_object('prb_current_time')
+        self.radio_sort_artist = self.builder.get_object('radio_sort_artist')
+        self.radio_sort_album = self.builder.get_object('radio_sort_album')
+        self.radio_sort_title = self.builder.get_object('radio_sort_title')
+        self.radio_sort_year = self.builder.get_object('radio_sort_year')
+        self.radio_sort_length = self.builder.get_object('radio_sort_length')
+        self.radio_sort_added = self.builder.get_object('radio_sort_added')
+        self.radio_sort_played = self.builder.get_object('radio_sort_played')
+        self.chk_sort_desc = self.builder.get_object('chk_sort_desc')
         self.add(self.content)
     
     def __set_current_song_info(self):
@@ -215,6 +230,28 @@ class MainWindow(Gtk.Window):
         self.prb_current_time.set_fraction(fraction)
 
         return True    
+
+    def on_sort_radio_toggled(self, widget):
+        if widget.get_active() or not isinstance(widget, Gtk.RadioButton):
+            order = ''
+            desc = self.chk_sort_desc.get_active()
+            if self.radio_sort_artist.get_active():
+                order = 'Artist'
+            elif self.radio_sort_album.get_active():
+                order = 'Album'
+            elif self.radio_sort_title.get_active():
+                order = 'Title'
+            elif self.radio_sort_length.get_active():
+                order = 'Length'
+            elif self.radio_sort_year.get_active():
+                order = 'Year'
+            elif self.radio_sort_added.get_active():
+                order = 'Added'
+            elif self.radio_sort_played.get_active():
+                order = 'Played'
+
+            threading.Thread(target=lambda: self.__create_model(self.player.library.search_song(order, desc))).start()
+    
 
     def on_leftmenu_selected_rows_changed(self, widget):
         label = widget.get_selected_row().get_children()[0]

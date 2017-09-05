@@ -97,6 +97,7 @@ class Player(object):
             logging.error('Could not save player state')
 
     def __about_to_finish(self, data):
+        self.__set_play_count()
         self.queue.next()
         self.streamer.stream = self.queue.peek()
     

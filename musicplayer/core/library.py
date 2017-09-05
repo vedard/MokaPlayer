@@ -42,22 +42,48 @@ class Library(object):
         except:
             return None
 
-    def search_song(self, text=None):
-        if text:
-            text = f'%{text}%' 
-            query = Song.select().where(Song.Title ** text
-                               | Song.AlbumArtist ** text
-                               | Song.Album ** text
-                               | Song.Year ** text
-                               | Song.Artist ** text)
-        else:
-            query = Song.select()
+    def search_song(self, order=None, desc=False):
+        order_fields = []
 
-        return query.order_by(Song.AlbumArtist or Song.Artist,
-                              Song.Year,
-                              Song.Album,
-                              Song.Discnumber,
-                              Song.Tracknumber)
+        if not order or order == 'Artist':
+            order_fields = [Song.AlbumArtist,
+                            Song.Year,
+                            Song.Album,
+                            Song.Discnumber,
+                            Song.Tracknumber]
+
+        elif order == 'Album':
+            order_fields = [Song.Album,
+                            Song.Discnumber,
+                            Song.Tracknumber]
+
+        elif order == 'Year':
+            order_fields = [Song.Year,
+                            Song.Album,
+                            Song.Discnumber,
+                            Song.Tracknumber]
+        
+        elif order == 'Added':
+            order_fields = [Song.Added,
+                            Song.AlbumArtist,
+                            Song.Year,
+                            Song.Album,
+                            Song.Discnumber,
+                            Song.Tracknumber]
+        
+        elif order == 'Title':
+            order_fields = [Song.Title]
+       
+        elif order == 'Length':
+            order_fields = [Song.Length]
+       
+        elif order == 'Played':
+            order_fields = [Song.Played]
+        
+        if desc:
+            order_fields[0] = -order_fields[0]
+
+        return Song.select().order_by(*order_fields)
     
     def sync_artwork(self, lastfm_apikey):
         """ For every album with a missing cover try to fetch it """
@@ -134,3 +160,17 @@ class Library(object):
             WHERE song.album != '' and album.albumid IS NULL
             GROUP BY song.album 
         """)
+    
+    # def sadf(self):
+    #     with DB.atomic():
+    #         with gzip.open('', mode="rt") as f:
+    #             json_library = json.loads(f.read())
+    #             songs = json_library["songs"]
+    #             for index, x in enumerate(songs):
+    #                 for real in Song.select().where(Song.Path ** ('%' + x['path'][-20:])):
+    #                     if os.path.samefile(real.Path, x['path']):
+    #                         real.Added = udatetime.from_string(x.get('added', 0))
+    #                         real.save()
+    #                         break
+    #                 if (index % 10 == 0):
+    #                     print(f'{index}/{len(songs)}')

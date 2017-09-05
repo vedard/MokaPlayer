@@ -14,7 +14,7 @@ class Song(peewee.Model):
     AlbumArtist = peewee.CharField(null=True, index=True)
     Tracknumber = peewee.IntegerField(null=True, index=True)
     Genre = peewee.CharField(null=True)
-    Discnumber = peewee.IntegerField(null=True)
+    Discnumber = peewee.IntegerField(null=True, index=True)
     Comment = peewee.CharField(null=True)
     Year = peewee.CharField(null=True, index=True)
     Label = peewee.CharField(null=True)
@@ -64,7 +64,6 @@ class Song(peewee.Model):
                 self.Discnumber = 0
 
             self.AlbumArtist = self.AlbumArtist or self.Artist
-
 
         except:
             logging.exception('Could not read tag from ' + self.Path)

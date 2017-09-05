@@ -25,6 +25,185 @@
     <property name="icon_name">media-skip-backward</property>
     <property name="icon_size">1</property>
   </object>
+  <object class="GtkPopoverMenu" id="popup_sort">
+    <property name="can_focus">False</property>
+    <property name="position">left</property>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkCheckButton" id="chk_sort_desc">
+            <property name="label" translatable="yes">Descendant</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="margin_left">5</property>
+            <property name="margin_right">5</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">10</property>
+            <property name="draw_indicator">True</property>
+            <signal name="toggled" handler="on_sort_radio_toggled" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkRadioButton" id="radio_sort_artist">
+            <property name="label" translatable="yes">Artist</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="margin_left">5</property>
+            <property name="margin_right">5</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+            <property name="active">True</property>
+            <property name="draw_indicator">True</property>
+            <signal name="toggled" handler="on_sort_radio_toggled" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkRadioButton" id="radio_sort_album">
+            <property name="label" translatable="yes">Album</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="margin_left">5</property>
+            <property name="margin_right">5</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+            <property name="active">True</property>
+            <property name="draw_indicator">True</property>
+            <property name="group">radio_sort_artist</property>
+            <signal name="toggled" handler="on_sort_radio_toggled" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkRadioButton" id="radio_sort_title">
+            <property name="label" translatable="yes">Title</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="margin_left">5</property>
+            <property name="margin_right">5</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+            <property name="active">True</property>
+            <property name="draw_indicator">True</property>
+            <property name="group">radio_sort_artist</property>
+            <signal name="toggled" handler="on_sort_radio_toggled" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkRadioButton" id="radio_sort_year">
+            <property name="label" translatable="yes">Year</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="margin_left">5</property>
+            <property name="margin_right">5</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+            <property name="active">True</property>
+            <property name="draw_indicator">True</property>
+            <property name="group">radio_sort_artist</property>
+            <signal name="toggled" handler="on_sort_radio_toggled" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">4</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkRadioButton" id="radio_sort_length">
+            <property name="label" translatable="yes">Length</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="margin_left">5</property>
+            <property name="margin_right">5</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+            <property name="active">True</property>
+            <property name="draw_indicator">True</property>
+            <property name="group">radio_sort_artist</property>
+            <signal name="toggled" handler="on_sort_radio_toggled" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">5</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkRadioButton" id="radio_sort_added">
+            <property name="label" translatable="yes">Added</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="margin_left">5</property>
+            <property name="margin_right">5</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+            <property name="active">True</property>
+            <property name="draw_indicator">True</property>
+            <property name="group">radio_sort_artist</property>
+            <signal name="toggled" handler="on_sort_radio_toggled" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">6</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkRadioButton" id="radio_sort_played">
+            <property name="label" translatable="yes">Played</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="margin_left">5</property>
+            <property name="margin_right">5</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+            <property name="draw_indicator">True</property>
+            <property name="group">radio_sort_artist</property>
+            <signal name="toggled" handler="on_sort_radio_toggled" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">7</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="submenu">main</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+  </object>
   <object class="GtkAdjustment" id="volume_ajustement">
     <property name="upper">100</property>
     <property name="step_increment">1</property>
@@ -441,57 +620,56 @@
                 <property name="activatable">False</property>
                 <property name="selectable">False</property>
                 <child>
-                  <object class="GtkSearchEntry" id="txt_search">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="valign">center</property>
-                    <property name="margin_left">10</property>
-                    <property name="margin_right">10</property>
-                    <property name="margin_top">5</property>
-                    <property name="margin_bottom">5</property>
-                    <property name="primary_icon_name">edit-find-symbolic</property>
-                    <property name="primary_icon_activatable">False</property>
-                    <property name="primary_icon_sensitive">False</property>
-                    <property name="placeholder_text" translatable="yes">Search...</property>
-                    <signal name="activate" handler="on_txt_search_activate" swapped="no"/>
-                    <signal name="search-changed" handler="on_txt_search_search_changed" swapped="no"/>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkListBoxRow">
-                <property name="height_request">40</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="activatable">False</property>
-                <property name="selectable">False</property>
-                <child>
-                  <object class="GtkLabel">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="halign">start</property>
-                    <property name="margin_left">10</property>
-                    <property name="label" translatable="yes">Playing</property>
-                    <attributes>
-                      <attribute name="weight" value="bold"/>
-                    </attributes>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkListBoxRow">
-                <property name="height_request">40</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="halign">start</property>
-                    <property name="margin_left">20</property>
-                    <property name="label" translatable="yes">Lyrics</property>
+                    <child>
+                      <object class="GtkSearchEntry" id="txt_search">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="valign">center</property>
+                        <property name="margin_left">10</property>
+                        <property name="margin_right">2</property>
+                        <property name="margin_top">5</property>
+                        <property name="margin_bottom">5</property>
+                        <property name="primary_icon_name">edit-find-symbolic</property>
+                        <property name="primary_icon_activatable">False</property>
+                        <property name="primary_icon_sensitive">False</property>
+                        <property name="placeholder_text" translatable="yes">Search...</property>
+                        <signal name="activate" handler="on_txt_search_activate" swapped="no"/>
+                        <signal name="search-changed" handler="on_txt_search_search_changed" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkMenuButton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="margin_left">2</property>
+                        <property name="margin_right">10</property>
+                        <property name="margin_top">5</property>
+                        <property name="margin_bottom">5</property>
+                        <property name="relief">none</property>
+                        <property name="popover">popup_sort</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="stock">gtk-sort-ascending</property>
+                          </object>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                 </child>
               </object>
@@ -648,6 +826,7 @@
                     <property name="sizing">fixed</property>
                     <property name="title" translatable="yes">Title</property>
                     <property name="expand">True</property>
+                    <property name="reorderable">True</property>
                     <child>
                       <object class="GtkCellRendererText"/>
                       <attributes>
@@ -662,6 +841,7 @@
                     <property name="sizing">fixed</property>
                     <property name="title" translatable="yes">Artist</property>
                     <property name="expand">True</property>
+                    <property name="reorderable">True</property>
                     <child>
                       <object class="GtkCellRendererText"/>
                       <attributes>
@@ -676,6 +856,7 @@
                     <property name="sizing">fixed</property>
                     <property name="title" translatable="yes">Album</property>
                     <property name="expand">True</property>
+                    <property name="reorderable">True</property>
                     <child>
                       <object class="GtkCellRendererText"/>
                       <attributes>
@@ -691,6 +872,7 @@
                     <property name="min_width">75</property>
                     <property name="max_width">75</property>
                     <property name="title" translatable="yes">Length</property>
+                    <property name="reorderable">True</property>
                     <child>
                       <object class="GtkCellRendererText"/>
                       <attributes>
@@ -706,6 +888,7 @@
                     <property name="min_width">75</property>
                     <property name="max_width">75</property>
                     <property name="title" translatable="yes">Year</property>
+                    <property name="reorderable">True</property>
                     <child>
                       <object class="GtkCellRendererText"/>
                       <attributes>
@@ -719,10 +902,27 @@
                     <property name="resizable">True</property>
                     <property name="sizing">fixed</property>
                     <property name="title" translatable="yes">Added</property>
+                    <property name="reorderable">True</property>
                     <child>
                       <object class="GtkCellRendererText"/>
                       <attributes>
                         <attribute name="text">6</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkTreeViewColumn" id="col_played">
+                    <property name="resizable">True</property>
+                    <property name="sizing">fixed</property>
+                    <property name="min_width">75</property>
+                    <property name="max_width">75</property>
+                    <property name="title" translatable="yes">Played</property>
+                    <property name="reorderable">True</property>
+                    <child>
+                      <object class="GtkCellRendererText"/>
+                      <attributes>
+                        <attribute name="text">7</attribute>
                       </attributes>
                     </child>
                   </object>
