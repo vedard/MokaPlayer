@@ -2,6 +2,7 @@ import threading
 import time
 import datetime
 import arrow
+import signal
 
 from gi.repository import Gtk
 from gi.repository import Gdk
@@ -22,6 +23,7 @@ class MainWindow(Gtk.Window):
         
         self.connect("destroy", self.on_window_destroy)
         self.connect("key-press-event", self.on_window_key_press)
+        signal.signal(signal.SIGTERM, self.on_SIGTERM)
         
         self.builder = Gtk.Builder()
         self.builder.add_from_file('musicplayer/ui/gtk/resources/main_window.ui')
@@ -120,6 +122,10 @@ class MainWindow(Gtk.Window):
                 self.gridview.scroll_to_cell(row.path, use_align=True)
                 self.gridview.grab_focus()
                 break
+
+    def on_SIGTERM(self, signum, frame):
+        self.player.save()
+        Gtk.main_quit()
 
     def on_window_destroy(self, widget):
         self.player.save()
