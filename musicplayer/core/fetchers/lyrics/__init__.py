@@ -27,4 +27,4 @@ def get(title, artist, album=''):
 
     return False, ("Lyrics not found, try this: " +
                    "https://google.ca/search?q=" +
-                   requests.utils.quote('{} {} lyrics').format(artist, title))
+                   requests.utils.quote(f'{artist} {title} lyrics'))

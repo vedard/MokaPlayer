@@ -61,12 +61,16 @@ class Player(object):
             self.__set_play_count()
             self.queue.next()
             self.streamer.play(self.queue.peek())
+        else:
+            self.stop()
 
     def prev(self):
         if len(self.queue):
             self.__set_play_count()
             self.queue.prev()
             self.streamer.play(self.queue.peek())
+        else:
+            self.stop()
     
     def restore(self):
         try:

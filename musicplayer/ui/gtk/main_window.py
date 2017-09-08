@@ -12,8 +12,10 @@ from musicplayer.core.configuration import Configuration
 from musicplayer.ui.gtk.adapter_song import AdapterSong
 from musicplayer.ui.gtk.about_window import AboutWindow
 from musicplayer.ui.gtk.lyrics_window import LyricsWindow
+from musicplayer.ui.gtk.tabs_window import TabsWindow
 from musicplayer.ui.gtk.help_shortcuts_window import HelpShortcutsWindow
 from musicplayer.ui.gtk import image_helper
+from musicplayer.ui.gtk import file_helper
 
 class MainWindow(Gtk.Window):
     def __init__(self):
@@ -86,6 +88,7 @@ class MainWindow(Gtk.Window):
         self.radio_sort_added = self.builder.get_object('radio_sort_added')
         self.radio_sort_played = self.builder.get_object('radio_sort_played')
         self.chk_sort_desc = self.builder.get_object('chk_sort_desc')
+        self.menu_gridview = self.builder.get_object('menu_gridview')
         self.add(self.content)
     
     def __set_current_song_info(self):
@@ -94,8 +97,11 @@ class MainWindow(Gtk.Window):
 
         if song:
             album = self.player.library.get_album(song.Album)
-            self.lbl_current_song_infos.set_text(f'{song.Artist} - {song.Album} ({song.Year})')
             self.lbl_current_title.set_text(song.Title)
+            self.lbl_current_song_infos.set_text(f'{song.Artist} - {song.Album} ({song.Year})')
+        elif self.player.queue.peek():
+            self.lbl_current_title.set_text(self.player.queue.peek())
+            self.lbl_current_song_infos.set_text('(Not in library)')
         else:
             self.lbl_current_title.set_text('')
             self.lbl_current_song_infos.set_text('')
@@ -122,6 +128,20 @@ class MainWindow(Gtk.Window):
                 self.gridview.scroll_to_cell(row.path, use_align=True)
                 self.gridview.grab_focus()
                 break
+    
+    def __show_lyrics(self, path):
+        song = self.player.library.get_song(path)
+        w = LyricsWindow()
+        w.start_fetch(song)
+        w.get_window().set_transient_for(self)
+        w.get_window().show()
+
+    def __show_tabs(self, path):
+        song = self.player.library.get_song(path)
+        w = TabsWindow()
+        w.start_fetch(song)
+        w.get_window().set_transient_for(self)
+        w.get_window().show()
 
     def on_SIGTERM(self, signum, frame):
         self.player.save()
@@ -138,11 +158,7 @@ class MainWindow(Gtk.Window):
         if ctrl and keyval_name == 'f':
             self.txt_search.grab_focus()
         elif ctrl and keyval_name == 'l':
-            song = self.player.library.get_song(self.player.queue.peek())
-            w = LyricsWindow()
-            w.start_fetch(song)
-            w.get_window().set_transient_for(self)
-            w.get_window().show()
+            self.__show_lyrics(self.player.queue.peek())
         elif ctrl and keyval_name == 'o':
             self.__focus_song(self.player.queue.peek())
         elif ctrl and keyval_name == 'Left':
@@ -153,6 +169,46 @@ class MainWindow(Gtk.Window):
             return False
 
         return True
+
+    def on_gridview_button_press_event(self, sender, event):
+        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
+            self.menu_gridview.popup( None, None, None, None, event.button, event.time)
+            return True
+    
+    def on_menu_gridview_append_activate(self, widget):
+        self.player.queue.append(self.__get_selected_songs_in_gridview())
+
+    def on_menu_gridview_insert_activate(self, widget):
+        self.player.queue.prepend(self.__get_selected_songs_in_gridview())
+
+    def on_menu_gridview_replace_activate(self, widget):
+        self.player.queue.clear()
+        self.player.queue.append(self.__get_selected_songs_in_gridview())
+
+    def on_menu_gridview_edit_activate(self, widget):
+        pass
+
+    def on_menu_gridview_tabs_activate(self, widget):
+        selected_songs = self.__get_selected_songs_in_gridview()
+        if any(selected_songs):
+            self.__show_tabs(selected_songs[0])
+
+    def on_menu_gridview_lyrics_activate(self, widget):
+        selected_songs = self.__get_selected_songs_in_gridview()
+        if any(selected_songs):
+            self.__show_lyrics(selected_songs[0])
+
+    def on_menu_gridview_folder_activate(self, widget):
+        selected_songs = self.__get_selected_songs_in_gridview()
+        if any(selected_songs):
+            file_helper.open_folder(selected_songs[0])
+    
+    def __get_selected_songs_in_gridview(self):
+        model, pathlist = self.gridview.get_selection().get_selected_rows()
+        result = []
+        for path in pathlist:
+            result.append(model[path][0])
+        return result
     
     def on_gridview_row_activated(self, widget, path, column):
         self.player.seek(self.model[path][0])
@@ -185,14 +241,18 @@ class MainWindow(Gtk.Window):
         self.model.refilter()
 
     def on_player_open_stream_activate(self, event):
-        pass
+        d = InputBox(self, "Url")
+        t = d.get_text()
+        if t:
+            print(t)
+            self.player.seek(t)
 
     def on_player_preferences_activate(self, event):
         pass
 
     def on_player_quit_activate(self, event):
         Gtk.main_quit()
-
+        
     def on_library_scan_activate(self, event):
         threading.Thread(target=self.player.library.sync).start() 
 
