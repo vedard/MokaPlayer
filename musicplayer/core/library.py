@@ -1,4 +1,5 @@
 import logging
+import peewee
 import mimetypes
 import pathlib
 
@@ -64,6 +65,7 @@ class Library(object):
                             Song.Tracknumber]
         
         elif order == 'Added':
+            peewee.DateField()
             order_fields = [Song.Added,
                             Song.AlbumArtist,
                             Song.Year,
@@ -104,8 +106,11 @@ class Library(object):
         Raises:
             ValueError: When musics_folder is not set
         """
-        if self._musics_folder is None:
+        if self._musics_folder is None or not pathlib.Path(self._musics_folder).is_dir():
             raise ValueError('Invalid music folder')
+        
+        print(self._musics_folder)
+        logging.info(f"Scanning {self._musics_folder}")
 
         logging.debug('Library sync started')
         self.__sync_songs()
@@ -161,9 +166,10 @@ class Library(object):
             GROUP BY song.album 
         """)
     
-    # def sadf(self):
+    # def vplayer_library_converter(self):
+    #     import udatetime, json, gzip, os
     #     with DB.atomic():
-    #         with gzip.open('', mode="rt") as f:
+    #         with gzip.open('/run/media/vincent/D-DRV/Documents/Autre/Dotfiles/VPlayer/library.gz', mode="rt") as f:
     #             json_library = json.loads(f.read())
     #             songs = json_library["songs"]
     #             for index, x in enumerate(songs):

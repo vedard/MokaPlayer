@@ -19,7 +19,7 @@ class Song(peewee.Model):
     Year = peewee.CharField(null=True, index=True)
     Label = peewee.CharField(null=True)
     Lyrics = peewee.CharField(null=True)
-    Added = peewee.DateTimeField(default=datetime.datetime.now, index=True)
+    Added = peewee.DateField(default=datetime.datetime.now, index=True)
     Last_played = peewee.DateTimeField(null=True)
     Played = peewee.IntegerField(default=0)
     Length = peewee.IntegerField(null=True)

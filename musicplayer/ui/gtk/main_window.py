@@ -13,11 +13,14 @@ from musicplayer.ui.gtk.adapter_song import AdapterSong
 from musicplayer.ui.gtk.about_window import AboutWindow
 from musicplayer.ui.gtk.lyrics_window import LyricsWindow
 from musicplayer.ui.gtk.tabs_window import TabsWindow
+from musicplayer.ui.gtk.tagseditor_window import TagsEditorWindow
 from musicplayer.ui.gtk.help_shortcuts_window import HelpShortcutsWindow
 from musicplayer.ui.gtk import image_helper
 from musicplayer.ui.gtk import file_helper
 
 class MainWindow(Gtk.Window):
+    """ Fenetre principale de l'application
+    """
     def __init__(self):
         Gtk.Window.__init__(self, title="Music Player", default_width=1366, default_height=768)
         
@@ -107,9 +110,9 @@ class MainWindow(Gtk.Window):
             self.lbl_current_song_infos.set_text('')
 
         if album:
-            self.img_current_album.set_from_pixbuf(image_helper.load(album.Cover, 100, 100))
+            self.img_current_album.set_from_pixbuf(image_helper.load(album.Cover, 128, 128))
         else:
-            self.img_current_album.set_from_pixbuf(image_helper.load(None, 100, 100))
+            self.img_current_album.set_from_pixbuf(image_helper.load(None, 128, 128))
         
     def __set_current_play_icon(self):
         if self.player.streamer.state == self.player.streamer.State.PLAYING:
@@ -142,6 +145,15 @@ class MainWindow(Gtk.Window):
         w.start_fetch(song)
         w.get_window().set_transient_for(self)
         w.get_window().show()
+
+    def __show_tagseditor(self, paths):
+        songs = self.player.library.get_songs(paths)
+        w = TagsEditorWindow(songs)
+        w.get_window().show()
+
+    def __library_scan(self):
+        self.player.library.sync()
+        GObject.idle_add(self.on_library_scan_finished)
 
     def on_SIGTERM(self, signum, frame):
         self.player.save()
@@ -186,7 +198,9 @@ class MainWindow(Gtk.Window):
         self.player.queue.append(self.__get_selected_songs_in_gridview())
 
     def on_menu_gridview_edit_activate(self, widget):
-        pass
+        selected_songs = self.__get_selected_songs_in_gridview()
+        if any(selected_songs):
+            self.__show_tagseditor(self.__get_selected_songs_in_gridview())
 
     def on_menu_gridview_tabs_activate(self, widget):
         selected_songs = self.__get_selected_songs_in_gridview()
@@ -255,6 +269,10 @@ class MainWindow(Gtk.Window):
         
     def on_library_scan_activate(self, event):
         threading.Thread(target=self.player.library.sync).start() 
+    
+    
+    def on_library_scan_finished(self):
+        self.on_sort_radio_toggled(None)
 
     def on_library_artworks_activate(self, event):
         threading.Thread(target=lambda: self.player.library.sync_artwork(self.configuration['lastfm']['api_key'])).start() 
@@ -292,7 +310,7 @@ class MainWindow(Gtk.Window):
         position_text = arrow.get(0).shift(seconds=position).format('mm:ss')
         duration_text = arrow.get(0).shift(seconds=duration).format('mm:ss')
 
-        self.lbl_current_time.set_text(f'{position_text} / {duration_text}')
+        self.lbl_current_time.set_text(f'[{position_text}/{duration_text}]')
         self.prb_current_time.set_fraction(fraction)
 
         return True    
