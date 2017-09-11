@@ -36,7 +36,9 @@ class MainWindow(Gtk.Window):
         
         self.__get_object()
 
-        self.player = Player(self.on_audio_changed, self.on_volume_changed)
+        self.player = Player(self.on_audio_changed, 
+                             self.on_volume_changed,
+                             self.on_player_state_changed)
         self.player.restore()
 
         self.__set_model(AdapterSong.create_store())
@@ -239,6 +241,9 @@ class MainWindow(Gtk.Window):
     
     def on_audio_changed(self, data):
         GObject.idle_add(self.__set_current_song_info)
+        GObject.idle_add(self.__set_current_play_icon)
+    
+    def on_player_state_changed(self):
         GObject.idle_add(self.__set_current_play_icon)
 
     def on_volume_changed(self, data1, data2):
