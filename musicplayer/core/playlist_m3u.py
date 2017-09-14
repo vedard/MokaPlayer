@@ -9,8 +9,8 @@ class PlaylistM3u:
         name: A string representing the name of the file 
     """
     def __init__(self, location):
-        if not pathlib.Path(location).is_file():
-            raise ValueError('file does not exist for: ' + location)
+        if not pathlib.Path(location).parent.is_dir():
+            raise ValueError('Directory does not exist for: ' + filename)
 
         self._location = location
         self._name = ''

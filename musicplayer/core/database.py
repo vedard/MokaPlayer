@@ -33,6 +33,27 @@ class Song(peewee.Model):
         l = tags.get(name, [''])
         return l[0] if any(l) else ''
 
+    def write_tags(self):
+        """ Write tags in the file
+        """
+        try:
+            fileref = taglib.File(self.Path)
+            
+            fileref.tags['TITLE'] = [self.Title]
+            fileref.tags['ALBUM'] = [self.Album]
+            fileref.tags['ARTIST'] = [self.Artist]
+            fileref.tags['DISCNUMBER'] = [str(self.Discnumber)]
+            fileref.tags['COMMENT'] = [self.Comment]
+            fileref.tags['DATE'] = [self.Year]
+            fileref.tags['LABEL'] = [self.Label]
+            fileref.tags['GENRE'] = [self.Genre]
+            fileref.tags['TRACKNUMBER'] = [str(self.Tracknumber)]
+            fileref.tags['ALBUMARTIST'] = [self.AlbumArtist]
+            
+            fileref.save()
+        except:
+            logging.exception('Could not write tag to ' + self.path)
+
     def read_tags(self):
         """ Read tags from the file
         """
