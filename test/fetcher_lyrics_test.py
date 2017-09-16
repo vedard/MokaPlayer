@@ -6,6 +6,7 @@ class FetcherLyricsTest(unittest.TestCase):
 
     def test_lyrics_fetcher(self):
         success, lyrics = lyricsfetcher.get('Thriller', 'Michael Jackson', 'Thriller')
+        self.assertTrue(success)
         self.assertNotRegex(lyrics, 'Lyrics not found')
 
     def test_provider_musicmatch(self):

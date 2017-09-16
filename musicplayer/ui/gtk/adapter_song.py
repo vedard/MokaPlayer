@@ -31,4 +31,7 @@ class AdapterSong:
         if not text:
             return True
         else:
-            return any(re.search(text, col, re.RegexFlag.IGNORECASE) for col in row)
+            try:
+                return any(re.search(text, col, re.RegexFlag.IGNORECASE) for col in row)
+            except re.error:
+                return False # regex syntax error
