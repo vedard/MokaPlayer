@@ -8,7 +8,6 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 from musicplayer.core.player import Player
-from musicplayer.core.configuration import Configuration
 from musicplayer.ui.gtk.adapter_song import AdapterSong
 from musicplayer.ui.gtk.about_window import AboutWindow
 from musicplayer.ui.gtk.lyrics_window import LyricsWindow
@@ -21,14 +20,18 @@ from musicplayer.ui.gtk import file_helper
 class MainWindow(Gtk.Window):
     """ Fenetre principale de l'application
     """
-    def __init__(self):
+    def __init__(self, appconfig, userconfig):
         Gtk.Window.__init__(self, title="Music Player", default_width=1366, default_height=768)
         
-        self.configuration = Configuration()
+        self.appconfig = appconfig
+        self.userconfig = userconfig
         
         self.connect("destroy", self.on_window_destroy)
         self.connect("key-press-event", self.on_window_key_press)
         signal.signal(signal.SIGTERM, self.on_SIGTERM)
+        signal.signal(signal.SIGHUP, self.on_SIGTERM)
+        signal.signal(signal.SIGINT, self.on_SIGTERM)
+        signal.signal(signal.SIGQUIT, self.on_SIGTERM)
         
         self.builder = Gtk.Builder()
         self.builder.add_from_file('musicplayer/ui/gtk/resources/main_window.ui')
@@ -36,7 +39,9 @@ class MainWindow(Gtk.Window):
         
         self.__get_object()
 
-        self.player = Player(self.on_audio_changed, 
+        self.player = Player(self.appconfig,
+                             self.userconfig,
+                             self.on_audio_changed, 
                              self.on_volume_changed,
                              self.on_player_state_changed)
         self.player.restore()
@@ -105,7 +110,7 @@ class MainWindow(Gtk.Window):
             self.lbl_current_title.set_text(song.Title)
             self.lbl_current_song_infos.set_text(f'{song.Artist} - {song.Album} ({song.Year})')
         elif self.player.queue.peek():
-            self.lbl_current_title.set_text(self.player.queue.peek())
+            self.lbl_current_title.set_text('')
             self.lbl_current_song_infos.set_text('(Not in library)')
         else:
             self.lbl_current_title.set_text('')
@@ -280,7 +285,7 @@ class MainWindow(Gtk.Window):
         self.on_sort_radio_toggled(None)
 
     def on_library_artworks_activate(self, event):
-        threading.Thread(target=lambda: self.player.library.sync_artwork(self.configuration['lastfm']['api_key'])).start() 
+        threading.Thread(target=lambda: self.player.library.sync_artwork(self.appconfig.LASTFM_SECRET_API_KEY)).start() 
 
     def on_queue_add_activate(self, event):
         self.player.queue.clear()

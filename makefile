@@ -1,5 +1,5 @@
 run:
-	python3 application.py
+	python3 application.py --debug
 
 clean:
 	find . -type f -name "*.py[co]" -delete 
@@ -7,7 +7,7 @@ clean:
 	find . -type d -name "__pycache__" -delete
 
 test:
-	python3 -m unittest discover musicplayer "*_test.py"
+	python3 -m unittest discover test "*_test.py"
 
 init:
 	pip3 install -r requirements.txt

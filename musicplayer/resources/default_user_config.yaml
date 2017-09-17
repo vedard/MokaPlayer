@@ -1,9 +1,5 @@
-database:
-  file: musicplayer.db
 library:
   music_directory: 
   playlist_directory:
 player:
   restore_state: Yes
-lastfm:
-  api_key: 

@@ -8,7 +8,6 @@ from threading import Thread
 
 from musicplayer.core.queue import Queue
 from musicplayer.core.event import Event
-from musicplayer.core.configuration import Configuration
 from musicplayer.core.library import Library
 from musicplayer.core.streamer import Streamer
 from musicplayer.core.keyboard import KeyboardClient
@@ -16,19 +15,17 @@ from musicplayer.core.keyboard import KeyboardClient
 
 class Player(object):
 
-    def __init__(self, audio_changed=None, notify_volume=None, state_changed=None):
+    def __init__(self, appconfig, userconfig, audio_changed=None, notify_volume=None, state_changed=None):
         self.state_change = Event()
         self.state_change.subscribe(state_changed)
-        self.configuration = Configuration()
+        self.appconfig = appconfig
+        self.userconfig = userconfig
         self.queue = Queue()
         self.streamer = Streamer(about_to_finish=self.__about_to_finish,
                                  audio_changed=audio_changed,
                                  notify_volume=notify_volume)
                                  
-        self.library = Library(self.configuration["database"]["file"],
-                               self.configuration["library"]["music_directory"],
-                               self.configuration["library"]["playlist_directory"],
-                               pathlib.Path(self.configuration.CACHE_DIRECTORY) / 'artworks' )
+        self.library = Library(self.appconfig, self.userconfig)
         KeyboardClient(self)
 
     def play(self):
@@ -87,8 +84,8 @@ class Player(object):
 
     def restore(self):
         try:
-            if (pathlib.Path(self.configuration.CACHE_DIRECTORY) / 'state.gz').is_file():
-                with gzip.open(pathlib.Path(self.configuration.CACHE_DIRECTORY) / 'state.gz', 'rt') as file:
+            if pathlib.Path(self.appconfig.PLAYER_CACHE_FILE).is_file():
+                with gzip.open(self.appconfig.PLAYER_CACHE_FILE, 'rt') as file:
                     data = json.load(file)
 
                     self.streamer.volume = data['Volume']
@@ -98,20 +95,21 @@ class Player(object):
                     self.pause()
                     time.sleep(0.3)
                     self.streamer.position = data['Position']
-        except:
-            logging.error('Could not restore player state')
+        except Exception as e:
+            logging.exception('Could not restore player state')
 
     def save(self):
         try:
-            with gzip.open(pathlib.Path(self.configuration.CACHE_DIRECTORY) / 'state.gz', 'wt') as file:
+            pathlib.Path(self.appconfig.PLAYER_CACHE_FILE).parent.mkdir(exist_ok=True)
+            with gzip.open(self.appconfig.PLAYER_CACHE_FILE, 'wt') as file:
                 json.dump({
                     "Queue": list(self.queue),
                     "Current": self.queue.peek(),
                     "Position": self.streamer.position,
                     "Volume": self.streamer.volume,
                 }, file)
-        except:
-            logging.error('Could not save player state')
+        except Exception as e:
+            logging.exception('Could not save player state')
 
     def __about_to_finish(self, data):
         self.__set_play_count()

@@ -16,17 +16,20 @@ class Library(object):
 
     """
 
-    def __init__(self, database_path, musics_folder=None, playlists_folder=None, artworks_folder=None):
-        DB.init(database_path)
+    def __init__(self, appconfig, userconfig):
+        DB.init(appconfig.DATABASE_FILE)
 
         Song.create_table(True)
         Album.create_table(True)
         Artist.create_table(True)
         Playlist.create_table(True)
 
-        self._musics_folder = musics_folder
-        self._playlists_folder = playlists_folder
-        self._artworks_folder = artworks_folder
+        self.appconfig = appconfig
+        self.userconfig = userconfig
+
+        self._musics_folder = self.userconfig["library"]["music_directory"]
+        self._playlists_folder = self.userconfig["library"]["playlist_directory"]
+        self._artworks_folder = self.appconfig.ARTWORK_CACHE_DIRECTORY
     
     def get_songs(self, path_list):
         return Song.select().where(Song.Path << path_list)
@@ -109,7 +112,6 @@ class Library(object):
         if self._musics_folder is None or not pathlib.Path(self._musics_folder).is_dir():
             raise ValueError('Invalid music folder')
         
-        print(self._musics_folder)
         logging.info(f"Scanning {self._musics_folder}")
 
         logging.debug('Library sync started')

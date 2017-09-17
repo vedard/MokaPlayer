@@ -1,4 +1,3 @@
 pyyaml
 appdirs
-sqlite3
 peewee

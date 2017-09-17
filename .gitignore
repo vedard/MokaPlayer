@@ -2,3 +2,5 @@ __pycache__
 *.ui~
 *.db
 .vscode
+secret.py
+dev_config.yaml

@@ -3,6 +3,7 @@ import unittest
 import pathlib
 
 from musicplayer.core.fetchers import artworks as artworksfetcher
+from musicplayer.config import appconfig
 
 class FetcherArtworkTest(unittest.TestCase):
 
@@ -17,12 +18,12 @@ class FetcherArtworkTest(unittest.TestCase):
 
     def test_artwork_fetcher(self):
         artist_artwork = artworksfetcher.get_artist_artwork(
-            '',
+            appconfig.Testing.LASTFM_SECRET_API_KEY,
             FetcherArtworkTest.FOLDER,
             'Michael Jackson'
         )
         album_artwork = artworksfetcher.get_album_artwork(
-            '',
+            appconfig.Testing.LASTFM_SECRET_API_KEY,
             FetcherArtworkTest.FOLDER,
             'Thriller',
             'Michael Jackson',
@@ -34,7 +35,7 @@ class FetcherArtworkTest(unittest.TestCase):
         
 
     def test_lastfm_provider(self):
-        provider = artworksfetcher.ProviderLastFM(api_key='',
+        provider = artworksfetcher.ProviderLastFM(api_key=appconfig.Testing.LASTFM_SECRET_API_KEY,
                                                   artwork_folder=FetcherArtworkTest.FOLDER)
 
         artist_artwork = provider.get_artist_artwork('Michael Jackson')
