@@ -2,54 +2,45 @@ import threading
 import time
 import datetime
 import arrow
-import signal
+import logging
 
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 from musicplayer.core.player import Player
-from musicplayer.ui.gtk.adapter_song import AdapterSong
-from musicplayer.ui.gtk.about_window import AboutWindow
-from musicplayer.ui.gtk.lyrics_window import LyricsWindow
-from musicplayer.ui.gtk.tabs_window import TabsWindow
-from musicplayer.ui.gtk.tagseditor_window import TagsEditorWindow
-from musicplayer.ui.gtk.help_shortcuts_window import HelpShortcutsWindow
-from musicplayer.ui.gtk import image_helper
-from musicplayer.ui.gtk import file_helper
+from musicplayer.ui.gtk.helper import image_helper, file_helper
+from musicplayer.ui.gtk.adapter import AdapterSong
+from musicplayer.ui.gtk.windows import AboutWindow
+from musicplayer.ui.gtk.windows import LyricsWindow
+from musicplayer.ui.gtk.windows import TabsWindow
+from musicplayer.ui.gtk.windows import TagsEditorWindow
+from musicplayer.ui.gtk.windows import HelpShortcutsWindow
 
 class MainWindow(Gtk.Window):
     """ Fenetre principale de l'application
     """
-    def __init__(self, appconfig, userconfig):
-        Gtk.Window.__init__(self, title="Music Player", default_width=1366, default_height=768)
+    def __init__(self, appconfig, userconfig, player):
+        Gtk.ApplicationWindow.__init__(self, title="Music Player", default_width=1366, default_height=768)
         
         self.appconfig = appconfig
         self.userconfig = userconfig
+        self.player = player
+        self.player.state_changed.subscribe(self.on_player_state_changed)
+        self.player.audio_changed.subscribe(self.on_audio_changed)
+        self.player.volume_changed.subscribe(self.on_volume_changed)
         
         self.connect("destroy", self.on_window_destroy)
         self.connect("key-press-event", self.on_window_key_press)
-        signal.signal(signal.SIGTERM, self.on_SIGTERM)
-        signal.signal(signal.SIGHUP, self.on_SIGTERM)
-        signal.signal(signal.SIGINT, self.on_SIGTERM)
-        signal.signal(signal.SIGQUIT, self.on_SIGTERM)
         
         self.builder = Gtk.Builder()
         self.builder.add_from_file('musicplayer/ui/gtk/resources/main_window.ui')
         self.builder.connect_signals(self)
         
         self.__get_object()
-
-        self.player = Player(self.appconfig,
-                             self.userconfig,
-                             self.on_audio_changed, 
-                             self.on_volume_changed,
-                             self.on_player_state_changed)
-        self.player.restore()
-
         self.__set_model(AdapterSong.create_store())
         self.__set_current_song_info()
+        self.on_volume_changed()
 
-        threading.Thread(target=lambda:self.player.restore()).start()
         threading.Thread(target=lambda:self.__create_model(self.player.library.search_song())).start()
 
         GObject.timeout_add(500, self.on_tick, None)
@@ -59,12 +50,11 @@ class MainWindow(Gtk.Window):
         start = time.perf_counter()
 
         for row in reversed(data):
-            model.insert_with_valuesv(0, 
-                                      AdapterSong.create_col_number(),
+            model.insert_with_valuesv(0, AdapterSong.create_col_number(),
                                       AdapterSong.create_row(row))
 
         end = time.perf_counter()
-        print(end - start)
+        logging.info(f'Model created in {str(end-start)} second(s)')
 
         GObject.idle_add(lambda: self.__set_model(model))
     
@@ -162,10 +152,6 @@ class MainWindow(Gtk.Window):
         self.player.library.sync()
         GObject.idle_add(self.on_library_scan_finished)
 
-    def on_SIGTERM(self, signum, frame):
-        self.player.save()
-        Gtk.main_quit()
-
     def on_window_destroy(self, widget):
         self.player.save()
         Gtk.main_quit()
@@ -244,14 +230,14 @@ class MainWindow(Gtk.Window):
     def on_btn_previous_clicked(self, widget):
         self.player.prev()
     
-    def on_audio_changed(self, data):
+    def on_audio_changed(self):
         GObject.idle_add(self.__set_current_song_info)
         GObject.idle_add(self.__set_current_play_icon)
     
     def on_player_state_changed(self):
         GObject.idle_add(self.__set_current_play_icon)
 
-    def on_volume_changed(self, data1, data2):
+    def on_volume_changed(self):
         self.volume_scale.set_value(self.player.streamer.volume * 100)
     
     def on_volume_scale_value_changed(self, widget):

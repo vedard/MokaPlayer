@@ -16,6 +16,7 @@ class ProviderBase(object):
                 "Accept": "*/*"
             }
 
+            logging.info('Fetching ' + url)
             response = requests.get(url, headers=headers)
 
             if response.ok:

@@ -90,18 +90,20 @@ class Library(object):
 
         return Song.select().order_by(*order_fields)
     
-    def sync_artwork(self, lastfm_apikey):
+    def sync_artwork(self):
         """ For every album with a missing cover try to fetch it """
         list_album = Album.select()
         with DB.atomic():
             for index, album in enumerate(list_album):
                 if not album.Cover or not pathlib.Path(album.Cover).exists():
                     path = pathlib.Path(album.Path).parent if pathlib.Path(album.Path).is_file else album.Path
-                    cover = artworks.get_album_artwork(lastfm_apikey, self._artworks_folder, album.Name, album.Artist, path)
+                    cover = artworks.get_album_artwork(self.appconfig.LASTFM_SECRET_API_KEY, self._artworks_folder, album.Name, album.Artist, path)
                     album.Cover = cover
                     album.save()
                 if index % 10 == 0:
-                    print(f'{index}/{len(list_album)}')
+                    logging.info(f'Artworks fetch {index}/{len(list_album)}')
+
+        logging.info(f'Artworks fetch completed')
 
     def sync(self):
         """Synchronize data from library and actual data in the musics folder
@@ -114,11 +116,11 @@ class Library(object):
         
         logging.info(f"Scanning {self._musics_folder}")
 
-        logging.debug('Library sync started')
+        logging.info('Library sync started')
         self.__sync_songs()
         self.__sync_artists()
         self.__sync_albums()
-        logging.debug('Library sync ended')
+        logging.info('Library sync ended')
 
     def __sync_songs(self):
         list_all_path = set(str(x.resolve(False)) for x in pathlib.Path(self._musics_folder).glob('**/*') if not x.is_dir())
@@ -133,13 +135,16 @@ class Library(object):
                     s = Song(Path=path)
                     s.read_tags()
                     s.save()
-                    if index % 10 == 0:
-                        print(f'{index}/{len(list_new_path)}')
+                if index % 10 == 0:
+                    logging.info(f'Scanning songs {index}/{len(list_new_path)}')
 
             for song in list_deleted_song:
                 Song.delete().where(Song.Path == song).execute()
 
+        logging.info(f'Scanning songs completed')
+
     def __sync_playlists(self):
+        logging.info('Scanning playlists')
         if self._playlists_folder is None or not pathlib.Path(self._playlists_folder).is_dir():
             return
 
@@ -152,6 +157,7 @@ class Library(object):
                 Playlist(Name=playlist.name, Path=playlist.location).save()
 
     def __sync_artists(self):
+        logging.info('Scanning artists')
         DB.execute_sql("""
             INSERT INTO ARTIST ('Name') 
             SELECT DISTINCT AlbumArtist FROM Song 
@@ -160,6 +166,7 @@ class Library(object):
         """)
 
     def __sync_albums(self):
+        logging.info('Scanning albums')
         DB.execute_sql("""
             INSERT INTO album ('Name', 'Year', 'Path', 'Artist')
             SELECT song.album, song.year, song.path, CASE WHEN song.albumartist ='' THEN song.artist ELSE song.albumartist END FROM song  

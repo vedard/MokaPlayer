@@ -2,7 +2,7 @@ from gi.repository import Gtk
 import arrow
 import re
 
-from musicplayer.ui.gtk import date_helper
+from musicplayer.ui.gtk.helper import date_helper
 
 class AdapterSong:
     @staticmethod

@@ -2,8 +2,8 @@ from threading import Thread
 from gi.repository import Gtk
 from gi.repository import GObject
 from musicplayer.core.fetchers import tabs as tabs_fetcher
-from musicplayer.ui.gtk.adapter_tab import AdapterTab
-from musicplayer.ui.gtk import file_helper
+from musicplayer.ui.gtk.adapter import AdapterTab
+from musicplayer.ui.gtk.helper import file_helper
 
 
 class TabsWindow():

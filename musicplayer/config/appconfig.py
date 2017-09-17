@@ -21,7 +21,7 @@ class Developpement(Default):
     USER_CONFIG_FILE = 'dev_config.yaml'
     PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'dev', 'player.gz' )
     ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'dev', 'artworks' )
-    LOG_LEVEL = 'DEBUG'
+    LOG_LEVEL = 'INFO'
 
 
 class Testing(Default):
@@ -29,7 +29,7 @@ class Testing(Default):
     USER_CONFIG_FILE = 'test_config.yaml'
     PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'test', 'player.gz' )
     ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'test', 'artworks' )
-    LOG_LEVEL = 'DEBUG'
+    LOG_LEVEL = 'INFO'
 
 
 class Production(Default):
@@ -37,4 +37,4 @@ class Production(Default):
     USER_CONFIG_FILE = os.path.join(Default.USER_DIRECTORY, 'config.yaml')
     PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'player.gz' )
     ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'artworks' )
-    LOG_LEVEL = 'INFO'
+    LOG_LEVEL = 'WARNING'

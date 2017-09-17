@@ -73,13 +73,17 @@ class ProviderLastFM(object):
             return None
 
     def _save_image_from_url(self, url, filename):
-        response = requests.get(url)
-        if response.ok:
-            pathlib.Path(filename).parent.mkdir(exist_ok=True)
+        try:
+            response = requests.get(url)
+            if response.ok:
+                pathlib.Path(filename).parent.mkdir(exist_ok=True)
 
-            with open(filename, 'wb') as f:
-                f.write(response.content)
-                return True
-        else:
-            logging.error('Could not download image from ' + url + 'response was not OK')
+                with open(filename, 'wb') as f:
+                    f.write(response.content)
+                    return True
+            else:
+                logging.error('Could not download image from ' + url + 'response was not OK')
+                return False
+        except:
+            logging.error('Could not download image from ' + url)
             return False

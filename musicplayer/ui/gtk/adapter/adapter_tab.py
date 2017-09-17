@@ -1,8 +1,5 @@
 from gi.repository import Gtk
-import arrow
-import re
 
-from musicplayer.ui.gtk import date_helper
 
 class AdapterTab:
     @staticmethod

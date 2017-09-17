@@ -15,15 +15,16 @@ from musicplayer.core.keyboard import KeyboardClient
 
 class Player(object):
 
-    def __init__(self, appconfig, userconfig, audio_changed=None, notify_volume=None, state_changed=None):
-        self.state_change = Event()
-        self.state_change.subscribe(state_changed)
+    def __init__(self, appconfig, userconfig):
         self.appconfig = appconfig
         self.userconfig = userconfig
+        self.state_changed = Event()
+        self.audio_changed = Event()
+        self.volume_changed = Event()
         self.queue = Queue()
         self.streamer = Streamer(about_to_finish=self.__about_to_finish,
-                                 audio_changed=audio_changed,
-                                 notify_volume=notify_volume)
+                                 audio_changed=self.__audio_changed,
+                                 notify_volume=self.__notify_volume)
                                  
         self.library = Library(self.appconfig, self.userconfig)
         KeyboardClient(self)
@@ -31,10 +32,10 @@ class Player(object):
     def play(self):
         if self.streamer.state == Streamer.State.PAUSED:
             self.streamer.resume()
-            self.state_change.fire()
+            self.state_changed.fire()
         elif self.streamer.state == Streamer.State.STOPED and self.queue.peek():
             self.streamer.play(self.queue.peek())
-            self.state_change.fire()
+            self.state_changed.fire()
 
     def seek(self, path):
         self.__set_play_count()
@@ -45,22 +46,22 @@ class Player(object):
         self.__set_play_count()
         self.streamer.stop()
         self.queue.pop()
-        self.state_change.fire()
+        self.state_changed.fire()
 
     def pause(self):
         self.streamer.pause()
-        self.state_change.fire()
+        self.state_changed.fire()
 
     def toggle(self):
         if self.streamer.state == Streamer.State.PLAYING:
             self.streamer.pause()
-            self.state_change.fire()
+            self.state_changed.fire()
         elif self.streamer.state == Streamer.State.PAUSED:
             self.streamer.resume()
-            self.state_change.fire()
+            self.state_changed.fire()
         elif self.streamer.state == Streamer.State.STOPED and self.queue.peek():
             self.streamer.play(self.queue.peek())
-            self.state_change.fire()
+            self.state_changed.fire()
 
     def next(self):
         if len(self.queue):
@@ -70,7 +71,7 @@ class Player(object):
         else:
             self.stop()
 
-        self.state_change.fire()
+        self.state_changed.fire()
 
     def prev(self):
         if len(self.queue):
@@ -80,7 +81,7 @@ class Player(object):
         else:
             self.stop()
     
-        self.state_change.fire()
+        self.state_changed.fire()
 
     def restore(self):
         try:
@@ -115,6 +116,12 @@ class Player(object):
         self.__set_play_count()
         self.queue.next()
         self.streamer.stream = self.queue.peek()
+
+    def __audio_changed(self, data):
+        self.audio_changed.fire()
+
+    def __notify_volume(self, data, data2):
+        self.volume_changed.fire()
     
     def __set_play_count(self):
         song = self.library.get_song(self.queue.peek())
