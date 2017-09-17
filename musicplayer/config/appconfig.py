@@ -10,7 +10,7 @@ class Default:
     USER_DIRECTORY = appdirs.user_data_dir(APPLICATION_NAME, version=APPLICATION_VERSION)
     CACHE_DIRECTORY = appdirs.user_cache_dir(APPLICATION_NAME, version=APPLICATION_VERSION)
     LASTFM_SECRET_API_KEY = secret.LASTFM_SECRET_API_KEY
-    LOG_MODE = 'INFO'
+    LOG_LEVEL = 'INFO'
 
     os.makedirs(USER_DIRECTORY, exist_ok=True)
     os.makedirs(CACHE_DIRECTORY, exist_ok=True)
@@ -21,7 +21,7 @@ class Developpement(Default):
     USER_CONFIG_FILE = 'dev_config.yaml'
     PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'dev', 'player.gz' )
     ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'dev', 'artworks' )
-    LOG_MODE = 'DEBUG'
+    LOG_LEVEL = 'DEBUG'
 
 
 class Testing(Default):
@@ -29,7 +29,7 @@ class Testing(Default):
     USER_CONFIG_FILE = 'test_config.yaml'
     PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'test', 'player.gz' )
     ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'test', 'artworks' )
-    LOG_MODE = 'DEBUG'
+    LOG_LEVEL = 'DEBUG'
 
 
 class Production(Default):
@@ -37,4 +37,4 @@ class Production(Default):
     USER_CONFIG_FILE = os.path.join(Default.USER_DIRECTORY, 'config.yaml')
     PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'player.gz' )
     ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'artworks' )
-    LOG_MODE = 'ERROR'
+    LOG_LEVEL = 'INFO'
