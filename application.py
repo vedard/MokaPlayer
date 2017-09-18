@@ -49,7 +49,6 @@ class Application():
         
         def handler(signum, frame): 
             self.player.save() 
-            print('test')
             Gtk.main_quit()
 
         signal.signal(signal.SIGTERM, handler)
