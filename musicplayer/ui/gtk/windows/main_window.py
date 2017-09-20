@@ -19,6 +19,7 @@ from musicplayer.ui.gtk.windows import HelpShortcutsWindow
 class MainWindow(Gtk.Window):
     """ Fenetre principale de l'application
     """
+    
     def __init__(self, appconfig, userconfig, player):
         Gtk.ApplicationWindow.__init__(self, title="Music Player", default_width=1366, default_height=768)
         
@@ -152,6 +153,10 @@ class MainWindow(Gtk.Window):
         self.player.library.sync()
         GObject.idle_add(self.on_library_scan_finished)
 
+    def __library_artwork(self):
+        self.player.library.sync_artwork()
+        GObject.idle_add(self.on_library_artworks_finished)
+
     def on_window_destroy(self, widget):
         self.player.save()
         Gtk.main_quit()
@@ -251,11 +256,7 @@ class MainWindow(Gtk.Window):
         self.model.refilter()
 
     def on_player_open_stream_activate(self, event):
-        d = InputBox(self, "Url")
-        t = d.get_text()
-        if t:
-            print(t)
-            self.player.seek(t)
+        pass
 
     def on_player_preferences_activate(self, event):
         pass
@@ -264,15 +265,17 @@ class MainWindow(Gtk.Window):
         Gtk.main_quit()
         
     def on_library_scan_activate(self, event):
-        threading.Thread(target=self.player.library.sync).start() 
-    
+        threading.Thread(target=self.__library_scan).start() 
     
     def on_library_scan_finished(self):
         self.on_sort_radio_toggled(None)
 
     def on_library_artworks_activate(self, event):
-        threading.Thread(target=lambda: self.player.library.sync_artwork(self.appconfig.LASTFM_SECRET_API_KEY)).start() 
+        threading.Thread(target=lambda: self.__library_artwork()).start() 
 
+    def on_library_artworks_finished(self):
+        self.__set_current_song_info()
+    
     def on_queue_add_activate(self, event):
         self.player.queue.clear()
         self.player.queue.append([x.Path for x in self.player.library.search_song()])
@@ -312,7 +315,7 @@ class MainWindow(Gtk.Window):
         return True    
 
     def on_sort_radio_toggled(self, widget):
-        if widget.get_active() or not isinstance(widget, Gtk.RadioButton):
+        if widget is None or widget.get_active() or not isinstance(widget, Gtk.RadioButton):
             order = ''
             desc = self.chk_sort_desc.get_active()
             if self.radio_sort_artist.get_active():
@@ -331,11 +334,3 @@ class MainWindow(Gtk.Window):
                 order = 'Played'
 
             threading.Thread(target=lambda: self.__create_model(self.player.library.search_song(order, desc))).start()
-    
-
-    def on_leftmenu_selected_rows_changed(self, widget):
-        label = widget.get_selected_row().get_children()[0]
-        # if label.get_text() == "Local":
-        #     threading.Thread(target=lambda:self.__create_model(self.player.library.search_song())).start()
-        # elif label.get_text() == "Queue":
-        #     threading.Thread(target=lambda:self.__create_model(self.player.library.get_songs([x for x in self.player.queue]))).start()

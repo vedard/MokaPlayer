@@ -97,8 +97,9 @@ class Library(object):
             for index, album in enumerate(list_album):
                 if not album.Cover or not pathlib.Path(album.Cover).exists():
                     path = pathlib.Path(album.Path).parent if pathlib.Path(album.Path).is_file else album.Path
-                    cover = artworks.get_album_artwork(self.appconfig.LASTFM_SECRET_API_KEY, self._artworks_folder, album.Name, album.Artist, path)
-                    album.Cover = cover
+                    album.Cover = artworks.get_album_artwork(self.appconfig.LASTFM_SECRET_API_KEY, 
+                                                             self._artworks_folder, album.Name,
+                                                             album.Artist, path)
                     album.save()
                 if index % 10 == 0:
                     logging.info(f'Artworks fetch {index}/{len(list_album)}')
