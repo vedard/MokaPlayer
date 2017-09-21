@@ -19,9 +19,10 @@ from musicplayer.ui.gtk.windows import HelpShortcutsWindow
 class MainWindow(Gtk.Window):
     """ Fenetre principale de l'application
     """
-    
+
     def __init__(self, appconfig, userconfig, player):
         Gtk.ApplicationWindow.__init__(self, title="Music Player", default_width=1366, default_height=768)
+        self.logger = logging.getLogger('MainWindow')
         
         self.appconfig = appconfig
         self.userconfig = userconfig
@@ -45,6 +46,7 @@ class MainWindow(Gtk.Window):
         threading.Thread(target=lambda:self.__create_model(self.player.library.search_song())).start()
 
         GObject.timeout_add(500, self.on_tick, None)
+        self.logger.info('Window loaded')
  
     def __create_model(self, data):
         model = AdapterSong.create_store()
@@ -55,7 +57,7 @@ class MainWindow(Gtk.Window):
                                       AdapterSong.create_row(row))
 
         end = time.perf_counter()
-        logging.info(f'Model created in {str(end-start)} second(s)')
+        self.logger.info('ListStore created in {:.3f} seconds'.format(end - start))
 
         GObject.idle_add(lambda: self.__set_model(model))
     
@@ -93,6 +95,8 @@ class MainWindow(Gtk.Window):
         self.add(self.content)
     
     def __set_current_song_info(self):
+        self.logger.debug("Setting currrent song info")
+        
         song = self.player.library.get_song(self.player.queue.peek())
         album = None
 

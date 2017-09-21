@@ -21,7 +21,7 @@ class Developpement(Default):
     USER_CONFIG_FILE = 'dev_config.yaml'
     PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'dev', 'player.gz' )
     ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'dev', 'artworks' )
-    LOG_LEVEL = 'INFO'
+    LOG_LEVEL = 'DEBUG'
 
 
 class Testing(Default):

@@ -16,6 +16,7 @@ from musicplayer.core.keyboard import KeyboardClient
 class Player(object):
 
     def __init__(self, appconfig, userconfig):
+        self.logger = logging.getLogger("Player")
         self.appconfig = appconfig
         self.userconfig = userconfig
         self.state_changed = Event()
@@ -30,6 +31,7 @@ class Player(object):
         KeyboardClient(self)
 
     def play(self):
+        self.logger.debug("Play")
         if self.streamer.state == Streamer.State.PAUSED:
             self.streamer.resume()
             self.state_changed.fire()
@@ -38,21 +40,25 @@ class Player(object):
             self.state_changed.fire()
 
     def seek(self, path):
+        self.logger.debug("Seek " + path)
         self.__set_play_count()
         self.queue.seek(path)
         self.streamer.play(path)
 
     def stop(self):
+        self.logger.debug("Stop")
         self.__set_play_count()
         self.streamer.stop()
         self.queue.pop()
         self.state_changed.fire()
 
     def pause(self):
+        self.logger.debug("Pause")
         self.streamer.pause()
         self.state_changed.fire()
 
     def toggle(self):
+        self.logger.debug("Toggle")
         if self.streamer.state == Streamer.State.PLAYING:
             self.streamer.pause()
             self.state_changed.fire()
@@ -64,6 +70,7 @@ class Player(object):
             self.state_changed.fire()
 
     def next(self):
+        self.logger.debug("Next")
         if len(self.queue):
             self.__set_play_count()
             self.queue.next()
@@ -74,6 +81,7 @@ class Player(object):
         self.state_changed.fire()
 
     def prev(self):
+        self.logger.debug("Prev")
         if len(self.queue):
             self.__set_play_count()
             self.queue.prev()
@@ -85,6 +93,7 @@ class Player(object):
 
     def restore(self):
         try:
+            self.logger.info("Restoring")
             if pathlib.Path(self.appconfig.PLAYER_CACHE_FILE).is_file():
                 with gzip.open(self.appconfig.PLAYER_CACHE_FILE, 'rt') as file:
                     data = json.load(file)
@@ -97,10 +106,11 @@ class Player(object):
                     time.sleep(0.3)
                     self.streamer.position = data['Position']
         except Exception as e:
-            logging.exception('Could not restore player state')
+            self.logger.exception('Could not restore player state')
 
     def save(self):
         try:
+            self.logger.info("Saving")
             pathlib.Path(self.appconfig.PLAYER_CACHE_FILE).parent.mkdir(exist_ok=True)
             with gzip.open(self.appconfig.PLAYER_CACHE_FILE, 'wt') as file:
                 json.dump({
@@ -110,14 +120,16 @@ class Player(object):
                     "Volume": self.streamer.volume,
                 }, file)
         except Exception as e:
-            logging.exception('Could not save player state')
+            self.logger.exception('Could not save player state')
 
     def __about_to_finish(self, data):
+        self.logger.debug("About to finish")
         self.__set_play_count()
         self.queue.next()
         self.streamer.stream = self.queue.peek()
 
-    def __audio_changed(self, data):
+    def __audio_changed(self):
+        self.logger.debug("Audio changed")
         self.audio_changed.fire()
 
     def __notify_volume(self, data, data2):

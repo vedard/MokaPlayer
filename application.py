@@ -40,6 +40,7 @@ class Application():
 
     def init_logging(self):
         logging.basicConfig(level=getattr(logging, self.appconfig.LOG_LEVEL))
+        logging.getLogger("peewee").setLevel(logging.INFO)
 
     def init_player(self):
         self.player = Player(self.appconfig, self.userconfig)
