@@ -5,6 +5,7 @@ gi.require_version('Gtk', '3.0')
 import argparse
 import signal
 import logging
+import threading
 
 from gi.repository import Gtk
 from gi.repository import Gio
@@ -44,7 +45,7 @@ class Application():
 
     def init_player(self):
         self.player = Player(self.appconfig, self.userconfig)
-        self.player.restore()
+        threading.Thread(target=self.player.restore).start()
     
     def init_signals(self):
         

@@ -27,9 +27,6 @@ class MainWindow(Gtk.Window):
         self.appconfig = appconfig
         self.userconfig = userconfig
         self.player = player
-        self.player.state_changed.subscribe(self.on_player_state_changed)
-        self.player.audio_changed.subscribe(self.on_audio_changed)
-        self.player.volume_changed.subscribe(self.on_volume_changed)
         
         self.connect("destroy", self.on_window_destroy)
         self.connect("key-press-event", self.on_window_key_press)
@@ -37,8 +34,12 @@ class MainWindow(Gtk.Window):
         self.builder = Gtk.Builder()
         self.builder.add_from_file('musicplayer/ui/gtk/resources/main_window.ui')
         self.builder.connect_signals(self)
-        
         self.__get_object()
+
+        self.player.state_changed.subscribe(self.on_player_state_changed)
+        self.player.audio_changed.subscribe(self.on_audio_changed)
+        self.player.volume_changed.subscribe(self.on_volume_changed)
+        
         self.__set_model(AdapterSong.create_store())
         self.__set_current_song_info()
         self.on_volume_changed()
