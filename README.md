@@ -2,55 +2,65 @@
 
 A simple music player written in python 
 
+![](musicplayer/resources/screenshot.png)
+
+##   Features
+-   Support all the most popular music file formats
+-   Gapless playback
+-   Resumes playback on startup
+-   Automatically fetch:
+    - Album covers
+    - Lyrics 
+    - ASCII and Guitar Pro tabs
+
 ## Configuration
 
-#### Create the file `musicplayer/config/secret.py` with this line:
+Create the file `musicplayer/config/secret.py` with this line:
     
     LASTFM_SECRET_API_KEY = '__'
 
+### On Linux
+
+Download the following package:
+
+    gtk3
+    python-gobject
+    python-pip
+    gcc
+    taglib
+    gst-python
+    gst-plugins-base
+    gst-plugins-good
+    gst-plugins-bad
+    gst-plugins-ugly
+    libkeybinder3
+
+Download the pip requirements and run:
+
+    make init
+    make run
 
 ### On Windows
 
-#### Download the following package with [MSYS2](http://www.msys2.org/):
+Download the following package with [MSYS2](http://www.msys2.org/):
 
-    pacman -S mingw-w64-i686-gtk3
-    pacman -S mingw-w64-i686-python3-gobject
-    pacman -S mingw-w64-i686-python3-pip
-    pacman -S mingw-w64-i686-gcc
-    pacman -S mingw-w64-i686-taglib
-    pacman -S mingw-w64-i686-python3-lxml
-    pacman -S mingw-w64-i686-swig 
-    pacman -S mingw-w64-i686-gst-python
-    pacman -S mingw-w64-i686-gst-plugins-base
-    pacman -S mingw-w64-i686-gst-plugins-good
-    pacman -S mingw-w64-i686-gst-plugins-bad
-    pacman -S mingw-w64-i686-gst-plugins-ugly
+    mingw-w64-i686-gtk3
+    mingw-w64-i686-python3-gobject
+    mingw-w64-i686-python3-pip
+    mingw-w64-i686-gcc
+    mingw-w64-i686-taglib
+    mingw-w64-i686-python3-lxml
+    mingw-w64-i686-swig 
+    mingw-w64-i686-gst-python
+    mingw-w64-i686-gst-plugins-base
+    mingw-w64-i686-gst-plugins-good
+    mingw-w64-i686-gst-plugins-bad
+    mingw-w64-i686-gst-plugins-ugly
 
 
-#### Download the pip requirements:
+Download the pip requirements and run:
 
     mingw32-make init
+    mingw32-make run
 
-#### Download pytaglib manually (if pip not working):
 
-    git clone https://github.com/supermihi/pytaglib
-    python3 setup.py --cython
-    python3 setup.py build
-    pip3 install -e .
-
-### On Arch Linux
-
-#### Download the following package:
-    pacman -S gtk3
-    pacman -S python3-gobject
-    pacman -S python3-pip
-    pacman -S gcc
-    pacman -S taglib
-    pacman -S gst-python
-    pacman -S gst-plugins-base
-    pacman -S gst-plugins-good
-    pacman -S gst-plugins-bad
-    pacman -S gst-plugins-ugly
-
-#### Download the pip requirements:
-    make init
