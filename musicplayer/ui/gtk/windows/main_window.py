@@ -21,7 +21,7 @@ class MainWindow(Gtk.Window):
     """
 
     def __init__(self, appconfig, userconfig, player):
-        Gtk.ApplicationWindow.__init__(self, title="Music Player", default_width=1366, default_height=768)
+        super().__init__(title="Music Player", default_width=1366, default_height=768)
         self.logger = logging.getLogger('MainWindow')
         # settings = Gtk.Settings.get_default()
         # settings.set_property("gtk-application-prefer-dark-theme", True)

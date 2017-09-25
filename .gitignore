@@ -4,3 +4,4 @@ __pycache__
 .vscode
 secret.py
 dev_config.yaml
+.pylinrc
