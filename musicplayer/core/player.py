@@ -40,7 +40,7 @@ class Player(object):
             self.state_changed.fire()
 
     def seek(self, path):
-        self.logger.debug("Seek " + path)
+        self.logger.debug("Seek " + str(path))
         self.__set_play_count()
         self.queue.seek(path)
         self.streamer.play(path)

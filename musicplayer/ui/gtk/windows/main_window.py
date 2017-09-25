@@ -17,12 +17,14 @@ from musicplayer.ui.gtk.windows import TagsEditorWindow
 from musicplayer.ui.gtk.windows import HelpShortcutsWindow
 
 class MainWindow(Gtk.Window):
-    """ Fenetre principale de l'application
+    """ Main window
     """
 
     def __init__(self, appconfig, userconfig, player):
         Gtk.ApplicationWindow.__init__(self, title="Music Player", default_width=1366, default_height=768)
         self.logger = logging.getLogger('MainWindow')
+        # settings = Gtk.Settings.get_default()
+        # settings.set_property("gtk-application-prefer-dark-theme", True)
         
         self.appconfig = appconfig
         self.userconfig = userconfig
@@ -50,6 +52,7 @@ class MainWindow(Gtk.Window):
         self.logger.info('Window loaded')
  
     def __create_model(self, data):
+        self.logger.info('Creating ListStore')
         model = AdapterSong.create_store()
         start = time.perf_counter()
 

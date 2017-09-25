@@ -103,7 +103,7 @@ class Library(object):
                                                              album.Artist, path)
                     album.save()
                 if index % 10 == 0:
-                    self.logger.debug(f'Artworks fetch {index}/{len(list_album)}')
+                    self.logger.info(f'Artworks fetch {index}/{len(list_album)}')
 
         self.logger.info(f'Artworks fetch completed')
 
@@ -114,7 +114,7 @@ class Library(object):
             ValueError: When musics_folder is not set
         """
         if self._musics_folder is None or not pathlib.Path(self._musics_folder).is_dir():
-            raise ValueError('Invalid music folder')
+            raise ValueError('Invalid music folder: ' + str(self._musics_folder))
         
         self.logger.info(f"Scanning {self._musics_folder}")
         self.__sync_songs()
@@ -136,7 +136,7 @@ class Library(object):
                     s.read_tags()
                     s.save()
                 if index % 10 == 0:
-                    self.logger.debug(f'Scanning songs {index}/{len(list_new_path)}')
+                    self.logger.info(f'Scanning songs {index}/{len(list_new_path)}')
 
             for song in list_deleted_song:
                 Song.delete().where(Song.Path == song).execute()

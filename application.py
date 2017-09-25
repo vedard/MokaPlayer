@@ -53,10 +53,15 @@ class Application():
             self.player.save() 
             Gtk.main_quit()
 
-        signal.signal(signal.SIGTERM, handler)
-        signal.signal(signal.SIGHUP, handler)
-        signal.signal(signal.SIGINT, handler)
-        signal.signal(signal.SIGQUIT, handler)
+        # Some singal are not availble on every OS
+        if hasattr(signal, 'SIGTERM'):
+            signal.signal(signal.SIGTERM, handler)
+        if hasattr(signal, 'SIGINT'):
+            signal.signal(signal.SIGINT, handler)
+        if hasattr(signal, 'SIGHUP'):
+            signal.signal(signal.SIGHUP, handler)
+        if hasattr(signal, 'SIGQUIT'):
+            signal.signal(signal.SIGQUIT, handler)
 
 if __name__ == '__main__':
     app = Application()

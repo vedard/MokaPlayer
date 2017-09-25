@@ -13,7 +13,7 @@ class AdapterSong:
             song.AlbumArtist or 'Unkown' ,
             song.Album or 'Unkown',
             date_helper.seconds_to_string(song.Length),
-            song.Year,
+            song.Year or '0000',
             arrow.Arrow(song.Added.year, song.Added.month, song.Added.day).humanize(),
             song.Played
         ]

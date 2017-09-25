@@ -1,18 +1,20 @@
 import logging
-import gi
-
-gi.require_version('Keybinder', '3.0')
-from gi.repository import Keybinder
 
 class KeyboardClient:
     def __init__(self, player):
         self.player = player
         self.logger = logging.getLogger('KeyboardClient')
 
-        Keybinder.init()
-        Keybinder.bind('XF86AudioPlay', self._on_XF86AudioPlay)
-        Keybinder.bind('XF86AudioNext', self._on_XF86AudioNext)
-        Keybinder.bind('XF86AudioPrev', self._on_XF86AudioPrev)
+        try:
+            import gi
+            gi.require_version('Keybinder', '3.0')
+            from gi.repository import Keybinder
+            Keybinder.init()
+            Keybinder.bind('XF86AudioPlay', self._on_XF86AudioPlay)
+            Keybinder.bind('XF86AudioNext', self._on_XF86AudioNext)
+            Keybinder.bind('XF86AudioPrev', self._on_XF86AudioPrev)
+        except ValueError:
+            self.logger.warning('Keybinder is needed on Linux for MediaKey binding')
 
     def _on_XF86AudioNext(self, key):
         self.logger.info(key)

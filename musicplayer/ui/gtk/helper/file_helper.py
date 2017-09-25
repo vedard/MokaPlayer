@@ -13,7 +13,7 @@ def open_file(path):
         ret_code = subprocess.call(['open', path])
 
     elif sys.platform.startswith('win'):
-        ret_code = subprocess.call(['start', path], shell=True)
+        ret_code = subprocess.call(['explorer', path])
 
     return ret_code
 

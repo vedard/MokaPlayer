@@ -1,6 +1,9 @@
 def seconds_to_string(duration):
     """Convert a time in seconds to a mm:ss string
     """
+    if duration is None:
+        return '00:00'
+
     minutes = duration // 60
     seconds = duration % 60
 
