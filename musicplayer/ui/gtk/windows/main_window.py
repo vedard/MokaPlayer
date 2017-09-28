@@ -25,14 +25,14 @@ class MainWindow(Gtk.Window):
         self.logger = logging.getLogger('MainWindow')
         # settings = Gtk.Settings.get_default()
         # settings.set_property("gtk-application-prefer-dark-theme", True)
-        
+
         self.appconfig = appconfig
         self.userconfig = userconfig
         self.player = player
-        
+
         self.connect("destroy", self.on_window_destroy)
         self.connect("key-press-event", self.on_window_key_press)
-        
+
         self.builder = Gtk.Builder()
         self.builder.add_from_file('musicplayer/ui/gtk/resources/main_window.ui')
         self.builder.connect_signals(self)
@@ -41,7 +41,7 @@ class MainWindow(Gtk.Window):
         self.player.state_changed.subscribe(self.on_player_state_changed)
         self.player.audio_changed.subscribe(self.on_audio_changed)
         self.player.volume_changed.subscribe(self.on_volume_changed)
-        
+
         self.__set_model(AdapterSong.create_store())
         self.__set_current_song_info()
         self.on_volume_changed()
@@ -50,7 +50,7 @@ class MainWindow(Gtk.Window):
 
         GObject.timeout_add(500, self.on_tick, None)
         self.logger.info('Window loaded')
- 
+
     def __create_model(self, data):
         self.logger.info('Creating ListStore')
         model = AdapterSong.create_store()
@@ -64,12 +64,12 @@ class MainWindow(Gtk.Window):
         self.logger.info('ListStore created in {:.3f} seconds'.format(end - start))
 
         GObject.idle_add(lambda: self.__set_model(model))
-    
+
     def __set_model(self, model):
         self.model = model.filter_new()
         self.model.set_visible_func(self.__model_filter_func)
         self.gridview.set_model(self.model)
-    
+
     def __get_object(self):
         self.content = self.builder.get_object('content')
         self.gridview = self.builder.get_object('gridview')
@@ -96,11 +96,12 @@ class MainWindow(Gtk.Window):
         self.radio_sort_played = self.builder.get_object('radio_sort_played')
         self.chk_sort_desc = self.builder.get_object('chk_sort_desc')
         self.menu_gridview = self.builder.get_object('menu_gridview')
+        self.search_bar = self.builder.get_object('search_bar')
         self.add(self.content)
-    
+
     def __set_current_song_info(self):
         self.logger.debug("Setting currrent song info")
-        
+
         song = self.player.library.get_song(self.player.queue.peek())
         album = None
 
@@ -108,27 +109,23 @@ class MainWindow(Gtk.Window):
             album = self.player.library.get_album(song.Album)
             self.lbl_current_title.set_text(song.Title)
             self.lbl_current_song_infos.set_text(f'{song.Artist} - {song.Album} ({song.Year})')
-        elif self.player.queue.peek():
-            self.lbl_current_title.set_text('')
-            self.lbl_current_song_infos.set_text('(Not in library)')
         else:
             self.lbl_current_title.set_text('')
             self.lbl_current_song_infos.set_text('')
 
         if album:
-            self.img_current_album.set_from_pixbuf(image_helper.load(album.Cover, 128, 128))
-        else:
-            self.img_current_album.set_from_pixbuf(image_helper.load(None, 128, 128))
-        
+            self.img_current_album.set_from_pixbuf(image_helper.load(album.Cover if album else None, 
+                                                                     140, 140))
+
     def __set_current_play_icon(self):
         if self.player.streamer.state == self.player.streamer.State.PLAYING:
             self.btn_play.set_image(self.img_pause)
         else:
             self.btn_play.set_image(self.img_play)
-    
+
     def __model_filter_func(self, model, iter, data):
         return AdapterSong.search(self.txt_search.get_text(), model[iter])
-    
+
     def __focus_song(self, path):
         for row in self.model:
             if row[0] == path:
@@ -137,7 +134,7 @@ class MainWindow(Gtk.Window):
                 self.gridview.scroll_to_cell(row.path, use_align=True)
                 self.gridview.grab_focus()
                 break
-    
+
     def __show_lyrics(self, path):
         song = self.player.library.get_song(path)
         w = LyricsWindow()
@@ -168,13 +165,16 @@ class MainWindow(Gtk.Window):
     def on_window_destroy(self, widget):
         self.player.save()
         Gtk.main_quit()
-    
+
     def on_window_key_press(self, widget, event):
         keyval_name = Gdk.keyval_name(event.keyval)
         ctrl = (event.state & Gdk.ModifierType.CONTROL_MASK)
 
         if ctrl and keyval_name == 'f':
-            self.txt_search.grab_focus()
+            search_mode = self.search_bar.get_search_mode()
+            self.search_bar.set_search_mode(not search_mode)
+            if not search_mode:
+                self.txt_search.grab_focus()
         elif ctrl and keyval_name == 'l':
             self.__show_lyrics(self.player.queue.peek())
         elif ctrl and keyval_name == 'o':
@@ -192,7 +192,7 @@ class MainWindow(Gtk.Window):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
             self.menu_gridview.popup( None, None, None, None, event.button, event.time)
             return True
-    
+
     def on_menu_gridview_append_activate(self, widget):
         self.player.queue.append(self.__get_selected_songs_in_gridview())
 
@@ -222,43 +222,46 @@ class MainWindow(Gtk.Window):
         selected_songs = self.__get_selected_songs_in_gridview()
         if any(selected_songs):
             file_helper.open_folder(selected_songs[0])
-    
+
     def __get_selected_songs_in_gridview(self):
         model, pathlist = self.gridview.get_selection().get_selected_rows()
         result = []
         for path in pathlist:
             result.append(model[path][0])
         return result
-    
+
     def on_gridview_row_activated(self, widget, path, column):
         self.player.seek(self.model[path][0])
-    
+
     def on_btn_next_clicked(self, widget):
         self.player.next()
-    
+
     def on_btn_play_clicked(self, widget):
         self.player.toggle()
         self.__set_current_play_icon()
 
     def on_btn_previous_clicked(self, widget):
         self.player.prev()
-    
+
     def on_audio_changed(self):
         GObject.idle_add(self.__set_current_song_info)
         GObject.idle_add(self.__set_current_play_icon)
-    
+
     def on_player_state_changed(self):
         GObject.idle_add(self.__set_current_play_icon)
 
     def on_volume_changed(self):
         self.volume_scale.set_value(self.player.streamer.volume * 100)
-    
+
     def on_volume_scale_value_changed(self, widget):
         self.player.streamer.volume = self.volume_scale.get_value() / 100
-    
-    def on_txt_search_activate(self, widget):
-        if any(self.model):
+
+    def on_txt_search_key_press_event(self, widget, event):
+        keyval_name = Gdk.keyval_name(event.keyval)
+        if keyval_name == "Return" and any(self.model):
             self.__focus_song(self.model[0][0])
+        elif keyval_name == "Escape":
+            self.search_bar.set_search_mode(False)
 
     def on_txt_search_search_changed(self, widget):
         self.model.refilter()
@@ -271,19 +274,19 @@ class MainWindow(Gtk.Window):
 
     def on_player_quit_activate(self, event):
         Gtk.main_quit()
-        
+
     def on_library_scan_activate(self, event):
-        threading.Thread(target=self.__library_scan).start() 
-    
+        threading.Thread(target=self.__library_scan).start()
+
     def on_library_scan_finished(self):
         self.on_sort_radio_toggled(None)
 
     def on_library_artworks_activate(self, event):
-        threading.Thread(target=lambda: self.__library_artwork()).start() 
+        threading.Thread(target=lambda: self.__library_artwork()).start()
 
     def on_library_artworks_finished(self):
         self.__set_current_song_info()
-    
+
     def on_queue_add_activate(self, event):
         self.player.queue.clear()
         self.player.queue.append([x.Path for x in self.player.library.search_song()])
@@ -294,7 +297,7 @@ class MainWindow(Gtk.Window):
 
     def on_queue_shuffle_activate(self, event):
         self.player.queue.shuffle()
-    
+
     def on_help_shortcuts_activate(self, event):
         shortcuts_window = HelpShortcutsWindow.get_diaglog()
         shortcuts_window.set_transient_for(self)
@@ -304,7 +307,7 @@ class MainWindow(Gtk.Window):
         about_window = AboutWindow.get_diaglog()
         about_window.set_transient_for(self)
         about_window.show()
-    
+
     def on_prp_current_time_click(self, widget, event):
         width = self.prb_current_time.get_allocated_width()
         duration = self.player.streamer.duration
@@ -313,14 +316,14 @@ class MainWindow(Gtk.Window):
     def on_tick(self, data):
         position = self.player.streamer.position
         duration = self.player.streamer.duration
-        fraction = position / duration if duration else 0  
+        fraction = position / duration if duration else 0
         position_text = arrow.get(0).shift(seconds=position).format('mm:ss')
         duration_text = arrow.get(0).shift(seconds=duration).format('mm:ss')
 
-        self.lbl_current_time.set_text(f'[{position_text}/{duration_text}]')
+        self.lbl_current_time.set_text(f'{position_text} / {duration_text}')
         self.prb_current_time.set_fraction(fraction)
 
-        return True    
+        return True
 
     def on_sort_radio_toggled(self, widget):
         if widget is None or widget.get_active() or not isinstance(widget, Gtk.RadioButton):
