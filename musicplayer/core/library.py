@@ -41,9 +41,9 @@ class Library(object):
         except:
             return None
 
-    def get_album(self, name):
+    def get_album(self, name, albumartist):
         try:
-            return Album.get(Album.Name==name)
+            return Album.get(Album.Name==name, Album.Artist==albumartist)
         except:
             return None
 
@@ -168,10 +168,11 @@ class Library(object):
         self.logger.info('Scanning albums')
         DB.execute_sql("""
             INSERT INTO album ('Name', 'Year', 'Path', 'Artist')
-            SELECT song.album, song.year, song.path, CASE WHEN song.albumartist ='' THEN song.artist ELSE song.albumartist END FROM song  
-            LEFT JOIN album ON album.name=song.album
-            WHERE song.album != '' and album.albumid IS NULL
-            GROUP BY song.album 
+            SELECT song.album, song.year, song.path, song.albumartist
+            FROM   song
+            LEFT JOIN album ON album.NAME = song.album AND album.artist LIKE song.albumartist
+            WHERE  song.album != '' AND album.albumid IS NULL
+            GROUP  BY song.album  
         """)
     
     # def vplayer_library_converter(self):

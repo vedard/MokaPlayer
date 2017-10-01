@@ -126,7 +126,7 @@ class MainWindow(Gtk.Window):
         album = None
 
         if song:
-            album = self.player.library.get_album(song.Album)
+            album = self.player.library.get_album(song.Album, song.AlbumArtist)
             self.lbl_current_title.set_text(song.Title)
             self.lbl_current_song_infos.set_text(f'{song.Artist} - {song.Album} ({song.Year})')
         else:
