@@ -4,7 +4,7 @@ def seconds_to_string(duration):
     if duration is None:
         return '00:00'
 
-    minutes = duration // 60
-    seconds = duration % 60
+    minutes = int(duration // 60)
+    seconds = int(duration % 60)
 
     return '{:02d}:{:02d}'.format(minutes, seconds)

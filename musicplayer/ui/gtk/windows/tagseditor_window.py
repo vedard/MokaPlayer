@@ -8,6 +8,7 @@ from gi.repository import Gtk
 from gi.repository import GObject
 
 from musicplayer.core.database import DB
+from musicplayer.ui.gtk.helper import date_helper
 
 class TagsEditorWindow:
     def __init__(self, songs):
@@ -22,6 +23,7 @@ class TagsEditorWindow:
         self.txt_Album = self.builder.get_object("txt_Album")
         self.txt_TrackNumber = self.builder.get_object("txt_TrackNumber")
         self.txt_Year = self.builder.get_object("txt_Year")
+        self.txt_Genre = self.builder.get_object("txt_Genre")
         self.txt_Added = self.builder.get_object("txt_Added")
         self.txt_Comment = self.builder.get_object("txt_Comment")
         self.txt_Length = self.builder.get_object("txt_Length")
@@ -34,10 +36,11 @@ class TagsEditorWindow:
         self.set_text(self.txt_Path, [s.Path for s in songs])
         self.set_text(self.txt_Bitrate, [s.Bitrate for s in songs])
         self.set_text(self.txt_Channels, [s.Channels for s in songs])
-        self.set_text(self.txt_Length, [s.Length for s in songs])
+        self.set_text(self.txt_Length, [date_helper.seconds_to_string(s.Length) for s in songs])
         self.set_text(self.txt_Title, [s.Title for s in songs])
         self.set_text(self.txt_Artist, [s.Artist for s in songs])
         self.set_text(self.txt_Album, [s.Album for s in songs])
+        self.set_text(self.txt_Genre, [s.Genre for s in songs])
         self.set_text(self.txt_Year, [s.Year for s in songs])
         self.set_text(self.txt_Comment, [s.Comment for s in songs])
         self.set_text(self.txt_Added, [str(s.Added) for s in songs])
@@ -72,6 +75,7 @@ class TagsEditorWindow:
             tracknumbers = self.get_value(self.txt_TrackNumber)
             years = self.get_value(self.txt_Year)
             addeds = self.get_value(self.txt_Added)
+            genres = self.get_value(self.txt_Genre)
             comments = self.get_value(self.txt_Comment)
 
             with DB.atomic():
@@ -83,8 +87,10 @@ class TagsEditorWindow:
                     song.Tracknumber = tracknumbers[index]
                     song.Year = years[index]
                     song.Comment = comments[index]
+                    song.Genre = genres[index]
                     song.Added = arrow.get(addeds[index]).naive
                     song.save()
+                    song.write_tags()
 
             self.window.destroy()
 

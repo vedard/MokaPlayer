@@ -15,16 +15,17 @@ class AdapterSong:
             date_helper.seconds_to_string(song.Length),
             song.Year or '0000',
             arrow.Arrow(song.Added.year, song.Added.month, song.Added.day).humanize(),
-            song.Played
+            song.Played,
+            song.Genre
         ]
     
     @staticmethod
     def create_store():
-        return Gtk.ListStore(str,str,str,str,str,str,str,str)
+        return Gtk.ListStore(str,str,str,str,str,str,str,str,str)
 
     @staticmethod
     def create_col_number():
-        return [0, 1, 2, 3, 4, 5, 6, 7]
+        return [0, 1, 2, 3, 4, 5, 6, 7, 8]
     
     @staticmethod
     def search(text, row):

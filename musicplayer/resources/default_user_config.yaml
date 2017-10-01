@@ -7,6 +7,6 @@ grid:
   order:
     field: 
     desc: No
-  columns: []
+  columns: ['Length', 'Title', 'Artist', 'Album', 'Year', 'Added', 'Played']
 gtk:
   darktheme: false

@@ -8,7 +8,7 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 from musicplayer.core.player import Player
-from musicplayer.ui.gtk.helper import image_helper, file_helper
+from musicplayer.ui.gtk.helper import image_helper, file_helper, date_helper
 from musicplayer.ui.gtk.adapter import AdapterSong
 from musicplayer.ui.gtk.windows import AboutWindow
 from musicplayer.ui.gtk.windows import LyricsWindow
@@ -39,6 +39,7 @@ class MainWindow(Gtk.Window):
         self.builder.add_from_file('musicplayer/ui/gtk/resources/main_window.ui')
         self.__get_object()
         self.__init_sort_radio()
+        # self.__init_gridview_columns()
 
         self.builder.connect_signals(self)
         self.player.state_changed.subscribe(self.on_player_state_changed)
@@ -51,8 +52,19 @@ class MainWindow(Gtk.Window):
 
         threading.Thread(target=self.__create_model).start()
 
-        GObject.timeout_add(500, self.on_tick, None)
+        GObject.timeout_add(750, self.on_tick, None)
         self.logger.info('Window loaded')
+
+    def __init_gridview_columns(self):
+        columns = self.gridview.get_columns()
+        for col in columns:
+            self.gridview.remove_column(col)
+
+        for name in self.userconfig['grid']['columns']:
+            for col in columns:
+                if name == col.get_title():
+                    import ipdb; ipdb.set_trace()
+                    self.gridview.append_column(col)
 
     def __create_model(self):
         self.logger.info('Creating ListStore')
@@ -64,8 +76,8 @@ class MainWindow(Gtk.Window):
 
         data = self.player.library.search_song(order, desc)
 
-        for row in reversed(data):
-            model.insert_with_valuesv(0, AdapterSong.create_col_number(),
+        for row in data:
+            model.insert_with_valuesv(-1, AdapterSong.create_col_number(),
                                       AdapterSong.create_row(row))
 
         end = time.perf_counter()
@@ -160,6 +172,7 @@ class MainWindow(Gtk.Window):
     def __show_tagseditor(self, paths):
         songs = self.player.library.get_songs(paths)
         w = TagsEditorWindow(songs)
+        w.get_window().set_transient_for(self)
         w.get_window().show()
 
     def __library_scan(self):
@@ -325,8 +338,8 @@ class MainWindow(Gtk.Window):
         position = self.player.streamer.position
         duration = self.player.streamer.duration
         fraction = position / duration if duration else 0
-        position_text = arrow.get(0).shift(seconds=position).format('mm:ss')
-        duration_text = arrow.get(0).shift(seconds=duration).format('mm:ss')
+        position_text = date_helper.seconds_to_string(position)
+        duration_text = date_helper.seconds_to_string(duration)
 
         self.lbl_current_time.set_text(f'{position_text} / {duration_text}')
         self.prb_current_time.set_fraction(fraction)
