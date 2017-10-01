@@ -1,9 +1,17 @@
+import collections
 import os
 import pathlib
 import shutil
 import logging
 import yaml
 import appdirs
+
+def merge(d1, d2):
+    for k in d2:
+        if k in d1 and isinstance(d1[k], dict) and isinstance(d2[k], dict):
+            merge(d1[k], d2[k])
+        else:
+            d1[k] = d2[k]   
 
 
 class UserConfig(object):
@@ -27,8 +35,10 @@ class UserConfig(object):
         """ Parse the YAML file
         """
         try:
-            with open(self.get_file(), 'rt') as stream:
+            with open(self.APPLICATION_DEFAULT_CONFIG_PATH, 'rt') as stream:
                 self._data = yaml.load(stream)
+            with open(self.get_file(), 'rt') as stream:
+                merge(self._data, yaml.load(stream))
         except:
             logging.critical('Could not load the user configuration file', exc_info=True)
     

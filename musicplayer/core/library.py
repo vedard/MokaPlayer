@@ -69,7 +69,6 @@ class Library(object):
                             Song.Tracknumber]
         
         elif order == 'Added':
-            peewee.DateField()
             order_fields = [Song.Added,
                             Song.AlbumArtist,
                             Song.Year,

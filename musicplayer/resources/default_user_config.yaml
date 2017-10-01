@@ -1,5 +1,12 @@
 library:
   music_directory: 
-  playlist_directory:
+  playlist_directory: 
 player:
   restore_state: Yes
+grid:
+  order:
+    field: 
+    desc: No
+  columns: []
+gtk:
+  darktheme: false

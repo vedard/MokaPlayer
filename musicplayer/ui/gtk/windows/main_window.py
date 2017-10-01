@@ -22,22 +22,25 @@ class MainWindow(Gtk.Window):
 
     def __init__(self, appconfig, userconfig, player):
         super().__init__(title="Music Player", default_width=1366, default_height=768)
-        self.logger = logging.getLogger('MainWindow')
-        # settings = Gtk.Settings.get_default()
-        # settings.set_property("gtk-application-prefer-dark-theme", True)
 
+        self.logger = logging.getLogger('MainWindow')
         self.appconfig = appconfig
         self.userconfig = userconfig
         self.player = player
+        
+        if self.userconfig['gtk']['darktheme']:
+            settings = Gtk.Settings.get_default()
+            settings.set_property("gtk-application-prefer-dark-theme", True)
 
         self.connect("destroy", self.on_window_destroy)
         self.connect("key-press-event", self.on_window_key_press)
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file('musicplayer/ui/gtk/resources/main_window.ui')
-        self.builder.connect_signals(self)
         self.__get_object()
+        self.__init_sort_radio()
 
+        self.builder.connect_signals(self)
         self.player.state_changed.subscribe(self.on_player_state_changed)
         self.player.audio_changed.subscribe(self.on_audio_changed)
         self.player.volume_changed.subscribe(self.on_volume_changed)
@@ -46,15 +49,20 @@ class MainWindow(Gtk.Window):
         self.__set_current_song_info()
         self.on_volume_changed()
 
-        threading.Thread(target=lambda:self.__create_model(self.player.library.search_song())).start()
+        threading.Thread(target=self.__create_model).start()
 
         GObject.timeout_add(500, self.on_tick, None)
         self.logger.info('Window loaded')
 
-    def __create_model(self, data):
+    def __create_model(self):
         self.logger.info('Creating ListStore')
-        model = AdapterSong.create_store()
         start = time.perf_counter()
+        model = AdapterSong.create_store()
+
+        order = self.userconfig['grid']['order']['field']
+        desc = self.userconfig['grid']['order']['desc']
+
+        data = self.player.library.search_song(order, desc)
 
         for row in reversed(data):
             model.insert_with_valuesv(0, AdapterSong.create_col_number(),
@@ -183,6 +191,8 @@ class MainWindow(Gtk.Window):
             self.player.streamer.volume -= 0.05
         elif ctrl and keyval_name == 'Right':
             self.player.streamer.volume += 0.05
+        elif keyval_name == "Escape":
+            self.search_bar.set_search_mode(False)
         else:
             return False
 
@@ -260,8 +270,6 @@ class MainWindow(Gtk.Window):
         keyval_name = Gdk.keyval_name(event.keyval)
         if keyval_name == "Return" and any(self.model):
             self.__focus_song(self.model[0][0])
-        elif keyval_name == "Escape":
-            self.search_bar.set_search_mode(False)
 
     def on_txt_search_search_changed(self, widget):
         self.model.refilter()
@@ -324,24 +332,44 @@ class MainWindow(Gtk.Window):
         self.prb_current_time.set_fraction(fraction)
 
         return True
+    
+    def __init_sort_radio(self):
+        self.chk_sort_desc.set_active(self.userconfig['grid']['order']['desc'])
+        if self.userconfig['grid']['order']['field'] == 'Artist':
+            self.radio_sort_artist.set_active(True)
+        elif self.userconfig['grid']['order']['field'] == 'Album':
+            self.radio_sort_album.set_active(True)
+        elif self.userconfig['grid']['order']['field'] == 'Title':
+            self.radio_sort_title.set_active(True)
+        elif self.userconfig['grid']['order']['field'] == 'Length':
+            self.radio_sort_length.set_active(True)
+        elif self.userconfig['grid']['order']['field'] == 'Year':
+            self.radio_sort_year.set_active(True)
+        elif self.userconfig['grid']['order']['field'] == 'Added':
+            self.radio_sort_added.set_active(True)
+        elif self.userconfig['grid']['order']['field'] == 'Played':
+            self.radio_sort_played.set_active(True)
+
 
     def on_sort_radio_toggled(self, widget):
         if widget is None or widget.get_active() or not isinstance(widget, Gtk.RadioButton):
-            order = ''
-            desc = self.chk_sort_desc.get_active()
-            if self.radio_sort_artist.get_active():
-                order = 'Artist'
-            elif self.radio_sort_album.get_active():
-                order = 'Album'
-            elif self.radio_sort_title.get_active():
-                order = 'Title'
-            elif self.radio_sort_length.get_active():
-                order = 'Length'
-            elif self.radio_sort_year.get_active():
-                order = 'Year'
-            elif self.radio_sort_added.get_active():
-                order = 'Added'
-            elif self.radio_sort_played.get_active():
-                order = 'Played'
+            self.userconfig['grid']['order']['field'] = ''
+            self.userconfig['grid']['order']['desc'] = self.chk_sort_desc.get_active()
 
-            threading.Thread(target=lambda: self.__create_model(self.player.library.search_song(order, desc))).start()
+            if self.radio_sort_artist.get_active():
+                self.userconfig['grid']['order']['field'] = 'Artist'
+            elif self.radio_sort_album.get_active():
+                self.userconfig['grid']['order']['field'] = 'Album'
+            elif self.radio_sort_title.get_active():
+                self.userconfig['grid']['order']['field'] = 'Title'
+            elif self.radio_sort_length.get_active():
+                self.userconfig['grid']['order']['field'] = 'Length'
+            elif self.radio_sort_year.get_active():
+                self.userconfig['grid']['order']['field'] = 'Year'
+            elif self.radio_sort_added.get_active():
+                self.userconfig['grid']['order']['field'] = 'Added'
+            elif self.radio_sort_played.get_active():
+                self.userconfig['grid']['order']['field'] = 'Played'
+            
+            threading.Thread(target=self.userconfig.save).start()
+            threading.Thread(target=self.__create_model).start()
