@@ -65,3 +65,6 @@ class UserConfig(object):
 
     def __getitem__(self, key):
         return self._data[key]
+
+    def __setitem__(self, key, value):
+        self._data[key] = value
