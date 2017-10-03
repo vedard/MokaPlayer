@@ -1,5 +1,4 @@
 import logging
-import peewee
 import mimetypes
 import pathlib
 
@@ -130,7 +129,7 @@ class Library(object):
         with DB.atomic():
             for index, path in enumerate(list_new_path):
                 mime = mimetypes.guess_type(path)
-                if mime[0] and 'audio' in mime[0] and 'mpegurl' not in mime[0]:
+                if mime[0] and 'audio' in str(mime[0]) and 'mpegurl' not in str(mime[0]):
                     s = Song(Path=path)
                     s.read_tags()
                     s.save()

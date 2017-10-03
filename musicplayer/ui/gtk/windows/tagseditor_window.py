@@ -2,7 +2,6 @@ import ast
 import logging
 import arrow
 
-from threading import Thread
 
 from gi.repository import Gtk
 from gi.repository import GObject
