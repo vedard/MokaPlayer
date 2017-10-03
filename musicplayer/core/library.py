@@ -30,10 +30,10 @@ class Library(object):
         self._musics_folder = self.userconfig["library"]["music_directory"]
         self._playlists_folder = self.userconfig["library"]["playlist_directory"]
         self._artworks_folder = self.appconfig.ARTWORK_CACHE_DIRECTORY
-    
+
     def get_songs(self, path_list):
         return Song.select().where(Song.Path << path_list)
-    
+
     def get_song(self, path):
         try:
             return Song.get(Song.Path==path)
@@ -66,7 +66,7 @@ class Library(object):
                             Song.Album,
                             Song.Discnumber,
                             Song.Tracknumber]
-        
+
         elif order == 'Added':
             order_fields = [Song.Added,
                             Song.AlbumArtist,
@@ -74,21 +74,21 @@ class Library(object):
                             Song.Album,
                             Song.Discnumber,
                             Song.Tracknumber]
-        
+
         elif order == 'Title':
             order_fields = [Song.Title]
-       
+
         elif order == 'Length':
             order_fields = [Song.Length]
-       
+
         elif order == 'Played':
             order_fields = [Song.Played]
-        
+
         if desc:
             order_fields[0] = -order_fields[0]
 
         return Song.select().order_by(*order_fields)
-    
+
     def sync_artwork(self):
         """ For every album with a missing cover try to fetch it """
         list_album = Album.select()
@@ -96,7 +96,7 @@ class Library(object):
             for index, album in enumerate(list_album):
                 if not album.Cover or not pathlib.Path(album.Cover).exists():
                     path = pathlib.Path(album.Path).parent if pathlib.Path(album.Path).is_file else album.Path
-                    album.Cover = artworks.get_album_artwork(self.appconfig.LASTFM_SECRET_API_KEY, 
+                    album.Cover = artworks.get_album_artwork(self.appconfig.LASTFM_SECRET_API_KEY,
                                                              self._artworks_folder, album.Name,
                                                              album.Artist, path)
                     album.save()
@@ -113,7 +113,7 @@ class Library(object):
         """
         if self._musics_folder is None or not pathlib.Path(self._musics_folder).is_dir():
             raise ValueError('Invalid music folder: ' + str(self._musics_folder))
-        
+
         self.logger.info(f"Scanning {self._musics_folder}")
         self.__sync_songs()
         self.__sync_artists()
@@ -149,31 +149,31 @@ class Library(object):
         list_path = set(str(x) for x in pathlib.Path(
             self._playlists_folder).glob('**/*m3u'))
 
-        with DB.atomic():
+        with database_context.atomic():
             for path in list_path:
                 playlist = PlaylistM3u(path)
                 Playlist(Name=playlist.name, Path=playlist.location).save()
 
     def __sync_artists(self):
         self.logger.info('Scanning artists')
-        DB.execute_sql("""
-            INSERT INTO ARTIST ('Name') 
-            SELECT DISTINCT AlbumArtist FROM Song 
+        database_context.execute_sql("""
+            INSERT INTO ARTIST ('Name')
+            SELECT DISTINCT AlbumArtist FROM Song
             LEFT JOIN Artist ON Song.AlbumArtist = Artist.Name
             WHERE AlbumArtist != '' AND ArtistId IS NULL
         """)
 
     def __sync_albums(self):
         self.logger.info('Scanning albums')
-        DB.execute_sql("""
+        database_context.execute_sql("""
             INSERT INTO album ('Name', 'Year', 'Path', 'Artist')
             SELECT song.album, song.year, song.path, song.albumartist
             FROM   song
             LEFT JOIN album ON album.NAME = song.album AND album.artist LIKE song.albumartist
             WHERE  song.album != '' AND album.albumid IS NULL
-            GROUP  BY song.album  
+            GROUP  BY song.album
         """)
-    
+
     # def vplayer_library_converter(self):
     #     import udatetime, json, gzip, os
     #     with DB.atomic():
