@@ -13,7 +13,7 @@ class Streamer(object):
     Attributes:
         _state: An enum {PLAYING, STOPED, PAUSED}
         _playbin: The gst element that can play a stream
-    
+
     Properties:
         stream: The file or url that will play next
         state: An enum {PLAYING, STOPED, PAUSED}
@@ -34,7 +34,7 @@ class Streamer(object):
         self._playbin = Gst.ElementFactory.make('playbin', None)
 
         self.audio_changed = audio_changed
-        
+
         if about_to_finish is not None:
             self._playbin.connect("about-to-finish", about_to_finish)
 
@@ -46,7 +46,7 @@ class Streamer(object):
         self.logger.debug('Play')
         self._playbin.set_state(Gst.State.READY)
         self.logger.debug('READY')
-        
+
         if stream is not None:
             self.stream = stream
 
@@ -72,7 +72,7 @@ class Streamer(object):
         self._playbin.set_state(Gst.State.PLAYING)
         self._state = Streamer.State.PLAYING
         self.logger.debug('PLAYING')
-    
+
     @property
     def stream(self):
         return self._playbin.props.uri
