@@ -27,7 +27,7 @@ class MainWindow(Gtk.Window):
         self.appconfig = appconfig
         self.userconfig = userconfig
         self.player = player
-        
+
         if self.userconfig['gtk']['darktheme']:
             settings = Gtk.Settings.get_default()
             settings.set_property("gtk-application-prefer-dark-theme", True)
@@ -133,9 +133,8 @@ class MainWindow(Gtk.Window):
             self.lbl_current_title.set_text('')
             self.lbl_current_song_infos.set_text('')
 
-        if album:
-            self.img_current_album.set_from_pixbuf(image_helper.load(album.Cover if album else None, 
-                                                                     140, 140))
+        self.img_current_album.set_from_pixbuf(image_helper.load(album.Cover if album else None,
+                                                                 140, 140))
 
     def __set_current_play_icon(self):
         if self.player.streamer.state == self.player.streamer.State.PLAYING:
@@ -345,7 +344,7 @@ class MainWindow(Gtk.Window):
         self.prb_current_time.set_fraction(fraction)
 
         return True
-    
+
     def __init_sort_radio(self):
         self.chk_sort_desc.set_active(self.userconfig['grid']['order']['desc'])
         if self.userconfig['grid']['order']['field'] == 'Artist':
@@ -383,6 +382,6 @@ class MainWindow(Gtk.Window):
                 self.userconfig['grid']['order']['field'] = 'Added'
             elif self.radio_sort_played.get_active():
                 self.userconfig['grid']['order']['field'] = 'Played'
-            
+
             threading.Thread(target=self.userconfig.save).start()
             threading.Thread(target=self.__create_model).start()
