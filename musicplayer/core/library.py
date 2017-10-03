@@ -1,3 +1,4 @@
+import time
 import logging
 import mimetypes
 import pathlib
@@ -14,6 +15,10 @@ class Library(object):
         _playlist_folder: A string indicating where the playlists is located
 
     """
+
+    INGORE_EXTENSION = {'.jpg', '.jpeg', '.db',
+                        '.ini', '.png', '.bmp', '.pdf',
+                        '.tif', '.txt', '.nfo',}
 
     def __init__(self, appconfig, userconfig):
         self.logger = logging.getLogger('Library')
@@ -115,28 +120,38 @@ class Library(object):
             raise ValueError('Invalid music folder: ' + str(self._musics_folder))
 
         self.logger.info(f"Scanning {self._musics_folder}")
+        start = time.perf_counter()
         self.__sync_songs()
         self.__sync_artists()
         self.__sync_albums()
-        self.logger.info('Scan ended')
+        end = time.perf_counter()
+        self.logger.info('Scan ended in {:.3f}'.format(end - start))
 
     def __sync_songs(self):
-        list_all_path = set(str(x.resolve(False)) for x in pathlib.Path(self._musics_folder).glob('**/*') if not x.is_dir())
-        list_known_path = set([x.Path for x in Song.select(Song.Path)])
-        list_new_path = set( [x for x in list_all_path if x not in list_known_path])
-        list_deleted_song = set( [x for x in list_known_path if x not in list_all_path])
+        paths = []
+        for x in pathlib.Path(self._musics_folder).glob('**/*'):
+            if x.is_dir():
+                continue
+            if x.suffix.lower() in self.INGORE_EXTENSION:
+                continue
+            paths.append(str(x.resolve(False)))
+
+        all_paths = set(paths)
+        known_paths = {x.Path for x in Song.select(Song.Path)}
+        new_paths = all_paths - known_paths
+        deleted_paths = known_paths - all_paths
 
         with database_context.atomic():
-            for index, path in enumerate(list_new_path):
+            for index, path in enumerate(new_paths):
                 mime = mimetypes.guess_type(path)
                 if mime[0] and 'audio' in str(mime[0]) and 'mpegurl' not in str(mime[0]):
                     s = Song(Path=path)
                     s.read_tags()
                     s.save()
-                if index % 10 == 0:
-                    self.logger.info(f'Scanning songs {index}/{len(list_new_path)}')
+                if index % 300 == 0 and index > 0:
+                    self.logger.info(f'Scanning songs {index}/{len(new_paths)}')
 
-            for song in list_deleted_song:
+            for song in deleted_paths:
                 Song.delete().where(Song.Path == song).execute()
 
         self.logger.info(f'Scanning songs completed')
