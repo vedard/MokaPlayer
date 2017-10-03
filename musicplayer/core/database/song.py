@@ -3,7 +3,7 @@ import logging
 import peewee
 import taglib
 
-DB = peewee.SqliteDatabase(None)
+from musicplayer.core.database import database_context
 
 class Song(peewee.Model):
     songId = peewee.PrimaryKeyField()
@@ -27,7 +27,7 @@ class Song(peewee.Model):
     Bitrate = peewee.IntegerField(null=True)
 
     class Meta:
-        database = DB
+        database = database_context
     
     def __get_tag_value(self, tags, name):
         l = tags.get(name, [''])
@@ -88,34 +88,3 @@ class Song(peewee.Model):
 
         except:
             logging.exception('Could not read tag from ' + self.Path)
-
-
-class Album(peewee.Model):
-    AlbumId= peewee.PrimaryKeyField()
-    Name = peewee.CharField(index=True) 
-    Path = peewee.CharField(index=True) 
-    Year = peewee.CharField(null=True)
-    Cover = peewee.CharField(null=True)
-    Description = peewee.CharField(null=True)
-    Artist = peewee.CharField(null=True)
-    
-    class Meta:
-        database = DB
-
-
-class Artist(peewee.Model):
-    ArtistId = peewee.PrimaryKeyField()
-    Name = peewee.CharField(index=True)
-    Cover = peewee.CharField(null=True)
-    Biographie = peewee.CharField(null=True)
-    
-    class Meta:
-        database = DB
-
-class Playlist(peewee.Model):
-    PlaylistId = peewee.PrimaryKeyField()
-    Name = peewee.CharField(index=True)
-    Path = peewee.CharField()
-
-    class Meta:
-        database = DB

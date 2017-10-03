@@ -2,7 +2,7 @@ import logging
 import mimetypes
 import pathlib
 
-from musicplayer.core.database import DB, Song, Album, Artist, Playlist
+from musicplayer.core.database import database_context, Song, Album, Artist, Playlist
 from musicplayer.core.playlist_m3u import PlaylistM3u
 from musicplayer.core.fetchers import artworks
 
@@ -17,7 +17,7 @@ class Library(object):
 
     def __init__(self, appconfig, userconfig):
         self.logger = logging.getLogger('Library')
-        DB.init(appconfig.DATABASE_FILE)
+        database_context.init(appconfig.DATABASE_FILE)
 
         Song.create_table(True)
         Album.create_table(True)
@@ -92,7 +92,7 @@ class Library(object):
     def sync_artwork(self):
         """ For every album with a missing cover try to fetch it """
         list_album = Album.select()
-        with DB.atomic():
+        with database_context.atomic():
             for index, album in enumerate(list_album):
                 if not album.Cover or not pathlib.Path(album.Cover).exists():
                     path = pathlib.Path(album.Path).parent if pathlib.Path(album.Path).is_file else album.Path
@@ -126,7 +126,7 @@ class Library(object):
         list_new_path = set( [x for x in list_all_path if x not in list_known_path])
         list_deleted_song = set( [x for x in list_known_path if x not in list_all_path])
 
-        with DB.atomic():
+        with database_context.atomic():
             for index, path in enumerate(list_new_path):
                 mime = mimetypes.guess_type(path)
                 if mime[0] and 'audio' in str(mime[0]) and 'mpegurl' not in str(mime[0]):

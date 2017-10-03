@@ -6,7 +6,7 @@ import arrow
 from gi.repository import Gtk
 from gi.repository import GObject
 
-from musicplayer.core.database import DB
+from musicplayer.core.database import database_context
 from musicplayer.ui.gtk.helper import date_helper
 
 class TagsEditorWindow:
@@ -77,7 +77,7 @@ class TagsEditorWindow:
             genres = self.get_value(self.txt_Genre)
             comments = self.get_value(self.txt_Comment)
 
-            with DB.atomic():
+            with database_context.atomic():
                 for index, song in enumerate(self.songs):
                     song.Title = titles[index]
                     song.Artist = artists[index]
