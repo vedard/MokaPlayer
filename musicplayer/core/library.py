@@ -177,6 +177,12 @@ class Library(object):
             LEFT JOIN Artist ON Song.AlbumArtist = Artist.Name
             WHERE AlbumArtist != '' AND ArtistId IS NULL
         """)
+        database_context.execute_sql("""
+            DELETE FROM Artist
+            where not exists (select songid
+                              from song
+                              where Song.AlbumArtist = Artist.Name)
+        """)
 
     def __sync_albums(self):
         self.logger.info('Scanning albums')
@@ -187,6 +193,14 @@ class Library(object):
             LEFT JOIN album ON album.NAME = song.album AND album.artist LIKE song.albumartist
             WHERE  song.album != '' AND album.albumid IS NULL
             GROUP  BY song.album
+        """)
+
+        database_context.execute_sql("""
+            DELETE FROM Album
+            where not exists (select songid
+                            from song
+                            where album.NAME = song.album AND
+                                    album.artist LIKE song.albumartist)
         """)
 
     # def vplayer_library_converter(self):

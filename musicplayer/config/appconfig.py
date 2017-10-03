@@ -25,7 +25,7 @@ class Developpement(Default):
 
 
 class Testing(Default):
-    DATABASE_FILE = 'test_database.db'
+    DATABASE_FILE = ':memory:'
     USER_CONFIG_FILE = 'test_config.yaml'
     PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'test', 'player.gz' )
     ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'test', 'artworks' )

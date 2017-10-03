@@ -11,7 +11,7 @@ def merge(d1, d2):
         if k in d1 and isinstance(d1[k], dict) and isinstance(d2[k], dict):
             merge(d1[k], d2[k])
         else:
-            d1[k] = d2[k]   
+            d1[k] = d2[k]
 
 
 class UserConfig(object):
@@ -20,16 +20,17 @@ class UserConfig(object):
 
     APPLICATION_DEFAULT_CONFIG_PATH = 'musicplayer/resources/default_user_config.yaml'
 
-    def __init__(self, path):
+    def __init__(self, path=None):
         """ Create the user configuration file if not found
             Parse the user configuration file
         """
         self.path = path
-
-        if self.get_file().exists():
-            self.read()
-        else:
-            self.create()
+        self._data = {}
+        if path is not None:
+            if self.get_file().exists():
+                self.read()
+            elif path:
+                self.create()
 
     def read(self):
         """ Parse the YAML file
@@ -41,7 +42,7 @@ class UserConfig(object):
                 merge(self._data, yaml.load(stream))
         except:
             logging.critical('Could not load the user configuration file', exc_info=True)
-    
+
     def save(self):
         """ Save the YAML file
         """

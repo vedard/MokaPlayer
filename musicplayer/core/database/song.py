@@ -28,7 +28,7 @@ class Song(peewee.Model):
 
     class Meta:
         database = database_context
-    
+
     def __get_tag_value(self, tags, name):
         l = tags.get(name, [''])
         return l[0] if any(l) else ''
@@ -38,7 +38,7 @@ class Song(peewee.Model):
         """
         try:
             fileref = taglib.File(self.Path)
-            
+
             fileref.tags['TITLE'] = [self.Title]
             fileref.tags['ALBUM'] = [self.Album]
             fileref.tags['ARTIST'] = [self.Artist]
@@ -49,7 +49,7 @@ class Song(peewee.Model):
             fileref.tags['GENRE'] = [self.Genre]
             fileref.tags['TRACKNUMBER'] = [str(self.Tracknumber)]
             fileref.tags['ALBUMARTIST'] = [self.AlbumArtist]
-            
+
             fileref.save()
         except:
             logging.exception('Could not write tag to ' + self.path)
@@ -69,7 +69,7 @@ class Song(peewee.Model):
             self.Lyrics = self.__get_tag_value(fileref.tags, 'LYRICS')
             self.Genre = self.__get_tag_value(fileref.tags, 'GENRE')
             self.Tracknumber = self.__get_tag_value(fileref.tags, 'TRACKNUMBER')
-            self.AlbumArtist = self.__get_tag_value(fileref.tags, 'ALBUMARTIST') 
+            self.AlbumArtist = self.__get_tag_value(fileref.tags, 'ALBUMARTIST')
             self.Length = fileref.length
             self.Channels = fileref.channels
             self.Bitrate = fileref.bitrate
