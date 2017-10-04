@@ -2,7 +2,7 @@ from gi.repository import Gtk
 import arrow
 import re
 
-from musicplayer.ui.gtk.helper import date_helper
+from musicplayer.core.helpers import time as time_helper
 
 class AdapterSong:
     @staticmethod
@@ -12,13 +12,13 @@ class AdapterSong:
             song.Title or 'Unkown',
             song.AlbumArtist or 'Unkown' ,
             song.Album or 'Unkown',
-            date_helper.seconds_to_string(song.Length),
+            time_helper.seconds_to_string(song.Length),
             song.Year or '0000',
             arrow.Arrow(song.Added.year, song.Added.month, song.Added.day).humanize(),
             song.Played,
             song.Genre
         ]
-    
+
     @staticmethod
     def create_store():
         return Gtk.ListStore(str,str,str,str,str,str,str,str,str)
@@ -26,7 +26,7 @@ class AdapterSong:
     @staticmethod
     def create_col_number():
         return [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    
+
     @staticmethod
     def search(text, row):
         if not text:

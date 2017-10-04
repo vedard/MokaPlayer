@@ -24,7 +24,7 @@ class UserConfig(object):
         """ Create the user configuration file if not found
             Parse the user configuration file
         """
-        self.path = path
+        self._path = path
         self._data = {}
         if path is not None:
             if self.get_file().exists():
@@ -56,7 +56,7 @@ class UserConfig(object):
     def get_file(self):
         """ Return a file object of the current user configuration file
         """
-        return pathlib.Path(self.path)
+        return pathlib.Path(self._path)
 
     def create(self):
         """ Copy the default user configuration file, then parse it

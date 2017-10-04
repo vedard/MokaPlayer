@@ -1,5 +1,6 @@
 import unittest
 import os
+import logging
 import pathlib
 
 from musicplayer.config import appconfig
@@ -14,6 +15,18 @@ class UserConfigTest(unittest.TestCase):
 
     def tearDown(self):
         os.remove(self.CONFIG_FILE_PATH)
+
+    def test_read_invalid_file(self):
+        with self.assertLogs(level=logging.CRITICAL):
+            tmp = userconfig.UserConfig()
+            tmp._path ='invalid/99999999/file'
+            tmp.read()
+
+    def test_save_invalid_file(self):
+        with self.assertLogs(level=logging.CRITICAL):
+            tmp = userconfig.UserConfig()
+            tmp._path ='invalid/99999999/file'
+            tmp.save()
 
     def test_get_file(self):
         self.assertIsInstance(self.cfg.get_file(), pathlib.Path)

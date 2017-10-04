@@ -1,6 +1,7 @@
 import unittest
 import pathlib
 import shutil
+import logging
 from musicplayer.core.database import Song
 
 
@@ -15,6 +16,16 @@ class TagsTest(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(TagsTest.FOLDER)
+
+    def test_read_invalid_file(self):
+        with self.assertLogs(level=logging.ERROR):
+            tmp = Song(Path='invalid/99999999/file')
+            tmp.read_tags()
+
+    def test_save_invalid_file(self):
+        with self.assertLogs(level=logging.ERROR):
+            tmp = Song(Path='invalid/99999999/file')
+            tmp.write_tags()
 
     def test_read_tags(self):
         shutil.copy(TagsTest.SRC_FILE,  TagsTest.DST_FILE)

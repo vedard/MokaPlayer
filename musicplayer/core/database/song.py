@@ -52,7 +52,7 @@ class Song(peewee.Model):
 
             fileref.save()
         except:
-            logging.exception('Could not write tag to ' + self.path)
+            logging.exception('Could not write tag to ' + self.Path)
 
     def read_tags(self):
         """ Read tags from the file

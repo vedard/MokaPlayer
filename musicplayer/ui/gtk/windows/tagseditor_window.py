@@ -7,10 +7,12 @@ from gi.repository import Gtk
 from gi.repository import GObject
 
 from musicplayer.core.database import database_context
-from musicplayer.ui.gtk.helper import date_helper
+from musicplayer.core.helpers import time as time_helper
 
 class TagsEditorWindow:
     def __init__(self, songs):
+        self.songs = songs
+
         self.builder = Gtk.Builder()
         self.builder.add_from_file('musicplayer/ui/gtk/resources/tagseditor_window.ui')
         self.builder.connect_signals(self)
@@ -30,27 +32,29 @@ class TagsEditorWindow:
         self.txt_Bitrate = self.builder.get_object("txt_Bitrate")
         self.txt_Path = self.builder.get_object("txt_Path")
 
-        self.songs = songs
+        self.load_text()
 
-        self.set_text(self.txt_Path, [s.Path for s in songs])
-        self.set_text(self.txt_Bitrate, [s.Bitrate for s in songs])
-        self.set_text(self.txt_Channels, [s.Channels for s in songs])
-        self.set_text(self.txt_Length, [date_helper.seconds_to_string(s.Length) for s in songs])
-        self.set_text(self.txt_Title, [s.Title for s in songs])
-        self.set_text(self.txt_Artist, [s.Artist for s in songs])
-        self.set_text(self.txt_Album, [s.Album for s in songs])
-        self.set_text(self.txt_Genre, [s.Genre for s in songs])
-        self.set_text(self.txt_Year, [s.Year for s in songs])
-        self.set_text(self.txt_Comment, [s.Comment for s in songs])
-        self.set_text(self.txt_Added, [str(s.Added) for s in songs])
-        self.set_text(self.txt_ArtistAlbum, [s.AlbumArtist for s in songs])
-        self.set_text(self.txt_TrackNumber, [s.Tracknumber for s in songs])
+    def load_text(self):
+        self.set_text(self.txt_Path, lambda s: s.Path)
+        self.set_text(self.txt_Bitrate, lambda s : s.Bitrate)
+        self.set_text(self.txt_Channels, lambda s : s.Channels)
+        self.set_text(self.txt_Length, lambda s : time_helper.seconds_to_string(s.Length))
+        self.set_text(self.txt_Title, lambda s : s.Title)
+        self.set_text(self.txt_Artist, lambda s : s.Artist)
+        self.set_text(self.txt_Album, lambda s : s.Album)
+        self.set_text(self.txt_Genre, lambda s : s.Genre)
+        self.set_text(self.txt_Year, lambda s : s.Year)
+        self.set_text(self.txt_Comment, lambda s : s.Comment)
+        self.set_text(self.txt_Added, lambda s : str(s.Added))
+        self.set_text(self.txt_ArtistAlbum, lambda s : s.AlbumArtist)
+        self.set_text(self.txt_TrackNumber, lambda s : s.Tracknumber)
 
-    
+
     def get_window(self):
         return self.window
 
-    def set_text(self, textentry, list_value):
+    def set_text(self, textentry, field):
+        list_value = [field(s) for s in self.songs]
         # If every item are the same http://stackoverflow.com/a/3844948
         if list_value.count(list_value[0]) == len(list_value):
             textentry.set_text(str(list_value[0]))

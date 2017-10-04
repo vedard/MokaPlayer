@@ -8,7 +8,8 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 from musicplayer.core.player import Player
-from musicplayer.ui.gtk.helper import image_helper, file_helper, date_helper
+from musicplayer.core.helpers import time as time_helper
+from musicplayer.ui.gtk.helper import image_helper, file_helper
 from musicplayer.ui.gtk.adapter import AdapterSong
 from musicplayer.ui.gtk.windows import AboutWindow
 from musicplayer.ui.gtk.windows import LyricsWindow
@@ -337,8 +338,8 @@ class MainWindow(Gtk.Window):
         position = self.player.streamer.position
         duration = self.player.streamer.duration
         fraction = position / duration if duration else 0
-        position_text = date_helper.seconds_to_string(position)
-        duration_text = date_helper.seconds_to_string(duration)
+        position_text = time_helper.seconds_to_string(position)
+        duration_text = time_helper.seconds_to_string(duration)
 
         self.lbl_current_time.set_text(f'{position_text} / {duration_text}')
         self.prb_current_time.set_fraction(fraction)

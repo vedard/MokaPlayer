@@ -6,3 +6,4 @@ secret.py
 dev_config.yaml
 .pylinrc
 reports/*
+.coverage
