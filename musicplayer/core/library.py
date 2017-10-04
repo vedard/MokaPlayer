@@ -158,7 +158,7 @@ class Library(object):
 
     def __sync_playlists(self):
         self.logger.info('Scanning playlists')
-        if self._playlists_folder is None or not pathlib.Path(self._playlists_folder).is_dir():
+        if self._playlists_folder or not pathlib.Path(self._playlists_folder).is_dir():
             return
 
         list_path = set(str(x) for x in pathlib.Path(

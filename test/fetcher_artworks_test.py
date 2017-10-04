@@ -32,7 +32,7 @@ class FetcherArtworkTest(unittest.TestCase):
 
         self.assertTrue(pathlib.Path(artist_artwork).exists())
         self.assertTrue(pathlib.Path(album_artwork).exists())
-        
+
 
     def test_lastfm_provider(self):
         provider = artworksfetcher.ProviderLastFM(api_key=appconfig.Testing.LASTFM_SECRET_API_KEY,

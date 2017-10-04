@@ -5,3 +5,4 @@ __pycache__
 secret.py
 dev_config.yaml
 .pylinrc
+reports/*

@@ -11,27 +11,27 @@ class UserConfigTest(unittest.TestCase):
 
     def setUp(self):
         self.cfg = userconfig.UserConfig(self.CONFIG_FILE_PATH)
-    
+
     def tearDown(self):
         os.remove(self.CONFIG_FILE_PATH)
 
     def test_get_file(self):
         self.assertIsInstance(self.cfg.get_file(), pathlib.Path)
-        self.assertEqual(self.cfg.get_file().resolve(), 
+        self.assertEqual(self.cfg.get_file().resolve(),
                          pathlib.Path(self.CONFIG_FILE_PATH).resolve())
 
     def test_create(self):
         os.remove(self.CONFIG_FILE_PATH)
         self.cfg.create()
         self.assertTrue(os.path.exists(self.CONFIG_FILE_PATH))
-    
+
     def test_read(self):
         self.cfg['data'] = 1
         self.cfg.save()
         self.cfg['data'] = 3
         self.cfg.read()
         self.assertEqual(1, self.cfg['data'])
-    
+
     def test_save(self):
         self.cfg['data'] = 1
         self.assertEqual(1, self.cfg['data'])
