@@ -8,7 +8,7 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 from musicplayer.core.player import Player
-from musicplayer.core.helpers import time as time_helper
+from musicplayer.core.helpers import time_helper
 from musicplayer.ui.gtk.helper import image_helper, file_helper
 from musicplayer.ui.gtk.adapter import AdapterSong
 from musicplayer.ui.gtk.windows import AboutWindow

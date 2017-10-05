@@ -2,7 +2,7 @@ from gi.repository import Gtk
 import arrow
 import re
 
-from musicplayer.core.helpers import time as time_helper
+from musicplayer.core.helpers import time_helper
 
 class AdapterSong:
     @staticmethod

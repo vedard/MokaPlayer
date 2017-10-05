@@ -7,14 +7,16 @@ from gi.repository import Gtk
 from gi.repository import GObject
 
 from musicplayer.core.database import database_context
-from musicplayer.core.helpers import time as time_helper
+from musicplayer.core.helpers import time_helper
+
 
 class TagsEditorWindow:
     def __init__(self, songs):
         self.songs = songs
 
         self.builder = Gtk.Builder()
-        self.builder.add_from_file('musicplayer/ui/gtk/resources/tagseditor_window.ui')
+        self.builder.add_from_file(
+            'musicplayer/ui/gtk/resources/tagseditor_window.ui')
         self.builder.connect_signals(self)
 
         self.window = self.builder.get_object("tagseditor_window")
@@ -36,19 +38,19 @@ class TagsEditorWindow:
 
     def load_text(self):
         self.set_text(self.txt_Path, lambda s: s.Path)
-        self.set_text(self.txt_Bitrate, lambda s : s.Bitrate)
-        self.set_text(self.txt_Channels, lambda s : s.Channels)
-        self.set_text(self.txt_Length, lambda s : time_helper.seconds_to_string(s.Length))
-        self.set_text(self.txt_Title, lambda s : s.Title)
-        self.set_text(self.txt_Artist, lambda s : s.Artist)
-        self.set_text(self.txt_Album, lambda s : s.Album)
-        self.set_text(self.txt_Genre, lambda s : s.Genre)
-        self.set_text(self.txt_Year, lambda s : s.Year)
-        self.set_text(self.txt_Comment, lambda s : s.Comment)
-        self.set_text(self.txt_Added, lambda s : str(s.Added))
-        self.set_text(self.txt_ArtistAlbum, lambda s : s.AlbumArtist)
-        self.set_text(self.txt_TrackNumber, lambda s : s.Tracknumber)
-
+        self.set_text(self.txt_Bitrate, lambda s: s.Bitrate)
+        self.set_text(self.txt_Channels, lambda s: s.Channels)
+        self.set_text(self.txt_Length,
+                      lambda s: time_helper.seconds_to_string(s.Length))
+        self.set_text(self.txt_Title, lambda s: s.Title)
+        self.set_text(self.txt_Artist, lambda s: s.Artist)
+        self.set_text(self.txt_Album, lambda s: s.Album)
+        self.set_text(self.txt_Genre, lambda s: s.Genre)
+        self.set_text(self.txt_Year, lambda s: s.Year)
+        self.set_text(self.txt_Comment, lambda s: s.Comment)
+        self.set_text(self.txt_Added, lambda s: str(s.Added))
+        self.set_text(self.txt_ArtistAlbum, lambda s: s.AlbumArtist)
+        self.set_text(self.txt_TrackNumber, lambda s: s.Tracknumber)
 
     def get_window(self):
         return self.window
@@ -99,7 +101,6 @@ class TagsEditorWindow:
 
         except Exception as e:
             logging.exception("Could not save tags")
-
 
     def on_btnCancel_clicked(self, button):
         self.window.destroy()
