@@ -1,6 +1,9 @@
 run:
 	python3 application.py --debug
 
+format:
+	autopep8 musicplayer --recursive --in-place --pep8-passes 2000 --max-line-length 110
+
 clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type f -name "*.ui~" -delete
@@ -30,6 +33,12 @@ help:
 	@echo "    Download requirements"
 	@echo "test"
 	@echo "    Run all test"
+	@echo "format"
+	@echo "    Format all code with autopep8"
+	@echo "report-coverage"
+	@echo "    Generate a report (test coverage) with coverage"
+	@echo "report-pep8"
+	@echo "    Generate a report (syntax) with pep8 and pepper8"
 	@echo "run"
 	@echo "    Run the program"
 	@echo "clean"
