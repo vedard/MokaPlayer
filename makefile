@@ -9,13 +9,20 @@ clean:
 test:
 	python3 -m unittest discover test "*_test.py"
 
+report-pep8:
+	mkdir -p reports/pep8
+	pep8 musicplayer | pepper8 > reports/pep8/index.html
+	xdg-open reports/pep8/index.html
+
 report-coverage:
+	mkdir -p reports/coverage
 	coverage run --source . -m unittest discover test "*_test.py"
 	coverage html -d reports/coverage
 	xdg-open reports/coverage/index.html
 
 init:
 	pip3 install -r requirements.txt
+	pip3 install -r requirements-dev.txt
 
 help:
 	@echo ""
@@ -28,4 +35,4 @@ help:
 	@echo "clean"
 	@echo "    Remove python artifacts."
 
-.PHONY: init test clean run help coverage-report
+.PHONY: init test clean run help
