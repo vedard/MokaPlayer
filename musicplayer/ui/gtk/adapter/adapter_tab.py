@@ -10,10 +10,10 @@ class AdapterTab:
             tab['rating'],
             tab['url']
         ]
-    
+
     @staticmethod
     def create_store():
-        return Gtk.ListStore(str,str,int,str)
+        return Gtk.ListStore(str, str, int, str)
 
     @staticmethod
     def create_col_number():

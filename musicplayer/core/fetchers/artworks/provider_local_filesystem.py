@@ -2,6 +2,7 @@ import pathlib
 import difflib
 import os
 
+
 class ProviderLocalFileSystem(object):
 
     IMAGE_SUFFIXES = ['.JPG', '.JPEG', '.PNG', '.BMP']

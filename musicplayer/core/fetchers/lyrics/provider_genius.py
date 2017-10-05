@@ -1,5 +1,6 @@
 from .provider_base import ProviderBase
 
+
 class ProviderGenius(ProviderBase):
     def get_name(self):
         return "Genius"

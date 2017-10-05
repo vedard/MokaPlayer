@@ -7,6 +7,7 @@ import pathlib
 import enum
 import logging
 
+
 class Streamer(object):
     """ Audio engine, for playing music
 

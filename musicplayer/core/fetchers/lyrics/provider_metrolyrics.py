@@ -1,5 +1,6 @@
 from .provider_base import ProviderBase
 
+
 class ProviderMetrolyrics(ProviderBase):
     def get_name(self):
         return "metrolyrics"

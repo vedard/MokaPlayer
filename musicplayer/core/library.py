@@ -7,6 +7,7 @@ from musicplayer.core.database import database_context, Song, Album, Artist, Pla
 from musicplayer.core.playlist_m3u import PlaylistM3u
 from musicplayer.core.fetchers import artworks
 
+
 class Library(object):
     """Explore the music folder and extract songs, album, artist into the database
 
@@ -18,7 +19,7 @@ class Library(object):
 
     INGORE_EXTENSION = {'.jpg', '.jpeg', '.db',
                         '.ini', '.png', '.bmp', '.pdf',
-                        '.tif', '.txt', '.nfo',}
+                        '.tif', '.txt', '.nfo', }
 
     def __init__(self, appconfig, userconfig):
         self.logger = logging.getLogger('Library')
@@ -41,13 +42,13 @@ class Library(object):
 
     def get_song(self, path):
         try:
-            return Song.get(Song.Path==path)
+            return Song.get(Song.Path == path)
         except:
             return None
 
     def get_album(self, name, albumartist):
         try:
-            return Album.get(Album.Name==name, Album.Artist==albumartist)
+            return Album.get(Album.Name == name, Album.Artist == albumartist)
         except:
             return None
 

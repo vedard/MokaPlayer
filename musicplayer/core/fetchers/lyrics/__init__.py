@@ -2,11 +2,11 @@ import random
 import logging
 import requests
 
-from .provider_azlyrics import ProviderAzLyrics 
-from .provider_darklyrics import ProviderDarkLyrics 
+from .provider_azlyrics import ProviderAzLyrics
+from .provider_darklyrics import ProviderDarkLyrics
 from .provider_genius import ProviderGenius
-from .provider_metrolyrics import ProviderMetrolyrics 
-from .provider_musixmatch import ProviderMusicmatch 
+from .provider_metrolyrics import ProviderMetrolyrics
+from .provider_musixmatch import ProviderMusicmatch
 
 
 def get(title, artist, album=''):

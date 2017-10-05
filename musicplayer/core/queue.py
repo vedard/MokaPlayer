@@ -9,20 +9,21 @@ class Queue(object):
         _container: A deque representing a list of objects in a specific order
         _current: Represent last object taken in the queue
     """
+
     def __init__(self):
         self._container = collections.deque()
         self._current = None
-    
+
     def pop(self):
         """Remove the currently playing object"""
         tmp = self._current
         self._current = None
         return tmp
-    
+
     def peek(self):
         """Get the currently playing object"""
         return self._current
-    
+
     def next(self):
         """Move to the next object"""
         if any(self._container):
@@ -49,7 +50,7 @@ class Queue(object):
         else:
             self.prepend(item)
             self.next()
-    
+
     def shuffle(self):
         """Shuffle the container"""
         random.shuffle(self._container)
@@ -58,7 +59,7 @@ class Queue(object):
             self._container.appendleft(self._current)
         except ValueError:
             pass
-    
+
     def append(self, container):
         """Insert objects at the end of the container"""
         if not isinstance(container, collections.MutableSequence):
@@ -70,10 +71,10 @@ class Queue(object):
             except ValueError:
                 pass
             self._container.append(x)
-        
+
         if self._current is None and any(self._container):
             self._current = self._container[0]
-    
+
     def prepend(self, container):
         """Insert objects at the start of the container"""
         if not isinstance(container, collections.MutableSequence):
@@ -108,15 +109,13 @@ class Queue(object):
                 self._container.remove(x)
             except ValueError:
                 pass
-    
+
     def clear(self):
         """Remove every objects from the container"""
         self._container.clear()
 
     def __len__(self):
         return len(self._container)
-    
+
     def __iter__(self):
         return iter(self._container)
-
-

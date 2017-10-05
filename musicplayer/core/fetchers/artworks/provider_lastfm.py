@@ -16,7 +16,6 @@ class ProviderLastFM(object):
         self._api_key = api_key
         self._artwork_folder = artwork_folder
 
-
     def get_name(self):
         "LastFm"
 

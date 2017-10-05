@@ -1,5 +1,6 @@
 from gi.repository import Gtk
 
+
 class HelpShortcutsWindow():
 
     @staticmethod

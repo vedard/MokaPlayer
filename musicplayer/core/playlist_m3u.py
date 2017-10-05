@@ -1,13 +1,15 @@
 import pathlib
 import logging
 
+
 class PlaylistM3u:
     """Represent a list of path or url (media file) loaded from a M3U file
-    
+
     Properties:
         location: A string representing the location of the playlist File
         name: A string representing the name of the file 
     """
+
     def __init__(self, location):
         if not pathlib.Path(location).parent.is_dir():
             raise ValueError('Directory does not exist for: ' + filename)
@@ -15,7 +17,7 @@ class PlaylistM3u:
         self._location = location
         self._name = ''
         self._media_files = []
-    
+
     def read(self):
         try:
             logging.debug('Reading playlist from ' + self.location)
@@ -37,16 +39,16 @@ class PlaylistM3u:
                     f.write(path + '\n')
         except:
             logging.exception('Could not write playlist to ' + self.location)
-    
+
     def clear(self):
         self._media_files.clear()
-    
+
     def __len__(self):
         return len(self._media_files)
-    
+
     def __iter__(self):
         return iter(self._media_files)
-    
+
     def __getitem__(self, key):
         return self._media_files[key]
 
@@ -55,7 +57,7 @@ class PlaylistM3u:
 
     def __delitem__(self, key):
         del(self._media_files[key])
-    
+
     def append(self, value):
         self._media_files.append(value)
 

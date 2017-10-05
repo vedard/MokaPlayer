@@ -26,7 +26,7 @@ class Player(object):
         self.streamer = Streamer(about_to_finish=self.__about_to_finish,
                                  audio_changed=self.__audio_changed,
                                  notify_volume=self.__notify_volume)
-                                 
+
         self.library = Library(self.appconfig, self.userconfig)
         KeyboardClient(self)
 
@@ -88,7 +88,7 @@ class Player(object):
             self.streamer.play(self.queue.peek())
         else:
             self.stop()
-    
+
         self.state_changed.fire()
 
     def restore(self):
@@ -134,14 +134,14 @@ class Player(object):
 
     def __notify_volume(self, data, data2):
         self.volume_changed.fire()
-    
+
     def __set_play_count(self):
         song = self.library.get_song(self.queue.peek())
         try:
             percent = self.streamer.position / self.streamer.duration
         except ZeroDivisionError:
             percent = 0
-        
+
         if song is not None and percent > 0.85:
             song.Played += 1
             song.Last_played = datetime.datetime.now()

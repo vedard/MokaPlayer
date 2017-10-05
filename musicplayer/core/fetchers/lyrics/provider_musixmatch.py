@@ -1,5 +1,6 @@
 from .provider_base import ProviderBase
 
+
 class ProviderMusicmatch(ProviderBase):
     def get_name(self):
         return "Musixmatch"

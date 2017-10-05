@@ -2,6 +2,7 @@ import subprocess
 import sys
 import os
 
+
 def open_file(path):
     """
     Open given file
@@ -17,6 +18,7 @@ def open_file(path):
 
     return ret_code
 
+
 def open_folder(path):
     """
     Open given folder
@@ -24,5 +26,5 @@ def open_folder(path):
 
     if os.path.isfile(path):
         path = os.path.dirname(path)
-    
+
     return open_file(path)

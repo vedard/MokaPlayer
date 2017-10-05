@@ -19,22 +19,22 @@ class Default:
 class Developpement(Default):
     DATABASE_FILE = 'dev_database.db'
     USER_CONFIG_FILE = 'dev_config.yaml'
-    PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'dev', 'player.gz' )
-    ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'dev', 'artworks' )
+    PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'dev', 'player.gz')
+    ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'dev', 'artworks')
     LOG_LEVEL = 'DEBUG'
 
 
 class Testing(Default):
     DATABASE_FILE = ':memory:'
     USER_CONFIG_FILE = 'test_config.yaml'
-    PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'test', 'player.gz' )
-    ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'test', 'artworks' )
+    PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'test', 'player.gz')
+    ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'test', 'artworks')
     LOG_LEVEL = 'INFO'
 
 
 class Production(Default):
     DATABASE_FILE = os.path.join(Default.USER_DIRECTORY, 'database.db')
     USER_CONFIG_FILE = os.path.join(Default.USER_DIRECTORY, 'config.yaml')
-    PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'player.gz' )
-    ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'artworks' )
+    PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'player.gz')
+    ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'artworks')
     LOG_LEVEL = 'WARNING'

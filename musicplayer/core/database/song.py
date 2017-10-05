@@ -5,6 +5,7 @@ import taglib
 
 from musicplayer.core.database import database_context
 
+
 class Song(peewee.Model):
     songId = peewee.PrimaryKeyField()
     Path = peewee.CharField(index=True)

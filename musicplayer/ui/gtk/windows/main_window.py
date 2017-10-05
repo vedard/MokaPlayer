@@ -17,6 +17,7 @@ from musicplayer.ui.gtk.windows import TabsWindow
 from musicplayer.ui.gtk.windows import TagsEditorWindow
 from musicplayer.ui.gtk.windows import HelpShortcutsWindow
 
+
 class MainWindow(Gtk.Window):
     """ Main window
     """
@@ -64,7 +65,8 @@ class MainWindow(Gtk.Window):
         for name in self.userconfig['grid']['columns']:
             for col in columns:
                 if name == col.get_title():
-                    import ipdb; ipdb.set_trace()
+                    import ipdb
+                    ipdb.set_trace()
                     self.gridview.append_column(col)
 
     def __create_model(self):
@@ -213,7 +215,7 @@ class MainWindow(Gtk.Window):
 
     def on_gridview_button_press_event(self, sender, event):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
-            self.menu_gridview.popup( None, None, None, None, event.button, event.time)
+            self.menu_gridview.popup(None, None, None, None, event.button, event.time)
             return True
 
     def on_menu_gridview_append_activate(self, widget):
@@ -362,7 +364,6 @@ class MainWindow(Gtk.Window):
             self.radio_sort_added.set_active(True)
         elif self.userconfig['grid']['order']['field'] == 'Played':
             self.radio_sort_played.set_active(True)
-
 
     def on_sort_radio_toggled(self, widget):
         if widget is None or widget.get_active() or not isinstance(widget, Gtk.RadioButton):

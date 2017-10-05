@@ -1,6 +1,7 @@
 import peewee
 from musicplayer.core.database import database_context
 
+
 class Playlist(peewee.Model):
     PlaylistId = peewee.PrimaryKeyField()
     Name = peewee.CharField(index=True)

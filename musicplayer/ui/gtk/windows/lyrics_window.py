@@ -13,7 +13,7 @@ class LyricsWindow():
         self.window = self.builder.get_object('lyrics_window')
         self.lbl_title = self.builder.get_object('lbl_title')
         self.txt_lyrics = self.builder.get_object('txt_lyrics')
-    
+
     def start_fetch(self, song):
         self.song = song
         self.txt_lyrics.get_buffer().set_text('')
@@ -26,7 +26,7 @@ class LyricsWindow():
 
     def fetch(self):
         ly = self.song.Lyrics
-        
+
         if not ly:
             success, ly = lyrics.get(self.song.Title, self.song.Artist, self.song.Album)
             if success:
@@ -35,14 +35,14 @@ class LyricsWindow():
         else:
             ly = ly + ' (cached)'
 
-        GObject.idle_add(lambda:self.on_fetch_finished(ly))
+        GObject.idle_add(lambda: self.on_fetch_finished(ly))
 
     def on_fetch_finished(self, ly):
         self.txt_lyrics.get_buffer().set_text(ly)
 
     def get_window(self):
         return self.window
-    
+
     def on_btn_refresh_clicked(self, widget):
         if self.song is not None:
             self.song.Lyrics = None

@@ -18,7 +18,7 @@ class ProviderUltimateGuitar():
                                 params={
                                     'band_name': artist,
                                     'song_name': title,
-                                    'type[]': ['200', '500'], #tab and guitar pro
+                                    'type[]': ['200', '500'],  # tab and guitar pro
                                 })
 
         if response.ok:
@@ -80,7 +80,7 @@ class ProviderUltimateGuitar():
                                                     'id': nodes[0]
                                                 })
                         filename = re.findall('filename\s*?=\s?"(.+)"',
-                                            response.headers['Content-Disposition'])[0]
+                                              response.headers['Content-Disposition'])[0]
 
                         os.makedirs(directory, exist_ok=True)
                         path = os.path.join(directory, filename)
@@ -91,7 +91,7 @@ class ProviderUltimateGuitar():
                     except:
                         logging.exception('Could not download guitar pro tabs for id: ' + nodes[0])
 
-        except: 
+        except:
             logging.exception('Could not download guitar pro tabs for: ' + url)
 
         return None

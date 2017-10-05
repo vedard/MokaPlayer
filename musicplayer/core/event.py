@@ -7,10 +7,10 @@ class Event:
 
     def unsubscribe(self, handler):
         self.__handlers.remove(handler)
-    
+
     def fire(self, *args, **keywargs):
         for handler in self.__handlers:
             handler(*args, **keywargs)
-    
+
     def clear(self):
         self.__handlers.clear()

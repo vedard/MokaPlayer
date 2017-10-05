@@ -4,6 +4,7 @@ import requests
 import logging
 from lxml import html
 
+
 class ProviderBase(object):
     def get_lyrics(self, title, artist, album):
         try:

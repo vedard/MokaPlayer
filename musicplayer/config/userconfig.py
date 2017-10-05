@@ -6,6 +6,7 @@ import logging
 import yaml
 import appdirs
 
+
 def merge(d1, d2):
     for k in d2:
         if k in d1 and isinstance(d1[k], dict) and isinstance(d2[k], dict):
@@ -51,7 +52,6 @@ class UserConfig(object):
                 yaml.dump(self._data, stream, default_flow_style=False)
         except:
             logging.critical('Could not read the user configuration file', exc_info=True)
-
 
     def get_file(self):
         """ Return a file object of the current user configuration file

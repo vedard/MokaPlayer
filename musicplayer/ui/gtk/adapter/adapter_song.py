@@ -4,13 +4,14 @@ import re
 
 from musicplayer.core.helpers import time_helper
 
+
 class AdapterSong:
     @staticmethod
     def create_row(song):
         return [
             song.Path,
             song.Title or 'Unkown',
-            song.AlbumArtist or 'Unkown' ,
+            song.AlbumArtist or 'Unkown',
             song.Album or 'Unkown',
             time_helper.seconds_to_string(song.Length),
             song.Year or '0000',
@@ -21,7 +22,7 @@ class AdapterSong:
 
     @staticmethod
     def create_store():
-        return Gtk.ListStore(str,str,str,str,str,str,str,str,str)
+        return Gtk.ListStore(str, str, str, str, str, str, str, str, str)
 
     @staticmethod
     def create_col_number():
@@ -35,4 +36,4 @@ class AdapterSong:
             try:
                 return any(re.search(text, col, re.RegexFlag.IGNORECASE) for col in row)
             except re.error:
-                return False # regex syntax error
+                return False  # regex syntax error

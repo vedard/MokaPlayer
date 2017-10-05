@@ -1,5 +1,6 @@
 import logging
 
+
 class KeyboardClient:
     def __init__(self, player):
         self.player = player
@@ -17,11 +18,11 @@ class KeyboardClient:
     def _on_XF86AudioNext(self, key):
         self.logger.info(key)
         self.player.next()
-    
+
     def _on_XF86AudioPrev(self, key):
         self.logger.info(key)
         self.player.prev()
-    
+
     def _on_XF86AudioPlay(self, key):
         self.logger.info(key)
         if self.player.streamer.state == self.player.streamer.State.PAUSED:

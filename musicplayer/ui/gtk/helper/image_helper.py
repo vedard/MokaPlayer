@@ -1,6 +1,7 @@
 import pathlib
 from gi.repository import GdkPixbuf
 
+
 def load(filename, width, height):
     if not filename or not pathlib.Path(filename).is_file():
         filename = 'musicplayer/resources/placeholder.png'
