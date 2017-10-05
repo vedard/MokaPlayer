@@ -7,12 +7,12 @@ class PlaylistM3u:
 
     Properties:
         location: A string representing the location of the playlist File
-        name: A string representing the name of the file 
+        name: A string representing the name of the file
     """
 
     def __init__(self, location):
         if not pathlib.Path(location).parent.is_dir():
-            raise ValueError('Directory does not exist for: ' + filename)
+            raise ValueError('Directory does not exist for: ' + location)
 
         self._location = location
         self._name = ''
