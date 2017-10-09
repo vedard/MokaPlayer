@@ -59,8 +59,13 @@ class MainWindow(Gtk.Window):
 
     def __init_gridview_columns(self):
         columns = self.gridview.get_columns()
+        font = self.userconfig['grid']['font']
         for col in columns:
             col.set_visible(False)
+
+            if font:
+                for cell in col.get_cells():
+                    cell.set_property('font', font)
 
         for name in reversed(self.userconfig['grid']['columns']):
             for col in columns:
@@ -123,20 +128,23 @@ class MainWindow(Gtk.Window):
 
     def __set_current_song_info(self):
         self.logger.debug("Setting currrent song info")
+        image_size = self.userconfig['header']['image_size']
+        line1 = self.userconfig['header']['line1']
+        line2 = self.userconfig['header']['line2']
 
         song = self.player.library.get_song(self.player.queue.peek())
         album = None
 
         if song:
             album = self.player.library.get_album(song.Album, song.AlbumArtist)
-            self.lbl_current_title.set_text(song.Title)
-            self.lbl_current_song_infos.set_text(f'{song.Artist} - {song.Album} ({song.Year})')
+            self.lbl_current_title.set_text(line1.format(**song._data))
+            self.lbl_current_song_infos.set_text(line2.format(**song._data))
         else:
             self.lbl_current_title.set_text('')
             self.lbl_current_song_infos.set_text('')
 
         self.img_current_album.set_from_pixbuf(image_helper.load(album.Cover if album else None,
-                                                                 140, 140))
+                                                                 image_size, image_size))
 
     def __set_current_play_icon(self):
         if self.player.streamer.state == self.player.streamer.State.PLAYING:

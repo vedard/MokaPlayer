@@ -1,3 +1,7 @@
+header:
+  image_size: 140
+  line1: '{Title}'
+  line2: '{Artist} - {Album} ({Year})'
 library:
   music_directory:
   playlist_directory:
@@ -7,6 +11,7 @@ grid:
   order:
     field:
     desc: No
+  font: null
   columns: [ 'Title', 'Artist', 'Album','Length', 'Year', 'Added', 'Played', 'Genre']
 gtk:
   darktheme: false
