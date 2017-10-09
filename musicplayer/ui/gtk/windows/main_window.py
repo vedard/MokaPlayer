@@ -207,7 +207,7 @@ class MainWindow(Gtk.Window):
             self.player.streamer.volume += 0.05
         elif keyval_name == "Escape":
             self.search_bar.set_search_mode(False)
-        elif keyval_name == "space":
+        elif keyval_name == "space" and not self.txt_search.has_focus():
             self.player.toggle()
         else:
             return False
