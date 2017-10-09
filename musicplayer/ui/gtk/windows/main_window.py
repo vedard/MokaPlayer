@@ -41,7 +41,7 @@ class MainWindow(Gtk.Window):
         self.builder.add_from_file('musicplayer/ui/gtk/resources/main_window.ui')
         self.__get_object()
         self.__init_sort_radio()
-        # self.__init_gridview_columns()
+        self.__init_gridview_columns()
 
         self.builder.connect_signals(self)
         self.player.state_changed.subscribe(self.on_player_state_changed)
@@ -60,14 +60,13 @@ class MainWindow(Gtk.Window):
     def __init_gridview_columns(self):
         columns = self.gridview.get_columns()
         for col in columns:
-            self.gridview.remove_column(col)
+            col.set_visible(False)
 
-        for name in self.userconfig['grid']['columns']:
+        for name in reversed(self.userconfig['grid']['columns']):
             for col in columns:
                 if name == col.get_title():
-                    import ipdb
-                    ipdb.set_trace()
-                    self.gridview.append_column(col)
+                    col.set_visible(True)
+                    self.gridview.move_column_after(col, None)
 
     def __create_model(self):
         self.logger.info('Creating ListStore')

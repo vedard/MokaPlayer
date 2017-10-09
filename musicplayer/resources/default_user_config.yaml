@@ -1,12 +1,12 @@
 library:
-  music_directory: 
-  playlist_directory: 
+  music_directory:
+  playlist_directory:
 player:
   restore_state: Yes
 grid:
   order:
-    field: 
+    field:
     desc: No
-  columns: ['Length', 'Title', 'Artist', 'Album', 'Year', 'Added', 'Played']
+  columns: [ 'Title', 'Artist', 'Album','Length', 'Year', 'Added', 'Played', 'Genre']
 gtk:
   darktheme: false
