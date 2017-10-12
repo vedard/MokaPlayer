@@ -58,6 +58,23 @@ class LibraryTest(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(LibraryTest.FOLDER)
 
+    def test_musics_folder(self):
+        self.assertTrue(self.library.is_musics_folder_valid())
+        self.library.musics_folder = 'asdf/Invalid folder/fasdfasdf'
+        self.assertEqual(self.library.musics_folder, 'asdf/Invalid folder/fasdfasdf')
+        self.assertFalse(self.library.is_musics_folder_valid())
+        self.library.musics_folder = ''
+        self.assertFalse(self.library.is_musics_folder_valid())
+        self.library.musics_folder = self.FOLDER
+        self.assertTrue(self.library.is_musics_folder_valid())
+        self.assertEqual(self.library.musics_folder, self.FOLDER)
+
+    def test_playlists_folder(self):
+        self.library.playlists_folder = 'asdf/Invalid folder/fasdfasdf'
+        self.assertEqual(self.library.playlists_folder, 'asdf/Invalid folder/fasdfasdf')
+        self.library.playlists_folder = self.FOLDER
+        self.assertEqual(self.library.playlists_folder, self.FOLDER)
+
     def test_sync(self):
         self.library.sync()
 

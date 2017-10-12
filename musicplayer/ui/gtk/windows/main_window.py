@@ -57,6 +57,21 @@ class MainWindow(Gtk.Window):
         GObject.timeout_add(750, self.on_tick, None)
         self.logger.info('Window loaded')
 
+        if not self.player.library.is_musics_folder_valid():
+            self.__ask_for_music_folder()
+
+    def __ask_for_music_folder(self):
+        dialog = Gtk.FileChooserDialog("Select where is your music", None,
+                                       Gtk.FileChooserAction.SELECT_FOLDER,
+                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                        "Select", Gtk.ResponseType.OK))
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            self.player.library.musics_folder = dialog.get_filename()
+            self.on_library_scan_activate(None)
+        dialog.destroy()
+
     def __init_gridview_columns(self):
         columns = self.gridview.get_columns()
         font = self.userconfig['grid']['font']

@@ -5,6 +5,7 @@ import pathlib
 from musicplayer.core.fetchers import artworks as artworksfetcher
 from musicplayer.config import appconfig
 
+@unittest.skip('')
 class FetcherArtworkTest(unittest.TestCase):
 
     FOLDER = './test/artworks'

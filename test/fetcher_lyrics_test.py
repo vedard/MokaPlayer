@@ -2,6 +2,7 @@ import unittest
 
 from musicplayer.core.fetchers import lyrics as lyricsfetcher
 
+@unittest.skip('')
 class FetcherLyricsTest(unittest.TestCase):
 
     def test_lyrics_fetcher(self):

@@ -42,16 +42,17 @@ class UserConfig(object):
             with open(self.get_file(), 'rt') as stream:
                 merge(self._data, yaml.load(stream))
         except:
-            logging.critical('Could not load the user configuration file', exc_info=True)
+            logging.critical('Could not read the user configuration file', exc_info=True)
 
     def save(self):
         """ Save the YAML file
         """
         try:
-            with open(self.get_file(), 'wt') as stream:
-                yaml.dump(self._data, stream, default_flow_style=False)
+            if self._path is not None:
+                with open(self.get_file(), 'wt') as stream:
+                    yaml.dump(self._data, stream, default_flow_style=False)
         except:
-            logging.critical('Could not read the user configuration file', exc_info=True)
+            logging.critical('Could not save the user configuration file', exc_info=True)
 
     def get_file(self):
         """ Return a file object of the current user configuration file

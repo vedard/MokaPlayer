@@ -4,6 +4,7 @@ import pathlib
 
 from musicplayer.core.fetchers import tabs as tabsfetcher
 
+@unittest.skip('')
 class FetcherTabsTest(unittest.TestCase):
 
     FOLDER = './test/tabs'

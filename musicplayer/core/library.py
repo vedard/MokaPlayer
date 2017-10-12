@@ -33,9 +33,34 @@ class Library(object):
         self.appconfig = appconfig
         self.userconfig = userconfig
 
-        self._musics_folder = self.userconfig["library"]["music_directory"]
-        self._playlists_folder = self.userconfig["library"]["playlist_directory"]
-        self._artworks_folder = self.appconfig.ARTWORK_CACHE_DIRECTORY
+    def is_musics_folder_valid(self):
+        if not self.musics_folder:
+            return False
+        else:
+            return pathlib.Path(self.musics_folder).is_dir()
+
+    @property
+    def musics_folder(self):
+        return self.userconfig["library"]["music_directory"]
+
+    @musics_folder.setter
+    def musics_folder(self, value):
+        self.logger.debug('Setting musics_folder: ' + value)
+        self.userconfig["library"]["music_directory"] = value
+        self.userconfig.save()
+
+    @property
+    def playlists_folder(self):
+        return self.userconfig["library"]["playlist_directory"]
+
+    @playlists_folder.setter
+    def playlists_folder(self, value):
+        self.userconfig["library"]["playlist_directory"] = value
+        self.userconfig.save()
+
+    @property
+    def artworks_folder(self):
+        return self.appconfig.ARTWORK_CACHE_DIRECTORY
 
     def get_songs(self, path_list):
         return Song.select().where(Song.Path << path_list)
@@ -103,7 +128,7 @@ class Library(object):
                 if not album.Cover or not pathlib.Path(album.Cover).exists():
                     path = pathlib.Path(album.Path).parent if pathlib.Path(album.Path).is_file else album.Path
                     album.Cover = artworks.get_album_artwork(self.appconfig.LASTFM_SECRET_API_KEY,
-                                                             self._artworks_folder, album.Name,
+                                                             self.artworks_folder, album.Name,
                                                              album.Artist, path)
                     album.save()
                 if index % 10 == 0:
@@ -117,10 +142,10 @@ class Library(object):
         Raises:
             ValueError: When musics_folder is not set
         """
-        if self._musics_folder is None or not pathlib.Path(self._musics_folder).is_dir():
-            raise ValueError('Invalid music folder: ' + str(self._musics_folder))
+        if self.musics_folder is None or not pathlib.Path(self.musics_folder).is_dir():
+            raise ValueError('Invalid music folder: ' + str(self.musics_folder))
 
-        self.logger.info(f"Scanning {self._musics_folder}")
+        self.logger.info(f"Scanning {self.musics_folder}")
         start = time.perf_counter()
         self.__sync_songs()
         self.__sync_artists()
@@ -130,7 +155,7 @@ class Library(object):
 
     def __sync_songs(self):
         paths = []
-        for x in pathlib.Path(self._musics_folder).glob('**/*'):
+        for x in pathlib.Path(self.musics_folder).glob('**/*'):
             if x.is_dir():
                 continue
             if x.suffix.lower() in self.INGORE_EXTENSION:
@@ -159,7 +184,7 @@ class Library(object):
 
     def __sync_playlists(self):
         self.logger.info('Scanning playlists')
-        if self._playlists_folder or not pathlib.Path(self._playlists_folder).is_dir():
+        if self._playlists_folder or not pathlib.Path(self.playlists_folder).is_dir():
             return
 
         list_path = set(str(x) for x in pathlib.Path(
