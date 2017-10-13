@@ -1,3 +1,4 @@
+import pkg_resources
 from threading import Thread
 from gi.repository import Gtk
 from gi.repository import GObject
@@ -6,9 +7,13 @@ from musicplayer.core.fetchers import lyrics
 
 
 class LyricsWindow():
+    GLADE_FILE = pkg_resources.resource_filename('musicplayer',
+                                                 'ui/gtk/resources/lyrics_window.ui')
+
+
     def __init__(self):
         self.builder = Gtk.Builder()
-        self.builder.add_from_file('musicplayer/ui/gtk/resources/lyrics_window.ui')
+        self.builder.add_from_file(self.GLADE_FILE)
         self.builder.connect_signals(self)
         self.window = self.builder.get_object('lyrics_window')
         self.lbl_title = self.builder.get_object('lbl_title')

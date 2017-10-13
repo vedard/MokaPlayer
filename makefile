@@ -1,5 +1,8 @@
 run:
-	python3 application.py --debug
+	python3 musicplayer.py --debug
+
+release:
+	python3 setup.py sdist
 
 format:
 	autopep8 musicplayer --recursive --in-place --pep8-passes 2000 --max-line-length 110
@@ -8,6 +11,8 @@ clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type f -name "*.ui~" -delete
 	find . -type d -name "__pycache__" -delete
+	find . -type f -wholename "*.egg-info/*" -delete
+	find . -type d -name "*.egg-info" -delete
 
 test:
 	python3 -m unittest discover test "*_test.py"
@@ -24,8 +29,8 @@ report-coverage:
 	xdg-open reports/coverage/index.html
 
 init:
-	pip3 install -r requirements.txt
-	pip3 install -r requirements-dev.txt
+	pip3 install -r requirements.txt -U
+	pip3 install -r requirements-dev.txt -U
 
 help:
 	@echo ""

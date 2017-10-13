@@ -6,4 +6,7 @@ secret.py
 dev_config.yaml
 .pylinrc
 reports/*
+dist/*
+build/*
+*.egg-info
 .coverage

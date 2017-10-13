@@ -1,7 +1,7 @@
-#! /bin/python3
 import gi
 gi.require_version('Gtk', '3.0')
 
+import pkg_resources
 import argparse
 import signal
 import logging
@@ -13,7 +13,7 @@ from gi.repository import Gio
 from musicplayer.ui.gtk.windows.main_window import MainWindow
 from musicplayer.core.player import Player
 from musicplayer.config import appconfig as AppConfig
-from musicplayer.config.userconfig import UserConfig 
+from musicplayer.config.userconfig import UserConfig
 
 
 class Application():
@@ -25,9 +25,13 @@ class Application():
         self.init_signals()
         self.init_window()
 
+    def run(self):
+        Gtk.main()
+
     def init_window(self):
         self.window = MainWindow(self.appconfig, self.userconfig, self.player)
-        self.window.set_icon_from_file('musicplayer/resources/icon.png')
+        image = pkg_resources.resource_filename('musicplayer', 'resources/icon.png')
+        self.window.set_icon_from_file(image)
         self.window.show_all()
 
     def init_args(self):
@@ -46,11 +50,11 @@ class Application():
     def init_player(self):
         self.player = Player(self.appconfig, self.userconfig)
         threading.Thread(target=self.player.restore).start()
-    
+
     def init_signals(self):
-        
-        def handler(signum, frame): 
-            self.player.save() 
+
+        def handler(signum, frame):
+            self.player.save()
             Gtk.main_quit()
 
         # Some singal are not availble on every OS
@@ -62,7 +66,3 @@ class Application():
             signal.signal(signal.SIGHUP, handler)
         if hasattr(signal, 'SIGQUIT'):
             signal.signal(signal.SIGQUIT, handler)
-
-if __name__ == '__main__':
-    app = Application()
-    Gtk.main()

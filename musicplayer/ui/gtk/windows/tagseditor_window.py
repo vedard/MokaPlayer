@@ -1,7 +1,7 @@
+import pkg_resources
 import ast
 import logging
 import arrow
-
 
 from gi.repository import Gtk
 from gi.repository import GObject
@@ -11,12 +11,15 @@ from musicplayer.core.helpers import time_helper
 
 
 class TagsEditorWindow:
+
+    GLADE_FILE = pkg_resources.resource_filename('musicplayer',
+                                                 'ui/gtk/resources/tagseditor_window.ui')
+
     def __init__(self, songs):
         self.songs = songs
 
         self.builder = Gtk.Builder()
-        self.builder.add_from_file(
-            'musicplayer/ui/gtk/resources/tagseditor_window.ui')
+        self.builder.add_from_file(self.GLADE_FILE)
         self.builder.connect_signals(self)
 
         self.window = self.builder.get_object("tagseditor_window")

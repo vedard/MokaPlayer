@@ -1,3 +1,4 @@
+import pkg_resources
 from threading import Thread
 from gi.repository import Gtk
 from gi.repository import GObject
@@ -7,9 +8,13 @@ from musicplayer.ui.gtk.helper import file_helper
 
 
 class TabsWindow():
+
+    GLADE_FILE = pkg_resources.resource_filename('musicplayer',
+                                                 'ui/gtk/resources/tabs_window.ui')
+
     def __init__(self):
         self.builder = Gtk.Builder()
-        self.builder.add_from_file('musicplayer/ui/gtk/resources/tabs_window.ui')
+        self.builder.add_from_file(self.GLADE_FILE)
         self.builder.connect_signals(self)
         self.window = self.builder.get_object('window')
         self.gridview = self.builder.get_object('gridview')

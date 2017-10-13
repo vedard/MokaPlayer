@@ -3,6 +3,7 @@ import time
 import datetime
 import arrow
 import logging
+import pkg_resources
 
 from gi.repository import Gtk
 from gi.repository import Gdk
@@ -22,6 +23,9 @@ class MainWindow(Gtk.Window):
     """ Main window
     """
 
+    GLADE_FILE = pkg_resources.resource_filename('musicplayer',
+                                                 'ui/gtk/resources/main_window.ui')
+
     def __init__(self, appconfig, userconfig, player):
         super().__init__(title="Music Player", default_width=1366, default_height=768)
 
@@ -38,7 +42,7 @@ class MainWindow(Gtk.Window):
         self.connect("key-press-event", self.on_window_key_press)
 
         self.builder = Gtk.Builder()
-        self.builder.add_from_file('musicplayer/ui/gtk/resources/main_window.ui')
+        self.builder.add_from_file(self.GLADE_FILE)
         self.__get_object()
         self.__init_sort_radio()
         self.__init_gridview_columns()
@@ -61,7 +65,7 @@ class MainWindow(Gtk.Window):
             self.__ask_for_music_folder()
 
     def __ask_for_music_folder(self):
-        dialog = Gtk.FileChooserDialog("Select where is your music", None,
+        dialog = Gtk.FileChooserDialog("Select where is your music", self,
                                        Gtk.FileChooserAction.SELECT_FOLDER,
                                        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                         "Select", Gtk.ResponseType.OK))

@@ -5,6 +5,7 @@ import shutil
 import logging
 import yaml
 import appdirs
+import pkg_resources
 
 
 def merge(d1, d2):
@@ -19,7 +20,8 @@ class UserConfig(object):
     """Read, parse and manage the user configuration file
     """
 
-    APPLICATION_DEFAULT_CONFIG_PATH = 'musicplayer/resources/default_user_config.yaml'
+    APPLICATION_DEFAULT_CONFIG_PATH = pkg_resources.resource_filename('musicplayer',
+                                                                      'resources/default_user_config.yaml')
 
     def __init__(self, path=None):
         """ Create the user configuration file if not found

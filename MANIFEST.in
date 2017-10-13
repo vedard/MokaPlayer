@@ -1,0 +1,2 @@
+include musicplayer/resources/*
+include musicplayer/ui/gtk/resources/*
