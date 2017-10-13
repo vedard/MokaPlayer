@@ -21,7 +21,7 @@ class UserConfig(object):
     """
 
     APPLICATION_DEFAULT_CONFIG_PATH = pkg_resources.resource_filename('musicplayer',
-                                                                      'resources/default_user_config.yaml')
+                                                                      'data/default_user_config.yaml')
 
     def __init__(self, path=None):
         """ Create the user configuration file if not found

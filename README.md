@@ -2,7 +2,7 @@
 
 A simple music player written in python 
 
-![](musicplayer/resources/screenshot.png)
+![](musicplayer/data/screenshot.png)
 
 ##   Features
 -   Support all the most popular music file formats

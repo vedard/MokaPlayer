@@ -4,7 +4,7 @@ from gi.repository import Gtk
 
 class HelpShortcutsWindow():
     GLADE_FILE = pkg_resources.resource_filename('musicplayer',
-                                                 'ui/gtk/resources/help_shortcuts_window.ui')
+                                                 'data/ui/help_shortcuts_window.ui')
     @staticmethod
     def get_diaglog():
         builder = Gtk.Builder()

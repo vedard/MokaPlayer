@@ -24,7 +24,7 @@ class MainWindow(Gtk.Window):
     """
 
     GLADE_FILE = pkg_resources.resource_filename('musicplayer',
-                                                 'ui/gtk/resources/main_window.ui')
+                                                 'data/ui/main_window.ui')
 
     def __init__(self, appconfig, userconfig, player):
         super().__init__(title="Music Player", default_width=1366, default_height=768)
@@ -33,6 +33,7 @@ class MainWindow(Gtk.Window):
         self.appconfig = appconfig
         self.userconfig = userconfig
         self.player = player
+        self.set_icon_from_file(pkg_resources.resource_filename('musicplayer', 'data/musicplayer.png'))
 
         if self.userconfig['gtk']['darktheme']:
             settings = Gtk.Settings.get_default()

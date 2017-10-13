@@ -30,8 +30,6 @@ class Application():
 
     def init_window(self):
         self.window = MainWindow(self.appconfig, self.userconfig, self.player)
-        image = pkg_resources.resource_filename('musicplayer', 'resources/icon.png')
-        self.window.set_icon_from_file(image)
         self.window.show_all()
 
     def init_args(self):

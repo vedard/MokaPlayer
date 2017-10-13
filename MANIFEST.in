@@ -1,2 +1,2 @@
-include musicplayer/resources/*
-include musicplayer/ui/gtk/resources/*
+include musicplayer/data/*
+include musicplayer/data/ui/*

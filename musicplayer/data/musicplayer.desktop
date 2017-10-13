@@ -2,7 +2,7 @@
 StartupNotify=true
 Name=Music Player
 Exec=/bin/musicplayer
-Icon=/usr/share/musicplayer/icon.png
+Icon=musicplayer
 Terminal=false
 Type=Application
 Categories=Music;

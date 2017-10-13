@@ -10,7 +10,7 @@ from musicplayer.ui.gtk.helper import file_helper
 class TabsWindow():
 
     GLADE_FILE = pkg_resources.resource_filename('musicplayer',
-                                                 'ui/gtk/resources/tabs_window.ui')
+                                                 'data/ui/tabs_window.ui')
 
     def __init__(self):
         self.builder = Gtk.Builder()

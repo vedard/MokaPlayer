@@ -13,7 +13,7 @@ from musicplayer.core.helpers import time_helper
 class TagsEditorWindow:
 
     GLADE_FILE = pkg_resources.resource_filename('musicplayer',
-                                                 'ui/gtk/resources/tagseditor_window.ui')
+                                                 'data/ui/tagseditor_window.ui')
 
     def __init__(self, songs):
         self.songs = songs

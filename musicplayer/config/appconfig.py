@@ -6,9 +6,8 @@ from musicplayer.config import secret
 
 class Default:
     APPLICATION_NAME = 'MusicPlayer'
-    APPLICATION_VERSION = '2.1.0.0'
-    USER_DIRECTORY = appdirs.user_data_dir(APPLICATION_NAME, version=APPLICATION_VERSION)
-    CACHE_DIRECTORY = appdirs.user_cache_dir(APPLICATION_NAME, version=APPLICATION_VERSION)
+    USER_DIRECTORY = appdirs.user_data_dir(APPLICATION_NAME)
+    CACHE_DIRECTORY = appdirs.user_cache_dir(APPLICATION_NAME)
     LASTFM_SECRET_API_KEY = secret.LASTFM_SECRET_API_KEY
     LOG_LEVEL = 'INFO'
 

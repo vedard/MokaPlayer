@@ -8,7 +8,7 @@ from musicplayer.core.fetchers import lyrics
 
 class LyricsWindow():
     GLADE_FILE = pkg_resources.resource_filename('musicplayer',
-                                                 'ui/gtk/resources/lyrics_window.ui')
+                                                 'data/ui/lyrics_window.ui')
 
 
     def __init__(self):

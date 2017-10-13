@@ -5,7 +5,7 @@ from gi.repository import Gtk
 
 class AboutWindow():
     GLADE_FILE = pkg_resources.resource_filename('musicplayer',
-                                                 'ui/gtk/resources/about_window.ui')
+                                                 'data/ui/about_window.ui')
 
     @staticmethod
     def get_diaglog():
