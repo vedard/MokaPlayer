@@ -2,15 +2,15 @@ import unittest
 import pathlib
 import shutil
 
-from musicplayer.core.playlist_m3u import PlaylistM3u
+from mokaplayer.core.playlist_m3u import PlaylistM3u
 
 class PlaylistTest(unittest.TestCase):
     FOLDER = './test/playlist/'
-    
+
     def setUp(self):
         pathlib.Path(PlaylistTest.FOLDER).mkdir(exist_ok=True)
         self.playlist = PlaylistM3u(PlaylistTest.FOLDER + 'test.m3u')
-    
+
     def tearDown(self):
         shutil.rmtree(PlaylistTest.FOLDER)
 
@@ -27,9 +27,9 @@ class PlaylistTest(unittest.TestCase):
 
         self.playlist.write()
         self.playlist.read()
-        
+
         self.assertEqual(len(self.playlist), 4)
-    
+
     def test_nameandlocation(self):
         self.assertFalse(pathlib.Path(self.playlist.location).is_file())
 

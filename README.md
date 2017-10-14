@@ -1,8 +1,8 @@
-# MusicPlayer
+# MokaPlayer
 
 A simple music player written in python 
 
-![](musicplayer/data/screenshot.png)
+![](mokaplayer/data/screenshot.png)
 
 ##   Features
 -   Support all the most popular music file formats
@@ -15,7 +15,7 @@ A simple music player written in python
 
 ## Configuration
 
-Create the file `musicplayer/config/secret.py` with this line:
+Create the file `mokaplayer/config/secret.py` with this line:
     
     LASTFM_SECRET_API_KEY = '__'
 
@@ -23,17 +23,8 @@ Create the file `musicplayer/config/secret.py` with this line:
 
 Download the following package:
 
-    gtk3
-    python-gobject
-    python-pip
     gcc
     taglib
-    gst-python
-    gst-plugins-base
-    gst-plugins-good
-    gst-plugins-bad
-    gst-plugins-ugly
-    libkeybinder3
 
 Download the pip requirements and run:
 

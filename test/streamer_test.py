@@ -2,7 +2,7 @@ import unittest
 import time
 import os
 
-from musicplayer.core.streamer import Streamer
+from mokaplayer.core.streamer import Streamer
 
 class StreamerTest(unittest.TestCase):
 

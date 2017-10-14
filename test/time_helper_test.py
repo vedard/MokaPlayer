@@ -1,5 +1,5 @@
 import unittest
-from musicplayer.core.helpers import time_helper
+from mokaplayer.core.helpers import time_helper
 
 
 class TimeHelperTest(unittest.TestCase):

@@ -3,8 +3,8 @@ import os
 import logging
 import pathlib
 
-from musicplayer.config import appconfig
-from musicplayer.config import userconfig
+from mokaplayer.config import appconfig
+from mokaplayer.config import userconfig
 
 class UserConfigTest(unittest.TestCase):
 

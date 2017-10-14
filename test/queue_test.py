@@ -1,7 +1,7 @@
 import unittest
 from collections import deque
 
-from musicplayer.core.queue import Queue
+from mokaplayer.core.queue import Queue
 
 
 class QueueTest(unittest.TestCase):
@@ -60,7 +60,7 @@ class QueueTest(unittest.TestCase):
     def test_append(self):
         self.queue.append(77)
         self.queue.append([1, 2, 5, 89, 45, 23])
-        self.assertEqual(self.queue._container, 
+        self.assertEqual(self.queue._container,
                          deque([3, 4, 6, 7, 8, 9, 77, 1, 2, 5, 89, 45, 23]))
         self.assertEqual(self.queue.peek(), 1)
 
@@ -71,7 +71,7 @@ class QueueTest(unittest.TestCase):
     def test_prepend(self):
         self.queue.prepend(77)
         self.queue.prepend([23, 8, 9, 3])
-        self.assertEqual(self.queue._container, 
+        self.assertEqual(self.queue._container,
                          deque([1, 23, 8, 9, 3, 77, 2, 4, 5, 6, 7]))
         self.assertEqual(self.queue.peek(), 1)
 

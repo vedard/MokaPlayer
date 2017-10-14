@@ -1,11 +1,11 @@
 run:
-	python3 musicplayer.py --debug
+	python3 mokaplayer.py --debug
 
 release:
 	python3 setup.py sdist
 
 format:
-	autopep8 musicplayer --recursive --in-place --pep8-passes 2000 --max-line-length 110
+	autopep8 mokaplayer --recursive --in-place --pep8-passes 2000 --max-line-length 110
 
 clean:
 	find . -type f -name "*.py[co]" -delete
@@ -19,7 +19,7 @@ test:
 
 report-pep8:
 	mkdir -p reports/pep8
-	pep8 musicplayer | pepper8 > reports/pep8/index.html
+	pep8 mokaplayer | pepper8 > reports/pep8/index.html
 	xdg-open reports/pep8/index.html
 
 report-coverage:

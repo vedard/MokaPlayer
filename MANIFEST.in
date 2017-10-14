@@ -1,2 +1,2 @@
-include musicplayer/data/*
-include musicplayer/data/ui/*
+include mokaplayer/data/*
+include mokaplayer/data/ui/*

@@ -1,6 +1,6 @@
 import unittest
 
-from musicplayer.core.fetchers import lyrics as lyricsfetcher
+from mokaplayer.core.fetchers import lyrics as lyricsfetcher
 
 @unittest.skip('')
 class FetcherLyricsTest(unittest.TestCase):

@@ -2,8 +2,8 @@ import shutil
 import unittest
 import pathlib
 
-from musicplayer.core.fetchers import artworks as artworksfetcher
-from musicplayer.config import appconfig
+from mokaplayer.core.fetchers import artworks as artworksfetcher
+from mokaplayer.config import appconfig
 
 @unittest.skip('')
 class FetcherArtworkTest(unittest.TestCase):

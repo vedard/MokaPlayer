@@ -2,7 +2,7 @@ import unittest
 import pathlib
 import shutil
 import logging
-from musicplayer.core.database import Song
+from mokaplayer.core.database import Song
 
 
 class TagsTest(unittest.TestCase):

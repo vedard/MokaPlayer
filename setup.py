@@ -2,42 +2,50 @@ import glob
 import os
 
 from setuptools import setup, find_packages
+import mokaplayer
+import os
+import re
 
-_install_requires = [
-    'pyyaml',
-    'appdirs',
-    'peewee',
-    'requests',
-    'lxml',
-    'arrow',
-    'appdirs',
-    'pytaglib'
-]
+def get_version():
+    with open('mokaplayer/__init__.py') as f:
+        version_match = re.search(r"__version__ = '(.*)'", f.read())
+    if version_match:
+        return version_match.group(1)
 
-_data_files = [
-    ('share/applications', ['musicplayer/data/musicplayer.desktop'])
-]
+    raise RuntimeError("Unable to find version string.")
 
-for path in glob.glob('musicplayer/data/icons/hicolor/*x*'):
-    folder = os.path.basename(path)
-    _data_files.append((f'share/icons/hicolor/{folder}/apps', [f'{path}/apps/musicplayer.png']))
+def get_data_files():
+    yield ('share/applications', ['mokaplayer/data/mokaplayer.desktop'])
+
+    for path in glob.glob('mokaplayer/data/icons/hicolor/*x*'):
+        folder = os.path.basename(path)
+        yield (f'share/icons/hicolor/{folder}/apps', [f'{path}/apps/mokaplayer.png'])
 
 setup(
-    name="MusicPlayer",
-    version="2.0.0.0",
-    packages=find_packages(exclude=["test"]),
+    name="MokaPlayer",
+    license="MIT",
+    version=get_version(),
     author="Vincent Bédard",
     description="A simple music player",
-    url="https://github.com/vedard/MusicPlayer/",
-    license="MIT",
-    keywords="music player tags tabs lyrics",
+    keywords="mokaplayer music player tags tabs lyrics",
+    url="https://github.com/vedard/MokaPlayer/",
+    packages=find_packages(exclude=["test"]),
+    zip_safe=False,
+    include_package_data=True,
+    install_requires=[
+        'pyyaml',
+        'appdirs',
+        'peewee',
+        'requests',
+        'lxml',
+        'arrow',
+        'appdirs',
+        'pytaglib'
+    ],
+    data_files= list(get_data_files()),
     entry_points={
         'console_scripts': [
-            'musicplayer=musicplayer:main',
+            'mokaplayer=mokaplayer:main',
         ],
     },
-    data_files=_data_files,
-    zip_safe=False,
-    install_requires=_install_requires,
-    include_package_data=True,
 )

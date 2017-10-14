@@ -3,10 +3,10 @@ import time
 import uuid
 import unittest
 import pathlib
-from musicplayer.core.library import Library
-from musicplayer.core.database import Song, Artist, Playlist, Album
-from musicplayer.core.playlist_m3u import PlaylistM3u
-from musicplayer.config import appconfig, userconfig
+from mokaplayer.core.library import Library
+from mokaplayer.core.database import Song, Artist, Playlist, Album
+from mokaplayer.core.playlist_m3u import PlaylistM3u
+from mokaplayer.config import appconfig, userconfig
 
 
 class LibraryTest(unittest.TestCase):

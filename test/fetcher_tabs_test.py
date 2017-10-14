@@ -2,7 +2,7 @@ import shutil
 import unittest
 import pathlib
 
-from musicplayer.core.fetchers import tabs as tabsfetcher
+from mokaplayer.core.fetchers import tabs as tabsfetcher
 
 @unittest.skip('')
 class FetcherTabsTest(unittest.TestCase):

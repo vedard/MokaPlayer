@@ -1,0 +1,8 @@
+[Desktop Entry]
+StartupNotify=true
+Name=MokaPlayer
+Exec=/bin/mokaplayer
+Icon=mokaplayer
+Terminal=false
+Type=Application
+Categories=Music;
