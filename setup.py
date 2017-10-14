@@ -1,10 +1,8 @@
 import glob
 import os
+import re
 
 from setuptools import setup, find_packages
-import mokaplayer
-import os
-import re
 
 def get_version():
     with open('mokaplayer/__init__.py') as f:
