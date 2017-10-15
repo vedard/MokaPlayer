@@ -10,7 +10,7 @@
   <object class="GtkWindow" id="lyrics_window">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">MokaPlayer - Lyrics</property>
-    <property name="default_width">500</property>
+    <property name="default_width">425</property>
     <property name="default_height">600</property>
     <child>
       <object class="GtkBox">
@@ -25,15 +25,13 @@
               <object class="GtkLabel" id="lbl_title">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">start</property>
-                <property name="margin_left">10</property>
-                <property name="margin_right">10</property>
-                <property name="margin_top">10</property>
-                <property name="margin_bottom">10</property>
+                <property name="margin_left">40</property>
+                <property name="margin_top">5</property>
+                <property name="margin_bottom">5</property>
                 <property name="label" translatable="yes">Title - Artist</property>
+                <property name="justify">center</property>
                 <attributes>
-                  <attribute name="weight" value="normal"/>
-                  <attribute name="scale" value="1.3999999999999999"/>
+                  <attribute name="scale" value="1"/>
                 </attributes>
               </object>
               <packing>
@@ -47,10 +45,9 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="margin_left">10</property>
-                <property name="margin_right">10</property>
-                <property name="margin_top">10</property>
-                <property name="margin_bottom">10</property>
+                <property name="margin_right">5</property>
+                <property name="margin_top">5</property>
+                <property name="margin_bottom">5</property>
                 <property name="image">image1</property>
                 <property name="relief">none</property>
                 <property name="always_show_image">True</property>
@@ -77,11 +74,11 @@
               <object class="GtkTextView" id="txt_lyrics">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="justification">center</property>
                 <property name="left_margin">10</property>
                 <property name="right_margin">10</property>
                 <property name="top_margin">10</property>
                 <property name="bottom_margin">10</property>
-                <property name="monospace">True</property>
               </object>
             </child>
           </object>
