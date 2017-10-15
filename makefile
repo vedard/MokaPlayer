@@ -4,6 +4,9 @@ run:
 release:
 	python3 setup.py sdist
 
+publish:
+	python setup.py sdist upload -r pypi
+
 format:
 	autopep8 mokaplayer --recursive --in-place --pep8-passes 2000 --max-line-length 110
 
