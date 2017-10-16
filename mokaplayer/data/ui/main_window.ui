@@ -818,6 +818,22 @@
                 </child>
               </object>
             </child>
+            <child>
+              <object class="GtkTreeViewColumn">
+                <property name="resizable">True</property>
+                <property name="sizing">fixed</property>
+                <property name="min_width">30</property>
+                <property name="max_width">30</property>
+                <property name="title" translatable="yes">#</property>
+                <property name="reorderable">True</property>
+                <child>
+                  <object class="GtkCellRendererText"/>
+                  <attributes>
+                    <attribute name="text">9</attribute>
+                  </attributes>
+                </child>
+              </object>
+            </child>
           </object>
         </child>
       </object>
