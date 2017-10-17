@@ -4,6 +4,10 @@ import re
 
 from setuptools import setup, find_packages
 
+def get_readme():
+    with open('PYPI_README.rst') as f:
+        return f.read()
+
 def get_version():
     with open('mokaplayer/__init__.py') as f:
         version_match = re.search(r"__version__ = '(.*)'", f.read())
@@ -25,6 +29,7 @@ setup(
     version=get_version(),
     author="Vincent Bédard",
     description="A simple music player (GTK)",
+    long_description=get_readme(),
     keywords='mokaplayer music player tags tabs lyrics musicplayer gapless gtk',
     url="https://github.com/vedard/MokaPlayer/",
     packages=find_packages(exclude=["test"]),

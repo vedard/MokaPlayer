@@ -1,2 +1,3 @@
 include mokaplayer/data/*
 include mokaplayer/data/ui/*
+include PYPI_README.rst
