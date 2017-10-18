@@ -50,6 +50,7 @@ class MainWindow(Gtk.Window):
         self.__init_gridview_columns()
         self.__create_playlist_menu()
 
+
         self.builder.connect_signals(self)
         self.player.state_changed.subscribe(self.on_player_state_changed)
         self.player.audio_changed.subscribe(self.on_audio_changed)
@@ -153,18 +154,30 @@ class MainWindow(Gtk.Window):
         self.menu_gridview = self.builder.get_object('menu_gridview')
         self.search_bar = self.builder.get_object('search_bar')
         self.menuchild_gridview_playlist = self.builder.get_object('menuchild_gridview_playlist')
+        self.listbox_playlist = self.builder.get_object('listbox_playlist')
+        self.playlist_sidebar = self.builder.get_object('playlist_sidebar')
+        self.playlist_title_box = self.builder.get_object('playlist_title_box')
         self.add(self.content)
 
     def __create_playlist_menu(self):
         for child in self.menuchild_gridview_playlist.get_children():
             self.menuchild_gridview_playlist.remove(child)
 
+        for child in self.listbox_playlist.get_children()[5:]:
+            self.listbox_playlist.remove(child)
+
         for playlist in self.player.library.get_playlists():
             menu_item = Gtk.MenuItem(label=playlist.name)
             menu_item.connect('activate', self.on_menu_gridview_add_to_playlist_activate, playlist)
             self.menuchild_gridview_playlist.append(menu_item)
 
+            list_box_row = Gtk.ListBoxRow()
+            list_box_row.set_size_request(0,40)
+            list_box_row.add(Gtk.Label(playlist.name, margin_left=5, halign=Gtk.Align.START))
+            self.listbox_playlist.add(list_box_row)
+
         self.menuchild_gridview_playlist.show_all()
+        self.listbox_playlist.show_all()
 
     def __set_current_song_info(self):
         self.logger.debug("Setting currrent song info")
@@ -392,6 +405,9 @@ class MainWindow(Gtk.Window):
             self.player.library.create_playlist(name)
             self.__create_playlist_menu()
 
+    def on_playlist_toggle_sidebar_toggled(self, widget):
+        self.playlist_sidebar.set_visible(widget.get_active())
+        self.playlist_title_box.set_visible(widget.get_active())
 
     def on_prp_current_time_click(self, widget, event):
         width = self.prb_current_time.get_allocated_width()
