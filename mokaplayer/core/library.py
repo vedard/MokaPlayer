@@ -150,6 +150,7 @@ class Library(object):
         self.__sync_songs()
         self.__sync_artists()
         self.__sync_albums()
+        self.__sync_playlists()
         end = time.perf_counter()
         self.logger.info('Scan ended in {:.3f}'.format(end - start))
 
@@ -184,16 +185,19 @@ class Library(object):
 
     def __sync_playlists(self):
         self.logger.info('Scanning playlists')
-        if self._playlists_folder or not pathlib.Path(self.playlists_folder).is_dir():
-            return
+        if not self.playlists_folder or not pathlib.Path(self.playlists_folder).is_dir():
+            self.playlists_folder = self.musics_folder
 
-        list_path = set(str(x) for x in pathlib.Path(
-            self._playlists_folder).glob('**/*m3u'))
-
+        all_paths = set(str(x) for x in pathlib.Path(self.playlists_folder).glob('**/*m3u'))
+        known_paths = {x.Path for x in Playlist.select(Playlist.Path)}
+        new_paths = all_paths - known_paths
+        deleted_paths = known_paths - all_paths
         with database_context.atomic():
-            for path in list_path:
+            for path in new_paths:
                 playlist = PlaylistM3u(path)
                 Playlist(Name=playlist.name, Path=playlist.location).save()
+            for path in deleted_paths:
+                Playlist.delete().where(Song.Path == path).execute()
 
     def __sync_artists(self):
         self.logger.info('Scanning artists')

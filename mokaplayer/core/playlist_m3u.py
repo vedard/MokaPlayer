@@ -24,7 +24,7 @@ class PlaylistM3u:
             self.clear()
             with open(self.location, 'rt') as f:
                 for line in f.read().split('\n'):
-                    if line and not line.startswith('#EXTM3U') and not line.startswith('#EXTINF'):
+                    if line and not line.startswith('#EXT'):
                         self._media_files.append(line)
         except:
             logging.exception('Could not read playlist from ' + self.location)

@@ -82,12 +82,14 @@ class LibraryTest(unittest.TestCase):
         self.assertEqual(Song.select().count(), 8)
         self.assertEqual(Artist.select().count(), 2)
         self.assertEqual(Album.select().count(), 4)
+        self.assertEqual(Playlist.select().count(), 1)
 
         self.library.sync()
 
         self.assertEqual(Song.select().count(), 8)
         self.assertEqual(Artist.select().count(), 2)
         self.assertEqual(Album.select().count(), 4)
+        self.assertEqual(Playlist.select().count(), 1)
 
     def test_sync_with_delete(self):
         self.library.sync()
@@ -96,11 +98,14 @@ class LibraryTest(unittest.TestCase):
             if index != 0:
                 pathlib.Path(path).unlink()
 
+        pathlib.Path(self.PLAYLIST_FILE).unlink()
+
         self.library.sync()
 
         self.assertEqual(Song.select().count(), 1)
         self.assertEqual(Album.select().count(), 1)
         self.assertEqual(Artist.select().count(), 1)
+        self.assertEqual(Playlist.select().count(), 0)
 
     def test_sync_with_add(self):
         self.library.sync()
