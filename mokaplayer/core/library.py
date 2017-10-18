@@ -51,7 +51,10 @@ class Library(object):
 
     @property
     def playlists_folder(self):
-        return self.userconfig["library"]["playlist_directory"]
+        folder = self.userconfig["library"]["playlist_directory"]
+        if not folder or not pathlib.Path(folder).is_dir():
+            self.folder = self.musics_folder
+        return folder
 
     @playlists_folder.setter
     def playlists_folder(self, value):
@@ -63,7 +66,12 @@ class Library(object):
         return self.appconfig.ARTWORK_CACHE_DIRECTORY
 
     def get_songs(self, path_list):
-        return Song.select().where(Song.Path << path_list)
+        result = Song.select().where(Song.Path << path_list)
+        for path in path_list:
+            for song in result:
+                if path == song.Path:
+                    yield song
+
 
     def get_song(self, path):
         try:
@@ -123,6 +131,14 @@ class Library(object):
             order_fields[0] = -order_fields[0]
 
         return Song.select().order_by(*order_fields)
+
+    def create_playlist(self, name):
+        """Create a new playlist in the right folder"""
+
+        path = pathlib.Path(self.playlists_folder) / (name + '.m3u')
+        if not path.exists():
+            PlaylistM3u(str(path)).write()
+            self.__sync_playlists()
 
     def sync_artwork(self):
         """ For every album with a missing cover try to fetch it """
@@ -189,8 +205,6 @@ class Library(object):
 
     def __sync_playlists(self):
         self.logger.info('Scanning playlists')
-        if not self.playlists_folder or not pathlib.Path(self.playlists_folder).is_dir():
-            self.playlists_folder = self.musics_folder
 
         all_paths = set(str(x) for x in pathlib.Path(self.playlists_folder).glob('**/*m3u'))
         known_paths = {x.Path for x in Playlist.select(Playlist.Path)}

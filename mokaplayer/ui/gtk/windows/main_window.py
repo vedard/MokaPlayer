@@ -17,6 +17,7 @@ from mokaplayer.ui.gtk.windows import LyricsWindow
 from mokaplayer.ui.gtk.windows import TabsWindow
 from mokaplayer.ui.gtk.windows import TagsEditorWindow
 from mokaplayer.ui.gtk.windows import HelpShortcutsWindow
+from mokaplayer.ui.gtk.windows import InputBox
 
 
 class MainWindow(Gtk.Window):
@@ -58,6 +59,9 @@ class MainWindow(Gtk.Window):
         self.__set_current_song_info()
         self.on_volume_changed()
 
+        p = self.player.library.get_playlists()[0]
+        p.read()
+
         threading.Thread(target=self.__create_model).start()
 
         GObject.timeout_add(750, self.on_tick, None)
@@ -94,7 +98,7 @@ class MainWindow(Gtk.Window):
                     col.set_visible(True)
                     self.gridview.move_column_after(col, None)
 
-    def __create_model(self):
+    def __create_model(self, paths=None):
         self.logger.info('Creating ListStore')
         start = time.perf_counter()
         model = AdapterSong.create_store()
@@ -102,7 +106,10 @@ class MainWindow(Gtk.Window):
         order = self.userconfig['grid']['order']['field']
         desc = self.userconfig['grid']['order']['desc']
 
-        data = self.player.library.search_song(order, desc)
+        if paths:
+            data = self.player.library.get_songs(paths)
+        else:
+            data = self.player.library.search_song(order, desc)
 
         for row in data:
             model.insert_with_valuesv(-1, AdapterSong.create_col_number(),
@@ -149,6 +156,9 @@ class MainWindow(Gtk.Window):
         self.add(self.content)
 
     def __create_playlist_menu(self):
+        for child in self.menuchild_gridview_playlist.get_children():
+            self.menuchild_gridview_playlist.remove(child)
+
         for playlist in self.player.library.get_playlists():
             menu_item = Gtk.MenuItem(label=playlist.name)
             menu_item.connect('activate', self.on_menu_gridview_add_to_playlist_activate, playlist)
@@ -264,6 +274,7 @@ class MainWindow(Gtk.Window):
         self.player.queue.prepend(self.__get_selected_songs_in_gridview())
 
     def on_menu_gridview_add_to_playlist_activate(self, widget, playlist):
+        playlist.read()
         for path in self.__get_selected_songs_in_gridview():
             playlist.append(path)
         playlist.write()
@@ -374,6 +385,13 @@ class MainWindow(Gtk.Window):
         about_window = AboutWindow.get_diaglog()
         about_window.set_transient_for(self)
         about_window.show()
+
+    def on_playlist_create_activate(self, event):
+        name = InputBox(self, "Playlist", 'What the name of the playlist?').get_text()
+        if name:
+            self.player.library.create_playlist(name)
+            self.__create_playlist_menu()
+
 
     def on_prp_current_time_click(self, widget, event):
         width = self.prb_current_time.get_allocated_width()

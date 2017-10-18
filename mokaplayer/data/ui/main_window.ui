@@ -410,6 +410,29 @@
           <object class="GtkMenuItem">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="label" translatable="yes">_Playlists</property>
+            <property name="use_underline">True</property>
+            <child type="submenu">
+              <object class="GtkMenu">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkMenuItem" id="playlist_create">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Create...</property>
+                    <property name="use_underline">True</property>
+                    <signal name="activate" handler="on_playlist_create_activate" swapped="no"/>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkMenuItem">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <property name="label" translatable="yes">_Help</property>
             <property name="use_underline">True</property>
             <child type="submenu">
