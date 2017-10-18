@@ -40,7 +40,7 @@
       <object class="GtkMenuItem" id="menu_gridview_append">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Append in queue</property>
+        <property name="label" translatable="yes">Add to queue</property>
         <signal name="activate" handler="on_menu_gridview_append_activate" swapped="no"/>
       </object>
     </child>
@@ -48,7 +48,7 @@
       <object class="GtkMenuItem" id="menu_gridview_replace">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Replace the Queue</property>
+        <property name="label" translatable="yes">Replace the queue</property>
         <signal name="activate" handler="on_menu_gridview_replace_activate" swapped="no"/>
       </object>
     </child>
@@ -83,6 +83,20 @@
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">Open Containing Folder</property>
         <signal name="activate" handler="on_menu_gridview_folder_activate" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="menu_gridview_playlists">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Add to playlist</property>
+        <property name="use_underline">True</property>
+        <child type="submenu">
+          <object class="GtkMenu" id="menuchild_gridview_playlist">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+        </child>
       </object>
     </child>
   </object>

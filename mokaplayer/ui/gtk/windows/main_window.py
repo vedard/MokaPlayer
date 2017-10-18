@@ -47,6 +47,7 @@ class MainWindow(Gtk.Window):
         self.__get_object()
         self.__init_sort_radio()
         self.__init_gridview_columns()
+        self.__create_playlist_menu()
 
         self.builder.connect_signals(self)
         self.player.state_changed.subscribe(self.on_player_state_changed)
@@ -144,7 +145,16 @@ class MainWindow(Gtk.Window):
         self.chk_sort_desc = self.builder.get_object('chk_sort_desc')
         self.menu_gridview = self.builder.get_object('menu_gridview')
         self.search_bar = self.builder.get_object('search_bar')
+        self.menuchild_gridview_playlist = self.builder.get_object('menuchild_gridview_playlist')
         self.add(self.content)
+
+    def __create_playlist_menu(self):
+        for playlist in self.player.library.get_playlists():
+            menu_item = Gtk.MenuItem(label=playlist.name)
+            menu_item.connect('activate', self.on_menu_gridview_add_to_playlist_activate, playlist)
+            self.menuchild_gridview_playlist.append(menu_item)
+
+        self.menuchild_gridview_playlist.show_all()
 
     def __set_current_song_info(self):
         self.logger.debug("Setting currrent song info")
@@ -252,6 +262,11 @@ class MainWindow(Gtk.Window):
 
     def on_menu_gridview_insert_activate(self, widget):
         self.player.queue.prepend(self.__get_selected_songs_in_gridview())
+
+    def on_menu_gridview_add_to_playlist_activate(self, widget, playlist):
+        for path in self.__get_selected_songs_in_gridview():
+            playlist.append(path)
+        playlist.write()
 
     def on_menu_gridview_replace_activate(self, widget):
         self.player.queue.clear()

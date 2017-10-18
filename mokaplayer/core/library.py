@@ -67,9 +67,13 @@ class Library(object):
 
     def get_song(self, path):
         try:
+            path = str(pathlib.Path(path).resolve(False))
             return Song.get(Song.Path == path)
         except:
             return None
+
+    def get_playlists(self):
+        return [PlaylistM3u(x.Path) for x in Playlist.select(Playlist.Path)]
 
     def get_album(self, name, albumartist):
         try:
