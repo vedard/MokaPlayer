@@ -752,6 +752,7 @@
                     <property name="width_request">150</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <signal name="row-activated" handler="on_listbox_playlist_row_activated" swapped="no"/>
                     <child>
                       <object class="GtkListBoxRow">
                         <property name="width_request">100</property>
@@ -865,19 +866,20 @@
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
             <child>
-              <object class="GtkBox" id="playlist_title_box">
+              <object class="GtkBox">
                 <property name="name">playlist_title_box</property>
+                <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="orientation">vertical</property>
+                <property name="margin_left">10</property>
+                <property name="margin_right">10</property>
+                <property name="margin_top">5</property>
+                <property name="margin_bottom">5</property>
                 <child>
-                  <object class="GtkLabel">
+                  <object class="GtkLabel" id="lbl_playlist">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
                     <property name="valign">end</property>
-                    <property name="margin_left">10</property>
-                    <property name="margin_right">5</property>
-                    <property name="margin_top">5</property>
                     <property name="label" translatable="yes">Library</property>
                     <attributes>
                       <attribute name="weight" value="normal"/>
@@ -888,26 +890,6 @@
                     <property name="expand">False</property>
                     <property name="fill">True</property>
                     <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="halign">start</property>
-                    <property name="valign">end</property>
-                    <property name="margin_left">10</property>
-                    <property name="margin_top">2</property>
-                    <property name="margin_bottom">5</property>
-                    <property name="label" translatable="yes">507 Songs</property>
-                    <attributes>
-                      <attribute name="foreground" value="#88888a8a8585"/>
-                    </attributes>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
                   </packing>
                 </child>
               </object>
@@ -923,7 +905,6 @@
                 <property name="can_focus">True</property>
                 <property name="margin_left">10</property>
                 <property name="margin_right">10</property>
-                <property name="margin_top">10</property>
                 <child>
                   <object class="GtkTreeView" id="gridview">
                     <property name="visible">True</property>

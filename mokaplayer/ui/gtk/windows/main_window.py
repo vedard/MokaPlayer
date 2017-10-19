@@ -103,14 +103,19 @@ class MainWindow(Gtk.Window):
         self.logger.info('Creating ListStore')
         start = time.perf_counter()
         model = AdapterSong.create_store()
-
+        model.set_default_sort_func(lambda *unused: 0)
+        model.set_sort_column_id(Gtk.TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, Gtk.SortType.ASCENDING)
         order = self.userconfig['grid']['order']['field']
         desc = self.userconfig['grid']['order']['desc']
 
-        if paths:
+        if paths is not None:
             data = self.player.library.get_songs(paths)
         else:
             data = self.player.library.search_song(order, desc)
+
+        end = time.perf_counter()
+        self.logger.info('ListStore query in {:.3f} seconds'.format(end - start))
+        start = time.perf_counter()
 
         for row in data:
             model.insert_with_valuesv(-1, AdapterSong.create_col_number(),
@@ -156,7 +161,8 @@ class MainWindow(Gtk.Window):
         self.menuchild_gridview_playlist = self.builder.get_object('menuchild_gridview_playlist')
         self.listbox_playlist = self.builder.get_object('listbox_playlist')
         self.playlist_sidebar = self.builder.get_object('playlist_sidebar')
-        self.playlist_title_box = self.builder.get_object('playlist_title_box')
+        self.playlist_toggle_sidebar = self.builder.get_object('playlist_toggle_sidebar')
+        self.lbl_playlist = self.builder.get_object('lbl_playlist')
         self.add(self.content)
 
     def __create_playlist_menu(self):
@@ -172,6 +178,7 @@ class MainWindow(Gtk.Window):
             self.menuchild_gridview_playlist.append(menu_item)
 
             list_box_row = Gtk.ListBoxRow()
+            list_box_row.playlist = playlist
             list_box_row.set_size_request(0,40)
             list_box_row.add(Gtk.Label(playlist.name, margin_left=5, halign=Gtk.Align.START))
             self.listbox_playlist.add(list_box_row)
@@ -232,10 +239,14 @@ class MainWindow(Gtk.Window):
         w.get_window().show()
 
     def __show_tagseditor(self, paths):
-        songs = self.player.library.get_songs(paths)
+        songs = list(self.player.library.get_songs(paths))
         w = TagsEditorWindow(songs)
         w.get_window().set_transient_for(self)
         w.get_window().show()
+
+    def __set_visibility_playlist_sidebar(self, visible):
+        self.playlist_sidebar.set_visible(visible)
+        self.playlist_toggle_sidebar.set_active(visible)
 
     def __library_scan(self):
         self.player.library.sync()
@@ -260,6 +271,8 @@ class MainWindow(Gtk.Window):
                 self.txt_search.grab_focus()
         elif ctrl and keyval_name == 'l':
             self.__show_lyrics(self.player.queue.peek())
+        elif ctrl and keyval_name == 'p':
+            self.__set_visibility_playlist_sidebar(not self.playlist_sidebar.get_visible())
         elif ctrl and keyval_name == 'o':
             self.__focus_song(self.player.queue.peek())
         elif ctrl and keyval_name == 'Left':
@@ -274,6 +287,11 @@ class MainWindow(Gtk.Window):
             return False
 
         return True
+
+    def on_listbox_playlist_row_activated(self, widget, row):
+        row.playlist.read()
+        self.lbl_playlist.set_text(row.playlist.name)
+        self.__create_model(row.playlist._media_files)
 
     def on_gridview_button_press_event(self, sender, event):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
@@ -299,7 +317,7 @@ class MainWindow(Gtk.Window):
     def on_menu_gridview_edit_activate(self, widget):
         selected_songs = self.__get_selected_songs_in_gridview()
         if any(selected_songs):
-            self.__show_tagseditor(self.__get_selected_songs_in_gridview())
+            self.__show_tagseditor(selected_songs)
 
     def on_menu_gridview_tabs_activate(self, widget):
         selected_songs = self.__get_selected_songs_in_gridview()
@@ -407,7 +425,6 @@ class MainWindow(Gtk.Window):
 
     def on_playlist_toggle_sidebar_toggled(self, widget):
         self.playlist_sidebar.set_visible(widget.get_active())
-        self.playlist_title_box.set_visible(widget.get_active())
 
     def on_prp_current_time_click(self, widget, event):
         width = self.prb_current_time.get_allocated_width()
