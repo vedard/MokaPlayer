@@ -66,12 +66,9 @@ class Library(object):
         return self.appconfig.ARTWORK_CACHE_DIRECTORY
 
     def get_songs(self, path_list):
-        result = Song.select().where(Song.Path << path_list)
+        result = {x.Path: x for x in Song.select().iterator()}
         for path in path_list:
-            for song in result:
-                if path == song.Path:
-                    yield song
-
+            yield result[path]
 
     def get_song(self, path):
         try:

@@ -47,6 +47,7 @@ class PlaylistM3u:
         return len(self._media_files)
 
     def __iter__(self):
+        self.read()
         return iter(self._media_files)
 
     def __getitem__(self, key):

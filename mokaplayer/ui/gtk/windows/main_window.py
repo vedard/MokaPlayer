@@ -9,6 +9,9 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 from mokaplayer.core.player import Player
+from mokaplayer.core.playlist_m3u import PlaylistM3u
+from mokaplayer.core.library import Library
+from mokaplayer.core.queue import Queue
 from mokaplayer.core.helpers import time_helper
 from mokaplayer.ui.gtk.helper import image_helper, file_helper
 from mokaplayer.ui.gtk.adapter import AdapterSong
@@ -48,7 +51,7 @@ class MainWindow(Gtk.Window):
         self.__get_object()
         self.__init_sort_radio()
         self.__init_gridview_columns()
-        self.__create_playlist_menu()
+        self.__create_playlist_menus()
 
 
         self.builder.connect_signals(self)
@@ -60,7 +63,7 @@ class MainWindow(Gtk.Window):
         self.__set_current_song_info()
         self.on_volume_changed()
 
-        threading.Thread(target=self.__create_model).start()
+        threading.Thread(target=lambda: self.__create_model(self.player.library)).start()
 
         GObject.timeout_add(750, self.on_tick, None)
         self.logger.info('Window loaded')
@@ -96,7 +99,7 @@ class MainWindow(Gtk.Window):
                     col.set_visible(True)
                     self.gridview.move_column_after(col, None)
 
-    def __create_model(self, paths=None):
+    def __create_model(self, data):
         self.logger.info('Creating ListStore')
         start = time.perf_counter()
         model = AdapterSong.create_store()
@@ -105,18 +108,15 @@ class MainWindow(Gtk.Window):
         order = self.userconfig['grid']['order']['field']
         desc = self.userconfig['grid']['order']['desc']
 
-        if paths is not None:
-            data = self.player.library.get_songs(paths)
+        if isinstance(data, PlaylistM3u) or isinstance(data, Queue):
+            songs = self.player.library.get_songs(list(iter(data)))
+        elif isinstance(data, Library):
+            songs = data.search_song(order, desc)
         else:
-            data = self.player.library.search_song(order, desc)
+            songs = []
 
-        end = time.perf_counter()
-        self.logger.info('ListStore query in {:.3f} seconds'.format(end - start))
-        start = time.perf_counter()
-
-        for row in data:
-            model.insert_with_valuesv(-1, AdapterSong.create_col_number(),
-                                      AdapterSong.create_row(row))
+        for row in songs:
+            model.insert_with_valuesv(-1, AdapterSong.create_col_number(), AdapterSong.create_row(row))
 
         end = time.perf_counter()
         self.logger.info('ListStore created in {:.3f} seconds'.format(end - start))
@@ -162,23 +162,32 @@ class MainWindow(Gtk.Window):
         self.lbl_playlist = self.builder.get_object('lbl_playlist')
         self.add(self.content)
 
-    def __create_playlist_menu(self):
+    def __create_playlist_row(self, playlist, name):
+        list_box_row = Gtk.ListBoxRow()
+        list_box_row.playlist = playlist
+        list_box_row.playlist_name = name
+        list_box_row.set_size_request(0,40)
+        list_box_row.add(Gtk.Label(name, margin_left=5, halign=Gtk.Align.START))
+        return list_box_row
+
+    def __create_playlist_menus(self):
         for child in self.menuchild_gridview_playlist.get_children():
             self.menuchild_gridview_playlist.remove(child)
 
-        for child in self.listbox_playlist.get_children()[5:]:
+        for child in self.listbox_playlist.get_children():
             self.listbox_playlist.remove(child)
+
+        self.listbox_playlist.add(self.__create_playlist_row(self.player.library, "Library"))
+        self.listbox_playlist.add(self.__create_playlist_row(self.player.queue, "Upnext"))
+        self.listbox_playlist.add(self.__create_playlist_row(self.player.library, "Most played"))
+        self.listbox_playlist.add(self.__create_playlist_row(self.player.library, "Recently added"))
+        self.listbox_playlist.add(self.__create_playlist_row(self.player.library, "Recently played"))
 
         for playlist in self.player.library.get_playlists():
             menu_item = Gtk.MenuItem(label=playlist.name)
             menu_item.connect('activate', self.on_menu_gridview_add_to_playlist_activate, playlist)
             self.menuchild_gridview_playlist.append(menu_item)
-
-            list_box_row = Gtk.ListBoxRow()
-            list_box_row.playlist = playlist
-            list_box_row.set_size_request(0,40)
-            list_box_row.add(Gtk.Label(playlist.name, margin_left=5, halign=Gtk.Align.START))
-            self.listbox_playlist.add(list_box_row)
+            self.listbox_playlist.add(self.__create_playlist_row(playlist, playlist.name))
 
         self.menuchild_gridview_playlist.show_all()
         self.listbox_playlist.show_all()
@@ -286,9 +295,8 @@ class MainWindow(Gtk.Window):
         return True
 
     def on_listbox_playlist_row_activated(self, widget, row):
-        row.playlist.read()
-        self.lbl_playlist.set_text(row.playlist.name)
-        self.__create_model(row.playlist._media_files)
+        self.lbl_playlist.set_text(row.playlist_name)
+        threading.Thread(target=lambda: self.__create_model(row.playlist)).start()
 
     def on_gridview_button_press_event(self, sender, event):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
@@ -418,7 +426,7 @@ class MainWindow(Gtk.Window):
         name = InputBox(self, "Playlist", 'What the name of the playlist?').get_text()
         if name:
             self.player.library.create_playlist(name)
-            self.__create_playlist_menu()
+            self.__create_playlist_menus()
 
     def on_playlist_toggle_sidebar_toggled(self, widget):
         self.playlist_sidebar.set_reveal_child(widget.get_active())
@@ -478,4 +486,4 @@ class MainWindow(Gtk.Window):
                 self.userconfig['grid']['order']['field'] = 'Played'
 
             threading.Thread(target=self.userconfig.save).start()
-            threading.Thread(target=self.__create_model).start()
+            threading.Thread(target=lambda: self.__create_model(self.player.library)).start()
