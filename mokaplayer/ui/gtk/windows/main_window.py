@@ -60,9 +60,6 @@ class MainWindow(Gtk.Window):
         self.__set_current_song_info()
         self.on_volume_changed()
 
-        p = self.player.library.get_playlists()[0]
-        p.read()
-
         threading.Thread(target=self.__create_model).start()
 
         GObject.timeout_add(750, self.on_tick, None)
@@ -245,7 +242,7 @@ class MainWindow(Gtk.Window):
         w.get_window().show()
 
     def __set_visibility_playlist_sidebar(self, visible):
-        self.playlist_sidebar.set_visible(visible)
+        self.playlist_sidebar.set_reveal_child(visible)
         self.playlist_toggle_sidebar.set_active(visible)
 
     def __library_scan(self):
@@ -272,7 +269,7 @@ class MainWindow(Gtk.Window):
         elif ctrl and keyval_name == 'l':
             self.__show_lyrics(self.player.queue.peek())
         elif ctrl and keyval_name == 'p':
-            self.__set_visibility_playlist_sidebar(not self.playlist_sidebar.get_visible())
+            self.__set_visibility_playlist_sidebar(not self.playlist_sidebar.get_reveal_child())
         elif ctrl and keyval_name == 'o':
             self.__focus_song(self.player.queue.peek())
         elif ctrl and keyval_name == 'Left':
@@ -424,7 +421,7 @@ class MainWindow(Gtk.Window):
             self.__create_playlist_menu()
 
     def on_playlist_toggle_sidebar_toggled(self, widget):
-        self.playlist_sidebar.set_visible(widget.get_active())
+        self.playlist_sidebar.set_reveal_child(widget.get_active())
 
     def on_prp_current_time_click(self, widget, event):
         width = self.prb_current_time.get_allocated_width()
