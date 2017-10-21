@@ -8,8 +8,8 @@ library:
 player:
   restore_state: Yes
 grid:
-  order:
-    field:
+  sort:
+    field: DEFAULT
     desc: No
   font: null
   columns: [ 'Title', 'Artist', 'Album','Length', 'Year', 'Added', 'Played', 'Genre']

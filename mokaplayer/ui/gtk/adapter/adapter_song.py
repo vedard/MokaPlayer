@@ -23,7 +23,10 @@ class AdapterSong:
 
     @staticmethod
     def create_store():
-        return Gtk.ListStore(str, str, str, str, str, str, str, str, str, str)
+        model = Gtk.ListStore(str, str, str, str, str, str, str, str, str, str)
+        model.set_default_sort_func(lambda *unused: 0)
+        model.set_sort_column_id(Gtk.TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, Gtk.SortType.ASCENDING)
+        return model
 
     @staticmethod
     def create_col_number():

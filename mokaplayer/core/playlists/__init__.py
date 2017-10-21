@@ -1,0 +1,61 @@
+import enum
+
+from mokaplayer.core.database import Song
+
+
+class AbstractPlaylist:
+    """ Abstract class for a playlist
+    """
+
+    class OrderBy(enum.Enum):
+        """ Enum for the different way to order a playlist
+        """
+        DEFAULT = enum.auto()
+        ARTIST = enum.auto()
+        ALBUM = enum.auto()
+        TITLE = enum.auto()
+        YEAR = enum.auto()
+        LENGTH = enum.auto()
+        ADDED = enum.auto()
+        PLAYED = enum.auto()
+
+    @property
+    def name(self):
+        """ Return the name of the playlist """
+        pass
+
+    def songs(self, order, desc):
+        """ Return a list of songs in the specified order"""
+        pass
+
+    def get_orderby_fields(self, order, desc):
+        """ Return a list of fields for a order by query
+        """
+        fields = []
+
+        if order == self.OrderBy.ALBUM:
+            fields = [Song.Album, Song.Discnumber, Song.Tracknumber]
+        elif order == self.OrderBy.YEAR:
+            fields = [Song.Year, Song.Album, Song.Discnumber, Song.Tracknumber]
+        elif order == self.OrderBy.ADDED:
+            fields = [-Song.Added, Song.AlbumArtist, Song.Year, Song.Album, Song.Discnumber, Song.Tracknumber]
+        elif order == self.OrderBy.TITLE:
+            fields = [Song.Title]
+        elif order == self.OrderBy.LENGTH:
+            fields = [Song.Length]
+        elif order == self.OrderBy.PLAYED:
+            fields = [-Song.Played]
+        else:
+            fields = [Song.AlbumArtist, Song.Year, Song.Album, Song.Discnumber, Song.Tracknumber]
+
+        if desc:
+            fields[0] = -fields[0]
+
+        return fields
+
+from .library_playlist import LibraryPlaylist
+from .m3u_playlist import M3UPlaylist
+from .mostplayed_playlist import MostPlayedPlaylist
+from .recentlyadded_playlist import RecentlyAddedPlaylist
+from .recentlyplayed_playlist import RecentlyPlayedPlaylist
+from .upnext_playlist import UpNextPlaylist

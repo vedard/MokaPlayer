@@ -2,7 +2,7 @@ import pathlib
 import logging
 
 
-class PlaylistM3u:
+class M3uParser:
     """Represent a list of path or url (media file) loaded from a M3U file
 
     Properties:

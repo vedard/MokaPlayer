@@ -4,7 +4,7 @@ import mimetypes
 import pathlib
 
 from mokaplayer.core.database import database_context, Song, Album, Artist, Playlist
-from mokaplayer.core.playlist_m3u import PlaylistM3u
+from mokaplayer.core.m3u_parser import M3uParser
 from mokaplayer.core.fetchers import artworks
 
 
@@ -53,7 +53,7 @@ class Library(object):
     def playlists_folder(self):
         folder = self.userconfig["library"]["playlist_directory"]
         if not folder or not pathlib.Path(folder).is_dir():
-            self.folder = self.musics_folder
+            folder = self.musics_folder
         return folder
 
     @playlists_folder.setter
@@ -65,10 +65,8 @@ class Library(object):
     def artworks_folder(self):
         return self.appconfig.ARTWORK_CACHE_DIRECTORY
 
-    def get_songs(self, path_list):
-        result = {x.Path: x for x in Song.select().iterator()}
-        for path in path_list:
-            yield result[path]
+    def get_songs(self, paths):
+        return Song.select().where(Song.Path << paths)
 
     def get_song(self, path):
         try:
@@ -78,7 +76,7 @@ class Library(object):
             return None
 
     def get_playlists(self):
-        return [PlaylistM3u(x.Path) for x in Playlist.select(Playlist.Path)]
+        return [x.Path for x in Playlist.select(Playlist.Path)]
 
     def get_album(self, name, albumartist):
         try:
@@ -86,55 +84,12 @@ class Library(object):
         except:
             return None
 
-    def search_song(self, order=None, desc=False):
-        order_fields = []
-
-        if not order or order == 'Artist':
-            order_fields = [Song.AlbumArtist,
-                            Song.Year,
-                            Song.Album,
-                            Song.Discnumber,
-                            Song.Tracknumber]
-
-        elif order == 'Album':
-            order_fields = [Song.Album,
-                            Song.Discnumber,
-                            Song.Tracknumber]
-
-        elif order == 'Year':
-            order_fields = [Song.Year,
-                            Song.Album,
-                            Song.Discnumber,
-                            Song.Tracknumber]
-
-        elif order == 'Added':
-            order_fields = [Song.Added,
-                            Song.AlbumArtist,
-                            Song.Year,
-                            Song.Album,
-                            Song.Discnumber,
-                            Song.Tracknumber]
-
-        elif order == 'Title':
-            order_fields = [Song.Title]
-
-        elif order == 'Length':
-            order_fields = [Song.Length]
-
-        elif order == 'Played':
-            order_fields = [Song.Played]
-
-        if desc:
-            order_fields[0] = -order_fields[0]
-
-        return Song.select().order_by(*order_fields)
-
     def create_playlist(self, name):
         """Create a new playlist in the right folder"""
 
         path = pathlib.Path(self.playlists_folder) / (name + '.m3u')
         if not path.exists():
-            PlaylistM3u(str(path)).write()
+            M3uParser(str(path)).write()
             self.__sync_playlists()
 
     def sync_artwork(self):
@@ -209,7 +164,7 @@ class Library(object):
         deleted_paths = known_paths - all_paths
         with database_context.atomic():
             for path in new_paths:
-                playlist = PlaylistM3u(path)
+                playlist = M3uParser(path)
                 Playlist(Name=playlist.name, Path=playlist.location).save()
             for path in deleted_paths:
                 Playlist.delete().where(Song.Path == path).execute()
