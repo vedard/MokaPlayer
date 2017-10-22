@@ -2,7 +2,7 @@ import pathlib
 import logging
 
 
-class PlaylistM3u:
+class M3uParser:
     """Represent a list of path or url (media file) loaded from a M3U file
 
     Properties:
@@ -24,7 +24,7 @@ class PlaylistM3u:
             self.clear()
             with open(self.location, 'rt') as f:
                 for line in f.read().split('\n'):
-                    if line and not line.startswith('#EXTM3U') and not line.startswith('#EXTINF'):
+                    if line and not line.startswith('#EXT'):
                         self._media_files.append(line)
         except:
             logging.exception('Could not read playlist from ' + self.location)
@@ -47,6 +47,7 @@ class PlaylistM3u:
         return len(self._media_files)
 
     def __iter__(self):
+        self.read()
         return iter(self._media_files)
 
     def __getitem__(self, key):

@@ -10,7 +10,6 @@ class LyricsWindow():
     GLADE_FILE = pkg_resources.resource_filename('mokaplayer',
                                                  'data/ui/lyrics_window.ui')
 
-
     def __init__(self):
         self.builder = Gtk.Builder()
         self.builder.add_from_file(self.GLADE_FILE)

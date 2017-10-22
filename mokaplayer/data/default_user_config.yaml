@@ -1,3 +1,5 @@
+sidebar:
+  show: Yes
 header:
   image_size: 140
   line1: '{Title}'
@@ -8,10 +10,10 @@ library:
 player:
   restore_state: Yes
 grid:
-  order:
-    field:
+  sort:
+    field: DEFAULT
     desc: No
   font: null
   columns: [ 'Title', 'Artist', 'Album','Length', 'Year', 'Added', 'Played', 'Genre']
 gtk:
-  darktheme: false
+  darktheme: No

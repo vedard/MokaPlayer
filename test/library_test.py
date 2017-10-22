@@ -5,7 +5,7 @@ import unittest
 import pathlib
 from mokaplayer.core.library import Library
 from mokaplayer.core.database import Song, Artist, Playlist, Album
-from mokaplayer.core.playlist_m3u import PlaylistM3u
+from mokaplayer.core.m3u_parser import M3uParser
 from mokaplayer.config import appconfig, userconfig
 
 
@@ -49,7 +49,7 @@ class LibraryTest(unittest.TestCase):
             song.Album = 'Album' + str(int(index / 2))
             song.write_tags()
 
-        playlist = PlaylistM3u(LibraryTest.PLAYLIST_FILE)
+        playlist = M3uParser(LibraryTest.PLAYLIST_FILE)
         for path in LibraryTest.DST_FILE:
             playlist.append(pathlib.Path(path).name)
         playlist.write()
@@ -70,10 +70,11 @@ class LibraryTest(unittest.TestCase):
         self.assertEqual(self.library.musics_folder, self.FOLDER)
 
     def test_playlists_folder(self):
-        self.library.playlists_folder = 'asdf/Invalid folder/fasdfasdf'
-        self.assertEqual(self.library.playlists_folder, 'asdf/Invalid folder/fasdfasdf')
-        self.library.playlists_folder = self.FOLDER
         self.assertEqual(self.library.playlists_folder, self.FOLDER)
+        self.library.playlists_folder = 'asdf/Invalid folder/fasdfasdf'
+        self.assertEqual(self.library.playlists_folder, self.FOLDER)
+        self.library.playlists_folder = './test'
+        self.assertEqual(self.library.playlists_folder, './test')
 
     def test_sync(self):
         self.library.sync()
@@ -82,12 +83,14 @@ class LibraryTest(unittest.TestCase):
         self.assertEqual(Song.select().count(), 8)
         self.assertEqual(Artist.select().count(), 2)
         self.assertEqual(Album.select().count(), 4)
+        self.assertEqual(Playlist.select().count(), 1)
 
         self.library.sync()
 
         self.assertEqual(Song.select().count(), 8)
         self.assertEqual(Artist.select().count(), 2)
         self.assertEqual(Album.select().count(), 4)
+        self.assertEqual(Playlist.select().count(), 1)
 
     def test_sync_with_delete(self):
         self.library.sync()
@@ -96,11 +99,14 @@ class LibraryTest(unittest.TestCase):
             if index != 0:
                 pathlib.Path(path).unlink()
 
+        pathlib.Path(self.PLAYLIST_FILE).unlink()
+
         self.library.sync()
 
         self.assertEqual(Song.select().count(), 1)
         self.assertEqual(Album.select().count(), 1)
         self.assertEqual(Artist.select().count(), 1)
+        self.assertEqual(Playlist.select().count(), 0)
 
     def test_sync_with_add(self):
         self.library.sync()

@@ -2,17 +2,17 @@ import unittest
 import pathlib
 import shutil
 
-from mokaplayer.core.playlist_m3u import PlaylistM3u
+from mokaplayer.core.m3u_parser import M3uParser
 
-class PlaylistTest(unittest.TestCase):
+class M3uPaserTest(unittest.TestCase):
     FOLDER = './test/playlist/'
 
     def setUp(self):
-        pathlib.Path(PlaylistTest.FOLDER).mkdir(exist_ok=True)
-        self.playlist = PlaylistM3u(PlaylistTest.FOLDER + 'test.m3u')
+        pathlib.Path(M3uPaserTest.FOLDER).mkdir(exist_ok=True)
+        self.playlist = M3uParser(M3uPaserTest.FOLDER + 'test.m3u')
 
     def tearDown(self):
-        shutil.rmtree(PlaylistTest.FOLDER)
+        shutil.rmtree(M3uPaserTest.FOLDER)
 
     def test_readandwrite(self):
         with self.assertLogs():

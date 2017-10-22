@@ -30,11 +30,12 @@ class Application():
 
     def init_window(self):
         self.window = MainWindow(self.appconfig, self.userconfig, self.player)
-        self.window.show_all()
+        self.window.show()
 
     def init_args(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument('--debug', help='Load the developpement configuration', required=False, action='store_true')
+        parser.add_argument('--debug', help='Load the developpement configuration',
+                            required=False, action='store_true')
         self.args = parser.parse_args()
 
     def init_configs(self):

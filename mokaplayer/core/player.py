@@ -48,9 +48,10 @@ class Player(object):
     def stop(self):
         self.logger.debug("Stop")
         self.__set_play_count()
-        self.streamer.stop()
         self.queue.pop()
+        self.streamer.stop()
         self.state_changed.fire()
+        self.audio_changed.fire()
 
     def pause(self):
         self.logger.debug("Pause")

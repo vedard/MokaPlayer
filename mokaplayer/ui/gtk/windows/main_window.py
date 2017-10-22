@@ -8,15 +8,19 @@ import pkg_resources
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
+from gi.repository import Pango
 from mokaplayer.core.player import Player
+from mokaplayer.core.m3u_parser import M3uParser
+from mokaplayer.core.library import Library
+from mokaplayer.core.queue import Queue
 from mokaplayer.core.helpers import time_helper
 from mokaplayer.ui.gtk.helper import image_helper, file_helper
 from mokaplayer.ui.gtk.adapter import AdapterSong
-from mokaplayer.ui.gtk.windows import AboutWindow
-from mokaplayer.ui.gtk.windows import LyricsWindow
-from mokaplayer.ui.gtk.windows import TabsWindow
-from mokaplayer.ui.gtk.windows import TagsEditorWindow
-from mokaplayer.ui.gtk.windows import HelpShortcutsWindow
+from mokaplayer.core.playlists import (AbstractPlaylist, LibraryPlaylist, M3UPlaylist, MostPlayedPlaylist,
+                                       RecentlyAddedPlaylist, RecentlyPlayedPlaylist, UpNextPlaylist,
+                                       RarelyPlayedPlaylist)
+from mokaplayer.ui.gtk.windows import (AboutWindow, LyricsWindow, TabsWindow,
+                                       TagsEditorWindow, HelpShortcutsWindow, InputBox)
 
 
 class MainWindow(Gtk.Window):
@@ -33,6 +37,7 @@ class MainWindow(Gtk.Window):
         self.appconfig = appconfig
         self.userconfig = userconfig
         self.player = player
+        self.current_playlist = LibraryPlaylist()
         self.set_icon_from_file(pkg_resources.resource_filename('mokaplayer', 'data/mokaplayer.png'))
 
         if self.userconfig['gtk']['darktheme']:
@@ -47,6 +52,7 @@ class MainWindow(Gtk.Window):
         self.__get_object()
         self.__init_sort_radio()
         self.__init_gridview_columns()
+        self.__init_sidebar()
 
         self.builder.connect_signals(self)
         self.player.state_changed.subscribe(self.on_player_state_changed)
@@ -57,7 +63,7 @@ class MainWindow(Gtk.Window):
         self.__set_current_song_info()
         self.on_volume_changed()
 
-        threading.Thread(target=self.__create_model).start()
+        threading.Thread(target=lambda: self.__create_model()).start()
 
         GObject.timeout_add(750, self.on_tick, None)
         self.logger.info('Window loaded')
@@ -93,19 +99,17 @@ class MainWindow(Gtk.Window):
                     col.set_visible(True)
                     self.gridview.move_column_after(col, None)
 
-    def __create_model(self):
+    def __create_model(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
         self.logger.info('Creating ListStore')
         start = time.perf_counter()
+
         model = AdapterSong.create_store()
+        order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
+        desc = self.userconfig['grid']['sort']['desc']
+        songs = self.current_playlist.songs(order, desc)
 
-        order = self.userconfig['grid']['order']['field']
-        desc = self.userconfig['grid']['order']['desc']
-
-        data = self.player.library.search_song(order, desc)
-
-        for row in data:
-            model.insert_with_valuesv(-1, AdapterSong.create_col_number(),
-                                      AdapterSong.create_row(row))
+        for row in songs:
+            model.insert_with_valuesv(-1, AdapterSong.create_col_number(), AdapterSong.create_row(row))
 
         end = time.perf_counter()
         self.logger.info('ListStore created in {:.3f} seconds'.format(end - start))
@@ -141,10 +145,55 @@ class MainWindow(Gtk.Window):
         self.radio_sort_length = self.builder.get_object('radio_sort_length')
         self.radio_sort_added = self.builder.get_object('radio_sort_added')
         self.radio_sort_played = self.builder.get_object('radio_sort_played')
+        self.radio_sort_default = self.builder.get_object('radio_sort_default')
         self.chk_sort_desc = self.builder.get_object('chk_sort_desc')
         self.menu_gridview = self.builder.get_object('menu_gridview')
         self.search_bar = self.builder.get_object('search_bar')
+        self.menuchild_gridview_playlist = self.builder.get_object('menuchild_gridview_playlist')
+        self.listbox_playlist = self.builder.get_object('listbox_playlist')
+        self.playlist_sidebar = self.builder.get_object('playlist_sidebar')
+        self.lbl_playlist = self.builder.get_object('lbl_playlist')
         self.add(self.content)
+
+    def __create_sidebar_row(self, playlist):
+        list_box_row = Gtk.ListBoxRow()
+        list_box_row.playlist = playlist
+        list_box_row.set_size_request(0, 40)
+        list_box_row.add(Gtk.Label(playlist.name, margin_left=20, halign=Gtk.Align.START))
+        return list_box_row
+
+    def __create_sidebar_header(self, name):
+        list_box_row = Gtk.ListBoxRow(activatable=False, selectable=False)
+        list_box_row.set_size_request(0, 40)
+        label = Gtk.Label(f'<b>{name}</b>', margin_left=10, halign=Gtk.Align.START, use_markup=True)
+        list_box_row.add(label)
+        return list_box_row
+
+    def __create_playlist_menus(self):
+        for child in self.menuchild_gridview_playlist.get_children():
+            self.menuchild_gridview_playlist.remove(child)
+
+        for child in self.listbox_playlist.get_children():
+            self.listbox_playlist.remove(child)
+
+        self.listbox_playlist.add(self.__create_sidebar_header('Collections'))
+        self.listbox_playlist.add(self.__create_sidebar_row(LibraryPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_row(UpNextPlaylist(self.player.queue)))
+        self.listbox_playlist.add(self.__create_sidebar_row(MostPlayedPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_row(RarelyPlayedPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_row(RecentlyPlayedPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_row(RecentlyAddedPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_header('Playlists'))
+
+        for playlist_location in self.player.library.get_playlists():
+            m3u = M3uParser(playlist_location)
+            menu_item = Gtk.MenuItem(label=m3u.name)
+            menu_item.connect('activate', self.on_menu_gridview_add_to_playlist_activate, m3u)
+            self.menuchild_gridview_playlist.append(menu_item)
+            self.listbox_playlist.add(self.__create_sidebar_row(M3UPlaylist(m3u)))
+
+        self.menuchild_gridview_playlist.show_all()
+        self.listbox_playlist.show_all()
 
     def __set_current_song_info(self):
         self.logger.debug("Setting currrent song info")
@@ -199,7 +248,7 @@ class MainWindow(Gtk.Window):
         w.get_window().show()
 
     def __show_tagseditor(self, paths):
-        songs = self.player.library.get_songs(paths)
+        songs = list(self.player.library.get_songs(paths))
         w = TagsEditorWindow(songs)
         w.get_window().set_transient_for(self)
         w.get_window().show()
@@ -227,6 +276,8 @@ class MainWindow(Gtk.Window):
                 self.txt_search.grab_focus()
         elif ctrl and keyval_name == 'l':
             self.__show_lyrics(self.player.queue.peek())
+        elif ctrl and keyval_name == 'p':
+            self.__show_sidebar(not self.playlist_sidebar.get_reveal_child())
         elif ctrl and keyval_name == 'o':
             self.__focus_song(self.player.queue.peek())
         elif ctrl and keyval_name == 'Left':
@@ -242,6 +293,11 @@ class MainWindow(Gtk.Window):
 
         return True
 
+    def on_listbox_playlist_row_activated(self, widget, row):
+        self.current_playlist = row.playlist
+        self.lbl_playlist.set_text(row.playlist.name)
+        threading.Thread(target=lambda: self.__create_model()).start()
+
     def on_gridview_button_press_event(self, sender, event):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
             self.menu_gridview.popup(None, None, None, None, event.button, event.time)
@@ -253,6 +309,12 @@ class MainWindow(Gtk.Window):
     def on_menu_gridview_insert_activate(self, widget):
         self.player.queue.prepend(self.__get_selected_songs_in_gridview())
 
+    def on_menu_gridview_add_to_playlist_activate(self, widget, playlist):
+        playlist.read()
+        for path in self.__get_selected_songs_in_gridview():
+            playlist.append(path)
+        playlist.write()
+
     def on_menu_gridview_replace_activate(self, widget):
         self.player.queue.clear()
         self.player.queue.append(self.__get_selected_songs_in_gridview())
@@ -260,7 +322,7 @@ class MainWindow(Gtk.Window):
     def on_menu_gridview_edit_activate(self, widget):
         selected_songs = self.__get_selected_songs_in_gridview()
         if any(selected_songs):
-            self.__show_tagseditor(self.__get_selected_songs_in_gridview())
+            self.__show_tagseditor(selected_songs)
 
     def on_menu_gridview_tabs_activate(self, widget):
         selected_songs = self.__get_selected_songs_in_gridview()
@@ -332,6 +394,7 @@ class MainWindow(Gtk.Window):
 
     def on_library_scan_finished(self):
         self.on_sort_radio_toggled(None)
+        self.__create_playlist_menus()
 
     def on_library_artworks_activate(self, event):
         threading.Thread(target=lambda: self.__library_artwork()).start()
@@ -341,8 +404,14 @@ class MainWindow(Gtk.Window):
 
     def on_queue_add_activate(self, event):
         self.player.queue.clear()
-        self.player.queue.append([x.Path for x in self.player.library.search_song()])
+        self.player.queue.append([x.Path for x in LibraryPlaylist().songs()])
         self.player.queue.seek(self.player.queue.pop())
+
+    def on_queue_add_playlist_activate(self, event):
+        order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
+        desc = self.userconfig['grid']['sort']['desc']
+        self.player.queue.clear()
+        self.player.queue.append([x.Path for x in self.current_playlist.songs(order, desc)])
 
     def on_queue_clear_activate(self, event):
         self.player.queue.clear()
@@ -359,6 +428,18 @@ class MainWindow(Gtk.Window):
         about_window = AboutWindow.get_diaglog()
         about_window.set_transient_for(self)
         about_window.show()
+
+    def on_playlist_create_activate(self, event):
+        name = InputBox(self, "Playlist", 'What the name of the playlist?').get_text()
+        if name:
+            self.player.library.create_playlist(name)
+            self.__create_playlist_menus()
+
+    def on_view_toggle_search_activate(self, widget):
+        self.search_bar.set_search_mode(not self.search_bar.get_search_mode())
+
+    def on_view_toggle_sidebar_activate(self, widget):
+        self.__show_sidebar(not self.playlist_sidebar.get_reveal_child())
 
     def on_prp_current_time_click(self, widget, event):
         width = self.prb_current_time.get_allocated_width()
@@ -377,42 +458,62 @@ class MainWindow(Gtk.Window):
 
         return True
 
+    def __init_sidebar(self):
+        show_sidebar = self.userconfig['sidebar']['show']
+        self.__create_playlist_menus()
+        if show_sidebar:
+            self.playlist_sidebar.set_reveal_child(show_sidebar)
+
+    def __show_sidebar(self, is_visible):
+        self.playlist_sidebar.set_reveal_child(is_visible)
+        self.userconfig['sidebar']['show'] = is_visible
+        threading.Thread(target=self.userconfig.save).start()
+
     def __init_sort_radio(self):
-        self.chk_sort_desc.set_active(self.userconfig['grid']['order']['desc'])
-        if self.userconfig['grid']['order']['field'] == 'Artist':
+        order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
+        desc = self.userconfig['grid']['sort']['desc']
+
+        self.chk_sort_desc.set_active(desc)
+        if order == AbstractPlaylist.OrderBy.ARTIST:
             self.radio_sort_artist.set_active(True)
-        elif self.userconfig['grid']['order']['field'] == 'Album':
+        elif order == AbstractPlaylist.OrderBy.ALBUM:
             self.radio_sort_album.set_active(True)
-        elif self.userconfig['grid']['order']['field'] == 'Title':
+        elif order == AbstractPlaylist.OrderBy.TITLE:
             self.radio_sort_title.set_active(True)
-        elif self.userconfig['grid']['order']['field'] == 'Length':
+        elif order == AbstractPlaylist.OrderBy.LENGTH:
             self.radio_sort_length.set_active(True)
-        elif self.userconfig['grid']['order']['field'] == 'Year':
+        elif order == AbstractPlaylist.OrderBy.YEAR:
             self.radio_sort_year.set_active(True)
-        elif self.userconfig['grid']['order']['field'] == 'Added':
+        elif order == AbstractPlaylist.OrderBy.ADDED:
             self.radio_sort_added.set_active(True)
-        elif self.userconfig['grid']['order']['field'] == 'Played':
+        elif order == AbstractPlaylist.OrderBy.PLAYED:
             self.radio_sort_played.set_active(True)
+        else:
+            self.radio_sort_default.set_active(True)
 
     def on_sort_radio_toggled(self, widget):
         if widget is None or widget.get_active() or not isinstance(widget, Gtk.RadioButton):
-            self.userconfig['grid']['order']['field'] = ''
-            self.userconfig['grid']['order']['desc'] = self.chk_sort_desc.get_active()
+            order = AbstractPlaylist.OrderBy.DEFAULT
 
-            if self.radio_sort_artist.get_active():
-                self.userconfig['grid']['order']['field'] = 'Artist'
+            if self.radio_sort_default.get_active():
+                order = AbstractPlaylist.OrderBy.DEFAULT
+            elif self.radio_sort_artist.get_active():
+                order = AbstractPlaylist.OrderBy.ARTIST
             elif self.radio_sort_album.get_active():
-                self.userconfig['grid']['order']['field'] = 'Album'
+                order = AbstractPlaylist.OrderBy.ALBUM
             elif self.radio_sort_title.get_active():
-                self.userconfig['grid']['order']['field'] = 'Title'
+                order = AbstractPlaylist.OrderBy.TITLE
             elif self.radio_sort_length.get_active():
-                self.userconfig['grid']['order']['field'] = 'Length'
+                order = AbstractPlaylist.OrderBy.LENGTH
             elif self.radio_sort_year.get_active():
-                self.userconfig['grid']['order']['field'] = 'Year'
+                order = AbstractPlaylist.OrderBy.YEAR
             elif self.radio_sort_added.get_active():
-                self.userconfig['grid']['order']['field'] = 'Added'
+                order = AbstractPlaylist.OrderBy.ADDED
             elif self.radio_sort_played.get_active():
-                self.userconfig['grid']['order']['field'] = 'Played'
+                order = AbstractPlaylist.OrderBy.PLAYED
+
+            self.userconfig['grid']['sort']['desc'] = self.chk_sort_desc.get_active()
+            self.userconfig['grid']['sort']['field'] = order.name
 
             threading.Thread(target=self.userconfig.save).start()
-            threading.Thread(target=self.__create_model).start()
+            threading.Thread(target=lambda: self.__create_model()).start()

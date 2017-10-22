@@ -36,4 +36,4 @@ class Production(Default):
     USER_CONFIG_FILE = os.path.join(Default.USER_DIRECTORY, 'config.yaml')
     PLAYER_CACHE_FILE = os.path.join(Default.CACHE_DIRECTORY, 'player.gz')
     ARTWORK_CACHE_DIRECTORY = os.path.join(Default.CACHE_DIRECTORY, 'artworks')
-    LOG_LEVEL = 'WARNING'
+    LOG_LEVEL = 'INFO'
