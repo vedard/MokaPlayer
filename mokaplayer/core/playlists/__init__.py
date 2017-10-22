@@ -53,6 +53,7 @@ class AbstractPlaylist:
 
         return fields
 
+
 from .library_playlist import LibraryPlaylist
 from .m3u_playlist import M3UPlaylist
 from .mostplayed_playlist import MostPlayedPlaylist

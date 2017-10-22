@@ -34,7 +34,8 @@ class Application():
 
     def init_args(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument('--debug', help='Load the developpement configuration', required=False, action='store_true')
+        parser.add_argument('--debug', help='Load the developpement configuration',
+                            required=False, action='store_true')
         self.args = parser.parse_args()
 
     def init_configs(self):

@@ -19,8 +19,8 @@ from mokaplayer.ui.gtk.adapter import AdapterSong
 from mokaplayer.core.playlists import (AbstractPlaylist, LibraryPlaylist, M3UPlaylist, MostPlayedPlaylist,
                                        RecentlyAddedPlaylist, RecentlyPlayedPlaylist, UpNextPlaylist,
                                        RarelyPlayedPlaylist)
-from mokaplayer.ui.gtk.windows import ( AboutWindow, LyricsWindow, TabsWindow,
-                                        TagsEditorWindow, HelpShortcutsWindow, InputBox)
+from mokaplayer.ui.gtk.windows import (AboutWindow, LyricsWindow, TabsWindow,
+                                       TagsEditorWindow, HelpShortcutsWindow, InputBox)
 
 
 class MainWindow(Gtk.Window):
@@ -105,7 +105,7 @@ class MainWindow(Gtk.Window):
 
         model = AdapterSong.create_store()
         order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
-        desc =self.userconfig['grid']['sort']['desc']
+        desc = self.userconfig['grid']['sort']['desc']
         songs = self.current_playlist.songs(order, desc)
 
         for row in songs:
@@ -158,14 +158,14 @@ class MainWindow(Gtk.Window):
     def __create_sidebar_row(self, playlist):
         list_box_row = Gtk.ListBoxRow()
         list_box_row.playlist = playlist
-        list_box_row.set_size_request(0,40)
+        list_box_row.set_size_request(0, 40)
         list_box_row.add(Gtk.Label(playlist.name, margin_left=20, halign=Gtk.Align.START))
         return list_box_row
 
     def __create_sidebar_header(self, name):
         list_box_row = Gtk.ListBoxRow(activatable=False, selectable=False)
-        list_box_row.set_size_request(0,40)
-        label =  Gtk.Label(f'<b>{name}</b>', margin_left=10, halign=Gtk.Align.START, use_markup=True)
+        list_box_row.set_size_request(0, 40)
+        label = Gtk.Label(f'<b>{name}</b>', margin_left=10, halign=Gtk.Align.START, use_markup=True)
         list_box_row.add(label)
         return list_box_row
 
@@ -409,7 +409,7 @@ class MainWindow(Gtk.Window):
 
     def on_queue_add_playlist_activate(self, event):
         order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
-        desc =self.userconfig['grid']['sort']['desc']
+        desc = self.userconfig['grid']['sort']['desc']
         self.player.queue.clear()
         self.player.queue.append([x.Path for x in self.current_playlist.songs(order, desc)])
 
@@ -459,10 +459,10 @@ class MainWindow(Gtk.Window):
         return True
 
     def __init_sidebar(self):
-       show_sidebar = self.userconfig['sidebar']['show']
-       self.__create_playlist_menus()
-       if show_sidebar:
-           self.playlist_sidebar.set_reveal_child(show_sidebar)
+        show_sidebar = self.userconfig['sidebar']['show']
+        self.__create_playlist_menus()
+        if show_sidebar:
+            self.playlist_sidebar.set_reveal_child(show_sidebar)
 
     def __show_sidebar(self, is_visible):
         self.playlist_sidebar.set_reveal_child(is_visible)
@@ -471,7 +471,7 @@ class MainWindow(Gtk.Window):
 
     def __init_sort_radio(self):
         order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
-        desc =self.userconfig['grid']['sort']['desc']
+        desc = self.userconfig['grid']['sort']['desc']
 
         self.chk_sort_desc.set_active(desc)
         if order == AbstractPlaylist.OrderBy.ARTIST:
