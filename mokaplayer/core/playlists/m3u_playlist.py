@@ -13,17 +13,18 @@ class M3UPlaylist(AbstractPlaylist):
         return self.m3u_parser.name
 
     def songs(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
-        query = Song.select().where(Song.Path << list(self.m3u_parser) |
-                                    Song.Path << [pathlib.Path(self.m3u_parser.location).parent / (x)
-                                                  for x in self.m3u_parser])
+        paths = list(self.m3u_parser) if not desc else list(reversed(self.m3u_parser))
+        playlist_folder = pathlib.Path(self.m3u_parser.location).parent
+        query = Song.select().where(Song.Path << paths |
+                                    Song.Path << [playlist_folder / (path) for path in paths])
 
         if order == self.OrderBy.DEFAULT:
             result = {x.Path: x for x in query}
-            for path in self.m3u_parser:
+            for path in paths:
                 if path in result:
                     yield result[path]
                 else:
-                    path_abs = str(pathlib.Path(self.m3u_parser.location).parent / (path))
+                    path_abs = str(playlist_folder / (path))
                     if path_abs in result:
                         yield result[path_abs]
         else:

@@ -8,6 +8,7 @@ import pkg_resources
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
+from gi.repository import Pango
 from mokaplayer.core.player import Player
 from mokaplayer.core.m3u_parser import M3uParser
 from mokaplayer.core.library import Library
@@ -16,7 +17,8 @@ from mokaplayer.core.helpers import time_helper
 from mokaplayer.ui.gtk.helper import image_helper, file_helper
 from mokaplayer.ui.gtk.adapter import AdapterSong
 from mokaplayer.core.playlists import (AbstractPlaylist, LibraryPlaylist, M3UPlaylist, MostPlayedPlaylist,
-                                       RecentlyAddedPlaylist, RecentlyPlayedPlaylist, UpNextPlaylist)
+                                       RecentlyAddedPlaylist, RecentlyPlayedPlaylist, UpNextPlaylist,
+                                       RarelyPlayedPlaylist)
 from mokaplayer.ui.gtk.windows import ( AboutWindow, LyricsWindow, TabsWindow,
                                         TagsEditorWindow, HelpShortcutsWindow, InputBox)
 
@@ -50,8 +52,7 @@ class MainWindow(Gtk.Window):
         self.__get_object()
         self.__init_sort_radio()
         self.__init_gridview_columns()
-        self.__create_playlist_menus()
-
+        self.__init_sidebar()
 
         self.builder.connect_signals(self)
         self.player.state_changed.subscribe(self.on_player_state_changed)
@@ -154,11 +155,18 @@ class MainWindow(Gtk.Window):
         self.lbl_playlist = self.builder.get_object('lbl_playlist')
         self.add(self.content)
 
-    def __create_playlist_row(self, playlist):
+    def __create_sidebar_row(self, playlist):
         list_box_row = Gtk.ListBoxRow()
         list_box_row.playlist = playlist
         list_box_row.set_size_request(0,40)
-        list_box_row.add(Gtk.Label(playlist.name, margin_left=5, halign=Gtk.Align.START))
+        list_box_row.add(Gtk.Label(playlist.name, margin_left=20, halign=Gtk.Align.START))
+        return list_box_row
+
+    def __create_sidebar_header(self, name):
+        list_box_row = Gtk.ListBoxRow(activatable=False, selectable=False)
+        list_box_row.set_size_request(0,40)
+        label =  Gtk.Label(f'<b>{name}</b>', margin_left=10, halign=Gtk.Align.START, use_markup=True)
+        list_box_row.add(label)
         return list_box_row
 
     def __create_playlist_menus(self):
@@ -168,18 +176,21 @@ class MainWindow(Gtk.Window):
         for child in self.listbox_playlist.get_children():
             self.listbox_playlist.remove(child)
 
-        self.listbox_playlist.add(self.__create_playlist_row(LibraryPlaylist()))
-        self.listbox_playlist.add(self.__create_playlist_row(UpNextPlaylist(self.player.queue)))
-        self.listbox_playlist.add(self.__create_playlist_row(MostPlayedPlaylist()))
-        self.listbox_playlist.add(self.__create_playlist_row(RecentlyPlayedPlaylist()))
-        self.listbox_playlist.add(self.__create_playlist_row(RecentlyAddedPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_header('Collections'))
+        self.listbox_playlist.add(self.__create_sidebar_row(LibraryPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_row(UpNextPlaylist(self.player.queue)))
+        self.listbox_playlist.add(self.__create_sidebar_row(MostPlayedPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_row(RarelyPlayedPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_row(RecentlyPlayedPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_row(RecentlyAddedPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_header('Playlists'))
 
         for playlist_location in self.player.library.get_playlists():
             m3u = M3uParser(playlist_location)
             menu_item = Gtk.MenuItem(label=m3u.name)
             menu_item.connect('activate', self.on_menu_gridview_add_to_playlist_activate, m3u)
             self.menuchild_gridview_playlist.append(menu_item)
-            self.listbox_playlist.add(self.__create_playlist_row(M3UPlaylist(m3u)))
+            self.listbox_playlist.add(self.__create_sidebar_row(M3UPlaylist(m3u)))
 
         self.menuchild_gridview_playlist.show_all()
         self.listbox_playlist.show_all()
@@ -266,7 +277,7 @@ class MainWindow(Gtk.Window):
         elif ctrl and keyval_name == 'l':
             self.__show_lyrics(self.player.queue.peek())
         elif ctrl and keyval_name == 'p':
-            self.playlist_sidebar.set_reveal_child(not self.playlist_sidebar.get_reveal_child())
+            self.__show_sidebar(not self.playlist_sidebar.get_reveal_child())
         elif ctrl and keyval_name == 'o':
             self.__focus_song(self.player.queue.peek())
         elif ctrl and keyval_name == 'Left':
@@ -348,13 +359,6 @@ class MainWindow(Gtk.Window):
     def on_btn_previous_clicked(self, widget):
         self.player.prev()
 
-    def on_btn_play_playlist_clicked(self, widget):
-        order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
-        desc =self.userconfig['grid']['sort']['desc']
-        self.player.queue.clear()
-        self.player.queue.append([x.Path for x in self.current_playlist.songs(order, desc)])
-        self.player.next()
-
     def on_audio_changed(self):
         GObject.idle_add(self.__set_current_song_info)
         GObject.idle_add(self.__set_current_play_icon)
@@ -403,6 +407,12 @@ class MainWindow(Gtk.Window):
         self.player.queue.append([x.Path for x in LibraryPlaylist().songs()])
         self.player.queue.seek(self.player.queue.pop())
 
+    def on_queue_add_playlist_activate(self, event):
+        order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
+        desc =self.userconfig['grid']['sort']['desc']
+        self.player.queue.clear()
+        self.player.queue.append([x.Path for x in self.current_playlist.songs(order, desc)])
+
     def on_queue_clear_activate(self, event):
         self.player.queue.clear()
 
@@ -429,7 +439,7 @@ class MainWindow(Gtk.Window):
         self.search_bar.set_search_mode(not self.search_bar.get_search_mode())
 
     def on_view_toggle_sidebar_activate(self, widget):
-        self.playlist_sidebar.set_reveal_child(not self.playlist_sidebar.get_reveal_child())
+        self.__show_sidebar(not self.playlist_sidebar.get_reveal_child())
 
     def on_prp_current_time_click(self, widget, event):
         width = self.prb_current_time.get_allocated_width()
@@ -447,6 +457,17 @@ class MainWindow(Gtk.Window):
         self.prb_current_time.set_fraction(fraction)
 
         return True
+
+    def __init_sidebar(self):
+       show_sidebar = self.userconfig['sidebar']['show']
+       self.__create_playlist_menus()
+       if show_sidebar:
+           self.playlist_sidebar.set_reveal_child(show_sidebar)
+
+    def __show_sidebar(self, is_visible):
+        self.playlist_sidebar.set_reveal_child(is_visible)
+        self.userconfig['sidebar']['show'] = is_visible
+        threading.Thread(target=self.userconfig.save).start()
 
     def __init_sort_radio(self):
         order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]

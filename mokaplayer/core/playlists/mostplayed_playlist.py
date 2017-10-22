@@ -9,4 +9,4 @@ class MostPlayedPlaylist(AbstractPlaylist):
 
     def songs(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
         field = Song.Played.asc() if desc else Song.Played.desc()
-        return Song.select().where(Song.Played > 0).order_by(field).limit(50)
+        return Song.select().where(Song.Played > 0).order_by(field).limit(70)

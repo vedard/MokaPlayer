@@ -56,6 +56,7 @@ class AbstractPlaylist:
 from .library_playlist import LibraryPlaylist
 from .m3u_playlist import M3UPlaylist
 from .mostplayed_playlist import MostPlayedPlaylist
+from .rarelyplayed_playlist import RarelyPlayedPlaylist
 from .recentlyadded_playlist import RecentlyAddedPlaylist
 from .recentlyplayed_playlist import RecentlyPlayedPlaylist
 from .upnext_playlist import UpNextPlaylist

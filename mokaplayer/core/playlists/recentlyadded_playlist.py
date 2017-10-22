@@ -8,5 +8,8 @@ class RecentlyAddedPlaylist(AbstractPlaylist):
         return "Recently Added"
 
     def songs(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
-        field = Song.Added.asc() if desc else Song.Added.desc()
-        return Song.select().order_by(field).limit(100)
+        field = [-Song.Added, Song.AlbumArtist, Song.Year, Song.Album, Song.Discnumber, Song.Tracknumber]
+        if desc:
+            field[0] = Song.Added
+
+        return Song.select().order_by(*field).limit(150)

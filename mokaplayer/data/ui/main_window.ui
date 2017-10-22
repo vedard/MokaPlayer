@@ -19,11 +19,6 @@
     <property name="icon_name">media-playback-start</property>
     <property name="icon_size">1</property>
   </object>
-  <object class="GtkImage" id="img_play_playlist">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-media-play</property>
-  </object>
   <object class="GtkImage" id="img_prev">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -298,9 +293,6 @@
             <property name="position">8</property>
           </packing>
         </child>
-        <child>
-          <placeholder/>
-        </child>
       </object>
       <packing>
         <property name="submenu">main</property>
@@ -408,18 +400,18 @@
                   <object class="GtkMenuItem" id="queue_add">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Add all songs</property>
+                    <property name="label" translatable="yes">Add library</property>
                     <property name="use_underline">True</property>
                     <signal name="activate" handler="on_queue_add_activate" swapped="no"/>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkMenuItem" id="queue_clear">
+                  <object class="GtkMenuItem" id="queue_add_playlist">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Clear</property>
+                    <property name="label" translatable="yes">Add current playlist</property>
                     <property name="use_underline">True</property>
-                    <signal name="activate" handler="on_queue_clear_activate" swapped="no"/>
+                    <signal name="activate" handler="on_queue_add_playlist_activate" swapped="no"/>
                   </object>
                 </child>
                 <child>
@@ -429,6 +421,15 @@
                     <property name="label" translatable="yes">Shuffle</property>
                     <property name="use_underline">True</property>
                     <signal name="activate" handler="on_queue_shuffle_activate" swapped="no"/>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="queue_clear">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Clear</property>
+                    <property name="use_underline">True</property>
+                    <signal name="activate" handler="on_queue_clear_activate" swapped="no"/>
                   </object>
                 </child>
               </object>
@@ -920,8 +921,7 @@
                     <property name="valign">end</property>
                     <property name="label" translatable="yes">Library</property>
                     <attributes>
-                      <attribute name="weight" value="normal"/>
-                      <attribute name="scale" value="2"/>
+                      <attribute name="scale" value="1.7"/>
                     </attributes>
                   </object>
                   <packing>
@@ -953,22 +953,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="btn_play_playlist">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="focus_on_click">False</property>
-                    <property name="receives_default">True</property>
-                    <property name="valign">center</property>
-                    <property name="image">img_play_playlist</property>
-                    <property name="relief">none</property>
-                    <property name="always_show_image">True</property>
-                    <signal name="clicked" handler="on_btn_play_playlist_clicked" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">2</property>
-                  </packing>
+                  <placeholder/>
                 </child>
               </object>
               <packing>
