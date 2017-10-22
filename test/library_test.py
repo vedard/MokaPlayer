@@ -70,10 +70,11 @@ class LibraryTest(unittest.TestCase):
         self.assertEqual(self.library.musics_folder, self.FOLDER)
 
     def test_playlists_folder(self):
-        self.library.playlists_folder = 'asdf/Invalid folder/fasdfasdf'
-        self.assertEqual(self.library.playlists_folder, 'asdf/Invalid folder/fasdfasdf')
-        self.library.playlists_folder = self.FOLDER
         self.assertEqual(self.library.playlists_folder, self.FOLDER)
+        self.library.playlists_folder = 'asdf/Invalid folder/fasdfasdf'
+        self.assertEqual(self.library.playlists_folder, self.FOLDER)
+        self.library.playlists_folder = './test'
+        self.assertEqual(self.library.playlists_folder, './test')
 
     def test_sync(self):
         self.library.sync()
