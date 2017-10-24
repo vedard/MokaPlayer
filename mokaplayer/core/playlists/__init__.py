@@ -1,4 +1,5 @@
 import enum
+import peewee
 
 from mokaplayer.core.database import Song
 
@@ -34,11 +35,14 @@ class AbstractPlaylist:
         fields = []
 
         if order == self.OrderBy.ALBUM:
-            fields = [Song.Album, Song.Discnumber, Song.Tracknumber]
+            fields = [peewee.fn.strip_articles(Song.Album),
+                      Song.Discnumber, Song.Tracknumber]
         elif order == self.OrderBy.YEAR:
-            fields = [Song.Year, Song.Album, Song.Discnumber, Song.Tracknumber]
+            fields = [Song.Year, peewee.fn.strip_articles(Song.Album),
+                      Song.Discnumber, Song.Tracknumber]
         elif order == self.OrderBy.ADDED:
-            fields = [-Song.Added, Song.AlbumArtist, Song.Year, Song.Album, Song.Discnumber, Song.Tracknumber]
+            fields = [-Song.Added, peewee.fn.strip_articles(Song.AlbumArtist), Song.Year,
+                      peewee.fn.strip_articles(Song.Album), Song.Discnumber, Song.Tracknumber]
         elif order == self.OrderBy.TITLE:
             fields = [Song.Title]
         elif order == self.OrderBy.LENGTH:
@@ -46,7 +50,8 @@ class AbstractPlaylist:
         elif order == self.OrderBy.PLAYED:
             fields = [-Song.Played]
         else:
-            fields = [Song.AlbumArtist, Song.Year, Song.Album, Song.Discnumber, Song.Tracknumber]
+            fields = [peewee.fn.strip_articles(Song.AlbumArtist), Song.Year,
+                      peewee.fn.strip_articles(Song.Album), Song.Discnumber, Song.Tracknumber]
 
         if desc:
             fields[0] = -fields[0]
