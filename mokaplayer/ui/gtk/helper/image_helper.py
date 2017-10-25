@@ -1,4 +1,5 @@
 import pathlib
+
 import pkg_resources
 from gi.repository import GdkPixbuf
 

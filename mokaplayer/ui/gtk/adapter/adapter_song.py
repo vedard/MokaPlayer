@@ -1,7 +1,7 @@
-from gi.repository import Gtk
-import arrow
 import re
 
+import arrow
+from gi.repository import Gtk
 from mokaplayer.core.helpers import time_helper
 
 
@@ -10,9 +10,9 @@ class AdapterSong:
     def create_row(song):
         return [
             song.Path,
-            song.Title or 'Unkown',
-            song.AlbumArtist or 'Unkown',
-            song.Album or 'Unkown',
+            song.Title or 'Unknown',
+            song.AlbumArtist or 'Unknown',
+            song.Album or 'Unknown',
             time_helper.seconds_to_string(song.Length),
             song.Year or '0000',
             arrow.Arrow(song.Added.year, song.Added.month, song.Added.day).humanize(),

@@ -1,11 +1,11 @@
+import enum
+import logging
+import pathlib
+
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstAudio', '1.0')
-
 from gi.repository import Gst, GstAudio
-import pathlib
-import enum
-import logging
 
 
 class Streamer(object):

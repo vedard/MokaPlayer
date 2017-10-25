@@ -1,26 +1,25 @@
+import logging
 import threading
 import time
-import datetime
-import arrow
-import logging
-import pkg_resources
 
-from gi.repository import Gtk
-from gi.repository import Gdk
-from gi.repository import GObject
-from gi.repository import Pango
-from mokaplayer.core.player import Player
-from mokaplayer.core.m3u_parser import M3uParser
-from mokaplayer.core.library import Library
-from mokaplayer.core.queue import Queue
+import arrow
+import pkg_resources
+from gi.repository import Gdk, GObject, Gtk, Pango
 from mokaplayer.core.helpers import time_helper
-from mokaplayer.ui.gtk.helper import image_helper, file_helper
+from mokaplayer.core.library import Library
+from mokaplayer.core.m3u_parser import M3uParser
+from mokaplayer.core.player import Player
+from mokaplayer.core.playlists import (AbstractPlaylist, LibraryPlaylist,
+                                       M3UPlaylist, MostPlayedPlaylist,
+                                       RarelyPlayedPlaylist,
+                                       RecentlyAddedPlaylist,
+                                       RecentlyPlayedPlaylist, UpNextPlaylist)
+from mokaplayer.core.queue import Queue
 from mokaplayer.ui.gtk.adapter import AdapterSong
-from mokaplayer.core.playlists import (AbstractPlaylist, LibraryPlaylist, M3UPlaylist, MostPlayedPlaylist,
-                                       RecentlyAddedPlaylist, RecentlyPlayedPlaylist, UpNextPlaylist,
-                                       RarelyPlayedPlaylist)
-from mokaplayer.ui.gtk.windows import (AboutWindow, LyricsWindow, TabsWindow,
-                                       TagsEditorWindow, HelpShortcutsWindow, InputBox)
+from mokaplayer.ui.gtk.helper import file_helper, image_helper
+from mokaplayer.ui.gtk.windows import (AboutWindow, HelpShortcutsWindow,
+                                       InputBox, LyricsWindow, TabsWindow,
+                                       TagsEditorWindow)
 
 
 class MainWindow(Gtk.Window):

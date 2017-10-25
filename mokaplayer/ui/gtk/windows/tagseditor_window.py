@@ -1,11 +1,9 @@
-import pkg_resources
 import ast
 import logging
+
 import arrow
-
-from gi.repository import Gtk
-from gi.repository import GObject
-
+import pkg_resources
+from gi.repository import GObject, Gtk
 from mokaplayer.core.database import database_context
 from mokaplayer.core.helpers import time_helper
 

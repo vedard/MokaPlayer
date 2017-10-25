@@ -1,7 +1,7 @@
-import pkg_resources
 from threading import Thread
-from gi.repository import Gtk
-from gi.repository import GObject
+
+import pkg_resources
+from gi.repository import GObject, Gtk
 from mokaplayer.core.fetchers import tabs as tabs_fetcher
 from mokaplayer.ui.gtk.adapter import AdapterTab
 from mokaplayer.ui.gtk.helper import file_helper

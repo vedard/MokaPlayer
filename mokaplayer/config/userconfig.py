@@ -1,11 +1,10 @@
-import collections
-import os
+import logging
 import pathlib
 import shutil
-import logging
-import yaml
+
 import appdirs
 import pkg_resources
+import yaml
 
 
 def merge(d1, d2):

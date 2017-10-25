@@ -1,16 +1,16 @@
 import datetime
-import time
-import pathlib
-import logging
-import json
 import gzip
+import json
+import logging
+import pathlib
+import time
 from threading import Thread
 
-from mokaplayer.core.queue import Queue
 from mokaplayer.core.event import Event
-from mokaplayer.core.library import Library
-from mokaplayer.core.streamer import Streamer
 from mokaplayer.core.keyboard import KeyboardClient
+from mokaplayer.core.library import Library
+from mokaplayer.core.queue import Queue
+from mokaplayer.core.streamer import Streamer
 
 
 class Player(object):

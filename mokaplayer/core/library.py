@@ -1,11 +1,12 @@
-import time
 import logging
 import mimetypes
 import pathlib
+import time
 
-from mokaplayer.core.database import database_context, Song, Album, Artist, Playlist
-from mokaplayer.core.m3u_parser import M3uParser
+from mokaplayer.core.database import (Album, Artist, Playlist, Song,
+                                      database_context)
 from mokaplayer.core.fetchers import artworks
+from mokaplayer.core.m3u_parser import M3uParser
 
 
 class Library(object):

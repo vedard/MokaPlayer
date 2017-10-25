@@ -1,19 +1,15 @@
-import gi
-gi.require_version('Gtk', '3.0')
-
-import pkg_resources
 import argparse
-import signal
 import logging
+import signal
 import threading
 
+import gi
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from gi.repository import Gio
-
-from mokaplayer.ui.gtk.windows.main_window import MainWindow
-from mokaplayer.core.player import Player
 from mokaplayer.config import appconfig as AppConfig
 from mokaplayer.config.userconfig import UserConfig
+from mokaplayer.core.player import Player
+from mokaplayer.ui.gtk.windows.main_window import MainWindow
 
 
 class Application():

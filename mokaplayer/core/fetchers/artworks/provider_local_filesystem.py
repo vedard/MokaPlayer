@@ -1,6 +1,5 @@
-import pathlib
-import difflib
 import os
+import pathlib
 
 
 class ProviderLocalFileSystem(object):

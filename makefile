@@ -8,7 +8,8 @@ publish:
 	python setup.py sdist upload -r pypi
 
 format:
-	autopep8 mokaplayer --recursive --in-place --pep8-passes 2000 --max-line-length 110
+	autopep8 mokaplayer --recursive --in-place --pep8-passes 2000
+	autoflake mokaplayer -i -r
 
 clean:
 	find . -type f -name "*.py[co]" -delete

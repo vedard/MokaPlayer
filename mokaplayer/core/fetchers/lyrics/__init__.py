@@ -1,5 +1,4 @@
 import random
-import logging
 import requests
 
 from .provider_azlyrics import ProviderAzLyrics

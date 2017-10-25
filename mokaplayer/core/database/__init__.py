@@ -3,6 +3,7 @@ from playhouse.sqlite_ext import SqliteExtDatabase
 
 database_context = SqliteExtDatabase(peewee.SqliteDatabase(None))
 
+
 @database_context.func()
 def strip_articles(text):
     articles = ['le ', 'la ', 'les ', 'the ', 'a ']
@@ -11,6 +12,7 @@ def strip_articles(text):
             return text[len(a):]
 
     return text
+
 
 from .song import Song
 from .artist import Artist

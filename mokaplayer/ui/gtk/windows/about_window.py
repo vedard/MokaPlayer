@@ -1,6 +1,5 @@
-import pkg_resources
 import mokaplayer
-
+import pkg_resources
 from gi.repository import Gtk
 
 

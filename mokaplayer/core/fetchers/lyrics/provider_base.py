@@ -1,7 +1,8 @@
-import re
-import random
-import requests
 import logging
+import random
+import re
+
+import requests
 from lxml import html
 
 

@@ -1,6 +1,6 @@
 import os
-import appdirs
 
+import appdirs
 from mokaplayer.config import secret
 
 

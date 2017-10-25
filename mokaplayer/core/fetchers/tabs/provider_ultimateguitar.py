@@ -1,7 +1,8 @@
-import requests
+import logging
 import os
 import re
-import logging
+
+import requests
 from lxml import html
 
 

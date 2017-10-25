@@ -1,9 +1,10 @@
 import datetime
 import logging
-import peewee
-import taglib
 
+import peewee
 from mokaplayer.core.database import database_context
+
+import taglib
 
 
 class Song(peewee.Model):

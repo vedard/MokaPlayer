@@ -1,5 +1,5 @@
-from mokaplayer.core.playlists import AbstractPlaylist
 from mokaplayer.core.database import Song
+from mokaplayer.core.playlists import AbstractPlaylist
 
 
 class RarelyPlayedPlaylist(AbstractPlaylist):

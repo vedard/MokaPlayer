@@ -23,11 +23,9 @@ class AbstractPlaylist:
     @property
     def name(self):
         """ Return the name of the playlist """
-        pass
 
     def songs(self, order, desc):
         """ Return a list of songs in the specified order"""
-        pass
 
     def get_orderby_fields(self, order, desc):
         """ Return a list of fields for a order by query

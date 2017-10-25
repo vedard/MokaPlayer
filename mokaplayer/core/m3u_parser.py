@@ -1,5 +1,5 @@
-import pathlib
 import logging
+import pathlib
 
 
 class M3uParser:

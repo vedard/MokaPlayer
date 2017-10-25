@@ -1,7 +1,7 @@
-import pkg_resources
 from threading import Thread
-from gi.repository import Gtk
-from gi.repository import GObject
+
+import pkg_resources
+from gi.repository import GObject, Gtk
 from mokaplayer.core.database import Song
 from mokaplayer.core.fetchers import lyrics
 
