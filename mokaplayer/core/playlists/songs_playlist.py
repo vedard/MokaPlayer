@@ -2,13 +2,13 @@ from mokaplayer.core.database import Song
 from mokaplayer.core.playlists import AbstractPlaylist
 
 
-class LibraryPlaylist(AbstractPlaylist):
+class SongsPlaylist(AbstractPlaylist):
 
     @property
     def name(self):
-        return "Library"
+        return "Songs"
 
-    def songs(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
+    def collections(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
         if order == self.OrderBy.DEFAULT:
             order = self.OrderBy.ARTIST
 

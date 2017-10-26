@@ -10,7 +10,7 @@ class UpNextPlaylist(AbstractPlaylist):
     def name(self):
         return "Up next"
 
-    def songs(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
+    def collections(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
         result = {x.Path: x for x in Song.select()}
         for path in list(self.queue):
             if not path == self.queue.peek():

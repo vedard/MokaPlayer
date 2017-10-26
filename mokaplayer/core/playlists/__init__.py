@@ -24,7 +24,7 @@ class AbstractPlaylist:
     def name(self):
         """ Return the name of the playlist """
 
-    def songs(self, order, desc):
+    def collections(self, order, desc):
         """ Return a list of songs in the specified order"""
 
     def get_orderby_fields(self, order, desc):
@@ -57,10 +57,12 @@ class AbstractPlaylist:
         return fields
 
 
-from .library_playlist import LibraryPlaylist
+from .songs_playlist import SongsPlaylist
 from .m3u_playlist import M3UPlaylist
 from .mostplayed_playlist import MostPlayedPlaylist
 from .rarelyplayed_playlist import RarelyPlayedPlaylist
 from .recentlyadded_playlist import RecentlyAddedPlaylist
 from .recentlyplayed_playlist import RecentlyPlayedPlaylist
 from .upnext_playlist import UpNextPlaylist
+from .albums_playlist import AlbumsPlaylist
+from .artists_playlist import ArtistsPlaylist
