@@ -65,4 +65,6 @@ from .recentlyadded_playlist import RecentlyAddedPlaylist
 from .recentlyplayed_playlist import RecentlyPlayedPlaylist
 from .upnext_playlist import UpNextPlaylist
 from .albums_playlist import AlbumsPlaylist
+from .album_playlist import AlbumPlaylist
 from .artists_playlist import ArtistsPlaylist
+from .artist_playlist import ArtistPlaylist

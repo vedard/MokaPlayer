@@ -14,7 +14,8 @@ from mokaplayer.core.playlists import (AbstractPlaylist, SongsPlaylist,
                                        RarelyPlayedPlaylist,
                                        RecentlyAddedPlaylist,
                                        RecentlyPlayedPlaylist, UpNextPlaylist,
-                                       AlbumsPlaylist, ArtistsPlaylist)
+                                       AlbumsPlaylist, ArtistsPlaylist,
+                                       AlbumPlaylist, ArtistPlaylist)
 from mokaplayer.core.queue import Queue
 from mokaplayer.core.database import Artist, Album
 from mokaplayer.ui.gtk.adapter import AdapterSong
@@ -39,7 +40,7 @@ class MainWindow(Gtk.Window):
         self.userconfig = userconfig
         self.player = player
         self.current_playlist = SongsPlaylist()
-        self.set_icon_from_file(pkg_resources.resource_filename('mokaplayer', 'data/mokaplayer.png'))
+        self.set_icon_from_file(pkg_resources.resource_filename('mokaplayer', 'data/icons/hicolor/48x48/apps/mokaplayer.png'))
 
         if self.userconfig['gtk']['darktheme']:
             settings = Gtk.Settings.get_default()
@@ -158,6 +159,7 @@ class MainWindow(Gtk.Window):
         self.add(self.content)
 
     def __show_current_playlist(self):
+        self.lbl_playlist.set_text(self.current_playlist.name)
         if (isinstance(self.current_playlist, AlbumsPlaylist) or
                 isinstance(self.current_playlist, ArtistsPlaylist)):
             for child in self.flowbox.get_children():
@@ -210,11 +212,14 @@ class MainWindow(Gtk.Window):
                                 justify=Gtk.Justification.LEFT, wrap=True,
                                 wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0, margin_top=5)
 
+        flowboxchild = Gtk.FlowBoxChild()
         grid = Gtk.Grid(margin_top=margin, margin_bottom=margin, margin_start=margin, margin_end=margin,
                         halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
         grid.attach(image, 0, 0, 1, 1)
         grid.attach(label_album, 0, 1, 1, 1)
-        return grid
+        flowboxchild.add(grid)
+        flowboxchild.data = artist
+        return flowboxchild
 
     def __create_album_view(self, album, image, margin):
         label_album = Gtk.Label(f'{album.Name} ({album.Year})', max_width_chars=0,
@@ -224,12 +229,15 @@ class MainWindow(Gtk.Window):
                                  justify=Gtk.Justification.LEFT, wrap=True,
                                  wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0, margin_top=5)
 
+        flowboxchild = Gtk.FlowBoxChild()
         grid = Gtk.Grid(margin_top=margin, margin_bottom=margin, margin_start=margin, margin_end=margin,
                         halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
         grid.attach(image, 0, 0, 1, 1)
         grid.attach(label_album, 0, 1, 1, 1)
         grid.attach(label_artist, 0, 2, 1, 1)
-        return grid
+        flowboxchild.add(grid)
+        flowboxchild.data = album
+        return flowboxchild
 
     def __create_sidebar_row(self, playlist):
         list_box_row = Gtk.ListBoxRow()
@@ -373,7 +381,6 @@ class MainWindow(Gtk.Window):
 
     def on_listbox_playlist_row_activated(self, widget, row):
         self.current_playlist = row.playlist
-        self.lbl_playlist.set_text(row.playlist.name)
         self.__show_current_playlist()
 
     def on_gridview_button_press_event(self, sender, event):
@@ -416,6 +423,18 @@ class MainWindow(Gtk.Window):
         selected_songs = self.__get_selected_songs_in_gridview()
         if any(selected_songs):
             file_helper.open_folder(selected_songs[0])
+
+    def on_menu_gridview_goto_artist_activate(self, widget):
+        selected_songs = self.__get_selected_songs_in_gridview()
+        if any(selected_songs):
+            self.current_playlist = ArtistPlaylist(None, song_path=selected_songs[0])
+            self.__show_current_playlist()
+
+    def on_menu_gridview_goto_album_activate(self, widget):
+        selected_songs = self.__get_selected_songs_in_gridview()
+        if any(selected_songs):
+            self.current_playlist = AlbumPlaylist(None, song_path=selected_songs[0])
+            self.__show_current_playlist()
 
     def __get_selected_songs_in_gridview(self):
         model, pathlist = self.gridview.get_selection().get_selected_rows()
@@ -595,4 +614,14 @@ class MainWindow(Gtk.Window):
             self.userconfig['grid']['sort']['field'] = order.name
 
             threading.Thread(target=self.userconfig.save).start()
+            self.__show_current_playlist()
+
+    def on_flowbox_selected_children_changed(self, widget):
+        selected = self.flowbox.get_selected_children()
+        if any(selected):
+            if isinstance(selected[0].data, Album):
+                self.current_playlist = AlbumPlaylist(selected[0].data)
+            elif isinstance(selected[0].data, Artist):
+                self.current_playlist = ArtistPlaylist(selected[0].data)
+
             self.__show_current_playlist()

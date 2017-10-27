@@ -99,6 +99,24 @@
         </child>
       </object>
     </child>
+    <child>
+      <object class="GtkMenuItem" id="menu_gridview_goto_album">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Go to album</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="on_menu_gridview_goto_album_activate" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="menu_gridview_goto_artist">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Go to artist</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="on_menu_gridview_goto_artist_activate" swapped="no"/>
+      </object>
+    </child>
   </object>
   <object class="GtkPopoverMenu" id="popup_sort">
     <property name="can_focus">False</property>
@@ -1145,7 +1163,7 @@
                             <property name="homogeneous">True</property>
                             <property name="column_spacing">2</property>
                             <property name="row_spacing">2</property>
-                            <property name="selection_mode">none</property>
+                            <signal name="selected-children-changed" handler="on_flowbox_selected_children_changed" swapped="no"/>
                           </object>
                         </child>
                       </object>
