@@ -1157,7 +1157,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkFlowBox" id="flowbox">
+                          <object class="GtkFlowBox" id="flowbox_album">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="homogeneous">True</property>
@@ -1170,9 +1170,36 @@
                     </child>
                   </object>
                   <packing>
-                    <property name="name">flowbox</property>
+                    <property name="name">flowbox_album</property>
                     <property name="title" translatable="yes">page0</property>
                     <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkScrolledWindow">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <child>
+                      <object class="GtkViewport">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkFlowBox" id="flowbox_artist">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="homogeneous">True</property>
+                            <property name="column_spacing">2</property>
+                            <property name="row_spacing">2</property>
+                            <signal name="selected-children-changed" handler="on_flowbox_selected_children_changed" swapped="no"/>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="name">flowbox_artist</property>
+                    <property name="title" translatable="yes">page0</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>

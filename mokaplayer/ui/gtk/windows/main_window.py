@@ -2,13 +2,16 @@ import logging
 import threading
 import time
 
-import arrow
 import pkg_resources
 from gi.repository import Gdk, GObject, Gtk, Pango
 from mokaplayer.core.helpers import time_helper
-from mokaplayer.core.library import Library
 from mokaplayer.core.m3u_parser import M3uParser
-from mokaplayer.core.player import Player
+from mokaplayer.core.database import Artist, Album
+from mokaplayer.ui.gtk.adapter import AdapterSong
+from mokaplayer.ui.gtk.helper import file_helper, image_helper
+from mokaplayer.ui.gtk.windows import (AboutWindow, HelpShortcutsWindow,
+                                       InputBox, LyricsWindow, TabsWindow,
+                                       TagsEditorWindow)
 from mokaplayer.core.playlists import (AbstractPlaylist, SongsPlaylist,
                                        M3UPlaylist, MostPlayedPlaylist,
                                        RarelyPlayedPlaylist,
@@ -16,13 +19,6 @@ from mokaplayer.core.playlists import (AbstractPlaylist, SongsPlaylist,
                                        RecentlyPlayedPlaylist, UpNextPlaylist,
                                        AlbumsPlaylist, ArtistsPlaylist,
                                        AlbumPlaylist, ArtistPlaylist)
-from mokaplayer.core.queue import Queue
-from mokaplayer.core.database import Artist, Album
-from mokaplayer.ui.gtk.adapter import AdapterSong
-from mokaplayer.ui.gtk.helper import file_helper, image_helper
-from mokaplayer.ui.gtk.windows import (AboutWindow, HelpShortcutsWindow,
-                                       InputBox, LyricsWindow, TabsWindow,
-                                       TagsEditorWindow)
 
 
 class MainWindow(Gtk.Window):
@@ -41,6 +37,8 @@ class MainWindow(Gtk.Window):
         self.player = player
         self.current_playlist = SongsPlaylist()
         self.set_icon_from_file(pkg_resources.resource_filename('mokaplayer', 'data/icons/hicolor/48x48/apps/mokaplayer.png'))
+        self.has_flowbox_album_loaded = False
+        self.has_flowbox_artist_loaded = False
 
         if self.userconfig['gtk']['darktheme']:
             settings = Gtk.Settings.get_default()
@@ -154,24 +152,34 @@ class MainWindow(Gtk.Window):
         self.listbox_playlist = self.builder.get_object('listbox_playlist')
         self.playlist_sidebar = self.builder.get_object('playlist_sidebar')
         self.lbl_playlist = self.builder.get_object('lbl_playlist')
-        self.flowbox = self.builder.get_object('flowbox')
+        self.flowbox_artist = self.builder.get_object('flowbox_artist')
+        self.flowbox_album = self.builder.get_object('flowbox_album')
         self.stack = self.builder.get_object('stack')
         self.add(self.content)
 
     def __show_current_playlist(self):
         self.lbl_playlist.set_text(self.current_playlist.name)
-        if (isinstance(self.current_playlist, AlbumsPlaylist) or
-                isinstance(self.current_playlist, ArtistsPlaylist)):
-            for child in self.flowbox.get_children():
-                self.flowbox.remove(child)
-            self.stack.set_visible_child_name('flowbox')
-            self.__create_flowbox()
+        if isinstance(self.current_playlist, AlbumsPlaylist):
+            self.stack.set_visible_child_name('flowbox_album')
+            if not self.has_flowbox_album_loaded:
+                for child in self.flowbox_album.get_children():
+                    self.flowbox_album.remove(child)
+                self.__create_flowbox(self.flowbox_album)
+                self.has_flowbox_album_loaded = True
+        
+        elif isinstance(self.current_playlist, ArtistsPlaylist):
+            self.stack.set_visible_child_name('flowbox_artist')
+            if not self.has_flowbox_artist_loaded:
+                for child in self.flowbox_artist.get_children():
+                    self.flowbox_artist.remove(child)
+                self.__create_flowbox(self.flowbox_artist)
+                self.has_flowbox_artist_loaded = True
         else:
             self.gridview.set_model(AdapterSong.create_store())
             self.stack.set_visible_child_name('gridview')
             threading.Thread(target=self.__create_model).start()
 
-    def __create_flowbox(self):
+    def __create_flowbox(self, flowbox):
         self.logger.info('Creating Flowbox')
         start = time.perf_counter()
 
@@ -195,17 +203,17 @@ class MainWindow(Gtk.Window):
             elif isinstance(item, Artist):
                 children.append(self.__create_artist_view(item, image, margin))
 
-        GObject.idle_add(lambda: self.__create_flowbox_finished(children, image_loading_queue))
+        GObject.idle_add(lambda: self.__create_flowbox_finished(flowbox, children, image_loading_queue))
         image_helper.set_multiple_image(image_loading_queue)
 
         end = time.perf_counter()
         self.logger.info('Flowbox created in {:.3f} seconds'.format(end - start))
 
-    def __create_flowbox_finished(self, children, image_loading_queue):
+    def __create_flowbox_finished(self, flowbox, children, image_loading_queue):
         for child in children:
-            self.flowbox.add(child)
+            flowbox.add(child)
 
-        self.flowbox.show_all()
+        flowbox.show_all()
 
     def __create_artist_view(self, artist, image, margin):
         label_album = Gtk.Label(artist.Name, max_width_chars=0,
@@ -298,8 +306,8 @@ class MainWindow(Gtk.Window):
             self.lbl_current_title.set_text('')
             self.lbl_current_song_infos.set_text('')
 
-        self.img_current_album.set_from_pixbuf(image_helper.load(album.Cover if album else None,
-                                                                 image_size, image_size))
+        args = (self.img_current_album, album.Cover if album else None, image_size, image_size)
+        threading.Thread(target=image_helper.set_image, args=args).start()
 
     def __set_current_play_icon(self):
         if self.player.streamer.state == self.player.streamer.State.PLAYING:
@@ -491,6 +499,8 @@ class MainWindow(Gtk.Window):
 
     def on_library_scan_finished(self):
         self.__create_playlist_menus()
+        self.has_flowbox_album_loaded = False
+        self.has_flowbox_artist_loaded = False
         self.__show_current_playlist()
 
     def on_library_artworks_activate(self, event):
@@ -498,6 +508,8 @@ class MainWindow(Gtk.Window):
 
     def on_library_artworks_finished(self):
         self.__set_current_song_info()
+        self.has_flowbox_album_loaded = False
+        self.has_flowbox_artist_loaded = False
         self.__show_current_playlist()
 
     def on_queue_add_activate(self, event):
@@ -614,10 +626,12 @@ class MainWindow(Gtk.Window):
             self.userconfig['grid']['sort']['field'] = order.name
 
             threading.Thread(target=self.userconfig.save).start()
+            self.has_flowbox_album_loaded = False
+            self.has_flowbox_artist_loaded = False
             self.__show_current_playlist()
 
     def on_flowbox_selected_children_changed(self, widget):
-        selected = self.flowbox.get_selected_children()
+        selected = widget.get_selected_children()
         if any(selected):
             if isinstance(selected[0].data, Album):
                 self.current_playlist = AlbumPlaylist(selected[0].data)

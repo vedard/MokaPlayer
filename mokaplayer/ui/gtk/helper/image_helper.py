@@ -15,9 +15,11 @@ def load(filename, width, height):
     pixbuf = pixbuf.scale_simple(width, height, GdkPixbuf.InterpType.BILINEAR)
     return pixbuf
 
+
 def set_image(gtkimage, filename, width, height):
     pixbuf = load(filename, width, height)
     GObject.idle_add(lambda: gtkimage.set_from_pixbuf(pixbuf))
+
 
 def set_multiple_image(list_tuples):
     pool = ThreadPool(4)
