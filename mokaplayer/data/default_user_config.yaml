@@ -16,7 +16,7 @@ grid:
   font: null
   columns: [ 'Title', 'Artist', 'Album','Length', 'Year', 'Added', 'Played', 'Genre']
 flowbox:
-  image_size: 175
-  margin: 25
+  image_size: 250
+  margin: 10
 gtk:
   darktheme: No

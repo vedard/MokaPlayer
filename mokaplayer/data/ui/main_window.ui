@@ -1161,8 +1161,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="homogeneous">True</property>
-                            <property name="column_spacing">2</property>
-                            <property name="row_spacing">2</property>
                             <signal name="selected-children-changed" handler="on_flowbox_selected_children_changed" swapped="no"/>
                           </object>
                         </child>
@@ -1188,8 +1186,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="homogeneous">True</property>
-                            <property name="column_spacing">2</property>
-                            <property name="row_spacing">2</property>
                             <signal name="selected-children-changed" handler="on_flowbox_selected_children_changed" swapped="no"/>
                           </object>
                         </child>

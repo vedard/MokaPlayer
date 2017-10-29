@@ -10,11 +10,15 @@ class ArtistsPlaylist(AbstractPlaylist):
     def name(self):
         return "Artists"
 
-    def collections(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
+    def collections(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False, search=''):
         if order == self.OrderBy.ARTIST or order == self.OrderBy.DEFAULT:
             fields = [peewee.fn.strip_articles(Artist.Name)]
 
         if desc:
             fields[0] = -fields[0]
 
-        return Artist.select().order_by(*fields)
+        query = Artist.select()
+        if search:
+            query = query.where(Artist.Name.regexp(search))
+
+        return query.order_by(*fields)

@@ -162,16 +162,12 @@ class MainWindow(Gtk.Window):
         if isinstance(self.current_playlist, AlbumsPlaylist):
             self.stack.set_visible_child_name('flowbox_album')
             if not self.has_flowbox_album_loaded:
-                for child in self.flowbox_album.get_children():
-                    self.flowbox_album.remove(child)
                 self.__create_flowbox(self.flowbox_album)
                 self.has_flowbox_album_loaded = True
-        
+
         elif isinstance(self.current_playlist, ArtistsPlaylist):
             self.stack.set_visible_child_name('flowbox_artist')
             if not self.has_flowbox_artist_loaded:
-                for child in self.flowbox_artist.get_children():
-                    self.flowbox_artist.remove(child)
                 self.__create_flowbox(self.flowbox_artist)
                 self.has_flowbox_artist_loaded = True
         else:
@@ -190,7 +186,10 @@ class MainWindow(Gtk.Window):
         desc = self.userconfig['grid']['sort']['desc']
         image_size = self.userconfig['flowbox']['image_size']
         margin = self.userconfig['flowbox']['margin']
-        collections = self.current_playlist.collections(order, desc)
+        collections = self.current_playlist.collections(order, desc, self.txt_search.get_text())
+
+        for child in flowbox.get_children():
+            flowbox.remove(child)
 
         for item in collections:
             image = Gtk.Image()
@@ -203,17 +202,14 @@ class MainWindow(Gtk.Window):
             elif isinstance(item, Artist):
                 children.append(self.__create_artist_view(item, image, margin))
 
-        GObject.idle_add(lambda: self.__create_flowbox_finished(flowbox, children, image_loading_queue))
+        for child in children:
+            flowbox.add(child)
+        flowbox.show_all()
+
         image_helper.set_multiple_image(image_loading_queue)
 
         end = time.perf_counter()
         self.logger.info('Flowbox created in {:.3f} seconds'.format(end - start))
-
-    def __create_flowbox_finished(self, flowbox, children, image_loading_queue):
-        for child in children:
-            flowbox.add(child)
-
-        flowbox.show_all()
 
     def __create_artist_view(self, artist, image, margin):
         label_album = Gtk.Label(artist.Name, max_width_chars=0,
@@ -221,8 +217,7 @@ class MainWindow(Gtk.Window):
                                 wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0, margin_top=5)
 
         flowboxchild = Gtk.FlowBoxChild()
-        grid = Gtk.Grid(margin_top=margin, margin_bottom=margin, margin_start=margin, margin_end=margin,
-                        halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
+        grid = Gtk.Grid(margin=margin, halign=Gtk.Align.CENTER)
         grid.attach(image, 0, 0, 1, 1)
         grid.attach(label_album, 0, 1, 1, 1)
         flowboxchild.add(grid)
@@ -237,9 +232,8 @@ class MainWindow(Gtk.Window):
                                  justify=Gtk.Justification.LEFT, wrap=True,
                                  wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0, margin_top=5)
 
-        flowboxchild = Gtk.FlowBoxChild()
-        grid = Gtk.Grid(margin_top=margin, margin_bottom=margin, margin_start=margin, margin_end=margin,
-                        halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
+        flowboxchild = Gtk.FlowBoxChild(halign=Gtk.Align.CENTER)
+        grid = Gtk.Grid(margin=margin, halign=Gtk.Align.CENTER)
         grid.attach(image, 0, 0, 1, 1)
         grid.attach(label_album, 0, 1, 1, 1)
         grid.attach(label_artist, 0, 2, 1, 1)
@@ -484,6 +478,14 @@ class MainWindow(Gtk.Window):
 
     def on_txt_search_search_changed(self, widget):
         self.model.refilter()
+        text_len = len(self.txt_search.get_text())
+        if text_len == 0 or text_len > 2:
+            self.has_flowbox_artist_loaded = False
+            self.has_flowbox_album_loaded = False
+            if isinstance(self.current_playlist, ArtistsPlaylist):
+                self.__show_current_playlist()
+            elif isinstance(self.current_playlist, AlbumsPlaylist):
+                self.__show_current_playlist()
 
     def on_player_open_stream_activate(self, event):
         pass

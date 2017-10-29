@@ -1,6 +1,7 @@
+import peewee
+
 from mokaplayer.core.database import Artist, Song, Album
 from mokaplayer.core.playlists import AbstractPlaylist
-from .album_playlist import AlbumPlaylist
 
 
 class ArtistPlaylist(AbstractPlaylist):
@@ -19,4 +20,7 @@ class ArtistPlaylist(AbstractPlaylist):
 
     def collections(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
         # return Album.select().where(Album.Artist == self.artist.Name)
-        return Song.select().where(Song.AlbumArtist == self.artist.Name)
+        return (Song.select()
+                .where(Song.AlbumArtist == self.artist.Name)
+                .order_by(peewee.fn.strip_articles(Song.AlbumArtist), Song.Year,
+                          peewee.fn.strip_articles(Song.Album), Song.Discnumber, Song.Tracknumber))
