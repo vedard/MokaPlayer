@@ -8,8 +8,8 @@ class AlbumPlaylist(AbstractPlaylist):
         if album:
             self.album = album
         elif song_path:
-            song = Song.get(Song.Path==song_path)
-            self.album = Album.get(Album.Name==song.Album)
+            song = Song.get(Song.Path == song_path)
+            self.album = Album.get(Album.Name == song.Album)
 
     @property
     def name(self):

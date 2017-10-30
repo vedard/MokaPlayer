@@ -10,8 +10,8 @@ class ArtistPlaylist(AbstractPlaylist):
         if artist:
             self.artist = artist
         elif song_path:
-            song = Song.get(Song.Path==song_path)
-            self.artist = Artist.get(Artist.Name==song.AlbumArtist)
+            song = Song.get(Song.Path == song_path)
+            self.artist = Artist.get(Artist.Name == song.AlbumArtist)
 
 
     @property
