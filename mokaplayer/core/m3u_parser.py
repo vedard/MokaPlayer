@@ -67,6 +67,12 @@ class M3uParser:
 
         self._media_files.append(value)
 
+    def remove(self, value):
+        for file in list(self._media_files):
+            if pathlib.Path(file).resolve() == pathlib.Path(value).resolve():
+                self._media_files.remove(file)
+                return
+
     @property
     def location(self):
         return self._location

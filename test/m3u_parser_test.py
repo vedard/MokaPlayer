@@ -37,6 +37,12 @@ class M3uPaserTest(unittest.TestCase):
 
         self.assertEqual(len(self.playlist), 4)
 
+        self.playlist.remove("song1.mp3")
+        self.assertEqual(len(self.playlist), 3)
+        self.playlist.write()
+        self.playlist.read()
+        self.assertEqual(len(self.playlist), 3)
+
     def test_nameandlocation(self):
         self.assertFalse(pathlib.Path(self.playlist.location).is_file())
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.0 -->
+<!-- Generated with glade 3.20.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkImage" id="img_next">
@@ -97,6 +97,15 @@
             <property name="can_focus">False</property>
           </object>
         </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="menu_gridview_remove_from_playlist">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Remove from this playlist</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="on_menu_gridview_remove_from_playlist_activate" swapped="no"/>
       </object>
     </child>
   </object>
