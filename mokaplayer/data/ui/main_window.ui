@@ -117,6 +117,15 @@
         <signal name="activate" handler="on_menu_gridview_goto_artist_activate" swapped="no"/>
       </object>
     </child>
+    <child>
+      <object class="GtkMenuItem" id="menu_gridview_remove_from_playlist">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Remove from this playlist</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="on_menu_gridview_remove_from_playlist_activate" swapped="no"/>
+      </object>
+    </child>
   </object>
   <object class="GtkPopoverMenu" id="popup_sort">
     <property name="can_focus">False</property>

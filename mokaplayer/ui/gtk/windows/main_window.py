@@ -149,6 +149,7 @@ class MainWindow(Gtk.Window):
         self.menu_gridview = self.builder.get_object('menu_gridview')
         self.search_bar = self.builder.get_object('search_bar')
         self.menuchild_gridview_playlist = self.builder.get_object('menuchild_gridview_playlist')
+        self.menu_gridview_remove_from_playlist = self.builder.get_object('menu_gridview_remove_from_playlist')
         self.listbox_playlist = self.builder.get_object('listbox_playlist')
         self.playlist_sidebar = self.builder.get_object('playlist_sidebar')
         self.lbl_playlist = self.builder.get_object('lbl_playlist')
@@ -387,6 +388,8 @@ class MainWindow(Gtk.Window):
 
     def on_gridview_button_press_event(self, sender, event):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
+            # if its a m3uPlaylist, offer option to remove selected songs
+            self.menu_gridview_remove_from_playlist.set_visible(isinstance(self.current_playlist, M3UPlaylist))
             self.menu_gridview.popup(None, None, None, None, event.button, event.time)
             return True
 
@@ -401,6 +404,14 @@ class MainWindow(Gtk.Window):
         for path in self.__get_selected_songs_in_gridview():
             playlist.append(path)
         playlist.write()
+
+    def on_menu_gridview_remove_from_playlist_activate(self, widget):
+        if isinstance(self.current_playlist, M3UPlaylist):
+            self.current_playlist.m3u_parser.read()
+            for path in self.__get_selected_songs_in_gridview():
+                self.current_playlist.m3u_parser.remove(path)
+            self.current_playlist.m3u_parser.write()
+            self.__show_current_playlist()
 
     def on_menu_gridview_replace_activate(self, widget):
         self.player.queue.clear()
