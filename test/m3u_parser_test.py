@@ -14,6 +14,13 @@ class M3uPaserTest(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(M3uPaserTest.FOLDER)
 
+    def test_append_same_file(self):
+        self.playlist.append('song1.mp3')
+        self.playlist.append('song1.mp3')
+        self.playlist.append('./song1.mp3')
+        self.playlist.append('./././song1.mp3')
+        self.assertEqual(len(self.playlist), 1)
+
     def test_readandwrite(self):
         with self.assertLogs():
             self.playlist.read()

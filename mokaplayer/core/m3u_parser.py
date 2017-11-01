@@ -1,3 +1,4 @@
+import os
 import logging
 import pathlib
 
@@ -60,6 +61,10 @@ class M3uParser:
         del(self._media_files[key])
 
     def append(self, value):
+        for file in self._media_files:
+            if pathlib.Path(file).resolve() == pathlib.Path(value).resolve():
+                return
+
         self._media_files.append(value)
 
     @property
