@@ -397,6 +397,10 @@ class MainWindow(Gtk.Window):
             self.__show_sidebar(not self.playlist_sidebar.get_reveal_child())
         elif ctrl and keyval_name == 'o':
             self.__focus_song(self.player.queue.peek())
+        elif ctrl and keyval_name == 'g':
+            if self.player.queue.peek():
+                self.current_playlist = ArtistPlaylist(song_path=self.player.queue.peek())
+                self.__show_current_playlist()
         elif ctrl and keyval_name == 'Left':
             self.player.streamer.volume -= 0.05
         elif ctrl and keyval_name == 'Right':
