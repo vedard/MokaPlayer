@@ -26,8 +26,9 @@ class MainWindow(Gtk.Window):
     """ Main window
     """
 
-    GLADE_FILE = pkg_resources.resource_filename('mokaplayer',
-                                                 'data/ui/main_window.ui')
+    GLADE_FILE = pkg_resources.resource_filename('mokaplayer', 'data/ui/main_window.ui')
+    CSS_FILE = pkg_resources.resource_filename('mokaplayer', 'data/ui/application.css')
+    ICON_FILE = pkg_resources.resource_filename('mokaplayer', 'data/icons/hicolor/48x48/apps/mokaplayer.png')
 
     def __init__(self, appconfig, userconfig, player):
         super().__init__(title="MokaPlayer", default_width=1366, default_height=768)
@@ -37,9 +38,14 @@ class MainWindow(Gtk.Window):
         self.userconfig = userconfig
         self.player = player
         self.current_playlist = SongsPlaylist()
-        self.set_icon_from_file(pkg_resources.resource_filename('mokaplayer', 'data/icons/hicolor/48x48/apps/mokaplayer.png'))
+        self.set_icon_from_file(self.ICON_FILE)
         self.has_flowbox_album_loaded = False
         self.has_flowbox_artist_loaded = False
+
+        style_provider = Gtk.CssProvider()
+        style_provider.load_from_path(self.CSS_FILE)
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(
+        ), style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         if self.userconfig['gtk']['darktheme']:
             settings = Gtk.Settings.get_default()
@@ -216,6 +222,7 @@ class MainWindow(Gtk.Window):
         for item in collections:
             image = Gtk.Image()
             image.set_size_request(image_size, image_size)
+            image.get_style_context().add_class('cover')
             image_loading_queue.append((image, item.Cover, image_size, image_size))
 
             if isinstance(item, Album):
@@ -238,6 +245,7 @@ class MainWindow(Gtk.Window):
         label_album = Gtk.Label(artist.Name, max_width_chars=0,
                                 justify=Gtk.Justification.LEFT, wrap=True,
                                 wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0, margin_top=5)
+        label_album.get_style_context().add_class('text110')
 
         flowboxchild = Gtk.FlowBoxChild()
         grid = Gtk.Grid(margin=margin, halign=Gtk.Align.CENTER)
@@ -255,6 +263,8 @@ class MainWindow(Gtk.Window):
                                  justify=Gtk.Justification.LEFT, wrap=True,
                                  wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0, margin_top=5)
 
+        label_album.get_style_context().add_class('text110')
+        label_artist.get_style_context().add_class('dim-label')
         flowboxchild = Gtk.FlowBoxChild(halign=Gtk.Align.CENTER)
         grid = Gtk.Grid(margin=margin, halign=Gtk.Align.CENTER)
         grid.attach(image, 0, 0, 1, 1)

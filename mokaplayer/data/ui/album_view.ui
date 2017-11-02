@@ -40,6 +40,9 @@
             <property name="margin_bottom">5</property>
             <property name="label" translatable="yes">Year</property>
             <property name="selectable">True</property>
+            <style>
+              <class name="dim-label"/>
+            </style>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -82,6 +85,9 @@
             <property name="margin_top">5</property>
             <property name="margin_bottom">5</property>
             <property name="stock">gtk-missing-image</property>
+            <style>
+              <class name="cover"/>
+            </style>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -112,7 +118,7 @@
                 <child>
                   <object class="GtkCellRendererText">
                     <property name="cell_background_rgba">rgba(0,0,0,0)</property>
-                    <property name="weight">100</property>
+                    <property name="foreground_rgba">rgb(136,138,133)</property>
                   </object>
                   <attributes>
                     <attribute name="text">1</attribute>
@@ -146,6 +152,7 @@
                     <property name="cell_background_rgba">rgba(0,0,0,0)</property>
                     <property name="xalign">1</property>
                     <property name="alignment">right</property>
+                    <property name="foreground_rgba">rgb(136,138,133)</property>
                   </object>
                   <attributes>
                     <attribute name="text">3</attribute>
@@ -153,6 +160,9 @@
                 </child>
               </object>
             </child>
+            <style>
+              <class name="transparent"/>
+            </style>
           </object>
           <packing>
             <property name="expand">True</property>
