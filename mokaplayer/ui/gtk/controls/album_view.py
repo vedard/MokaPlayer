@@ -31,7 +31,7 @@ class AlbumView:
             self.lbl_album_name.set_text(self.album_playlist.album.Name)
             self.lbl_year.set_text(self.album_playlist.album.Year)
 
-        image_helper.set_image(self.img_cover, album_playlist.album.Cover, 250, 250)
+        image_helper.set_image(self.img_cover, album_playlist.album.Cover, 220, 220)
 
         self._build_grid_songs()
 

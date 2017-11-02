@@ -226,11 +226,9 @@ class MainWindow(Gtk.Window):
             image_loading_queue.append((image, item.Cover, image_size, image_size))
 
             if isinstance(item, Album):
-                children.append(
-                    self.__create_album_flowboxitem(item, image, margin))
+                children.append(self.__create_album_flowboxitem(item, image, margin))
             elif isinstance(item, Artist):
-                children.append(
-                    self.__create_artist_flowboxitem(item, image, margin))
+                children.append(self.__create_artist_flowboxitem(item, image, margin))
 
         for child in children:
             flowbox.add(child)
@@ -242,9 +240,8 @@ class MainWindow(Gtk.Window):
         self.logger.info('Flowbox created in {:.3f} seconds'.format(end - start))
 
     def __create_artist_flowboxitem(self, artist, image, margin):
-        label_album = Gtk.Label(artist.Name, max_width_chars=0,
-                                justify=Gtk.Justification.LEFT, wrap=True,
-                                wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0, margin_top=5)
+        label_album = Gtk.Label(artist.Name, max_width_chars=0, justify=Gtk.Justification.LEFT,
+                                ellipsize=Pango.EllipsizeMode.END, xalign=0, margin_top=5)
         label_album.get_style_context().add_class('text110')
 
         flowboxchild = Gtk.FlowBoxChild()
@@ -259,9 +256,8 @@ class MainWindow(Gtk.Window):
         label_album = Gtk.Label(f'{album.Name} ({album.Year})', max_width_chars=0,
                                 justify=Gtk.Justification.LEFT, wrap=True,
                                 wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0, margin_top=5)
-        label_artist = Gtk.Label(album.Artist, max_width_chars=0,
-                                 justify=Gtk.Justification.LEFT, wrap=True,
-                                 wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0, margin_top=5)
+        label_artist = Gtk.Label(album.Artist, max_width_chars=0, justify=Gtk.Justification.LEFT,
+                                 ellipsize=Pango.EllipsizeMode.END, xalign=0, margin_top=5)
 
         label_album.get_style_context().add_class('text110')
         label_artist.get_style_context().add_class('dim-label')
