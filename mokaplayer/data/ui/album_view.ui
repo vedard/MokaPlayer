@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.20.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkBox" id="view">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="margin_left">10</property>
+    <property name="margin_right">10</property>
+    <property name="margin_bottom">20</property>
+    <property name="orientation">vertical</property>
+    <child>
+      <object class="GtkBox" id="header">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkLabel" id="lbl_album_name">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+            <property name="label" translatable="yes">Album name</property>
+            <property name="selectable">True</property>
+            <attributes>
+              <attribute name="weight" value="thin"/>
+              <attribute name="scale" value="1.5"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="lbl_year">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+            <property name="label" translatable="yes">Year</property>
+            <property name="selectable">True</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkSeparator">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_bottom">2</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkImage" id="img_cover">
+            <property name="width_request">200</property>
+            <property name="height_request">200</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="valign">start</property>
+            <property name="margin_right">10</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+            <property name="stock">gtk-missing-image</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkTreeView" id="grid_songs">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="margin_left">10</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+            <property name="headers_visible">False</property>
+            <property name="fixed_height_mode">True</property>
+            <property name="show_expanders">False</property>
+            <child internal-child="selection">
+              <object class="GtkTreeSelection">
+                <property name="mode">multiple</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkTreeViewColumn">
+                <property name="sizing">fixed</property>
+                <property name="fixed_width">25</property>
+                <property name="title" translatable="yes">Track</property>
+                <child>
+                  <object class="GtkCellRendererText">
+                    <property name="cell_background_rgba">rgba(0,0,0,0)</property>
+                    <property name="weight">100</property>
+                  </object>
+                  <attributes>
+                    <attribute name="text">1</attribute>
+                  </attributes>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkTreeViewColumn">
+                <property name="sizing">fixed</property>
+                <property name="title" translatable="yes">Title</property>
+                <property name="expand">True</property>
+                <child>
+                  <object class="GtkCellRendererText">
+                    <property name="cell_background_rgba">rgba(0,0,0,0)</property>
+                  </object>
+                  <attributes>
+                    <attribute name="text">2</attribute>
+                  </attributes>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkTreeViewColumn">
+                <property name="sizing">fixed</property>
+                <property name="fixed_width">50</property>
+                <property name="min_width">0</property>
+                <property name="title" translatable="yes">Duration</property>
+                <child>
+                  <object class="GtkCellRendererText">
+                    <property name="cell_background_rgba">rgba(0,0,0,0)</property>
+                    <property name="xalign">1</property>
+                    <property name="alignment">right</property>
+                  </object>
+                  <attributes>
+                    <attribute name="text">3</attribute>
+                  </attributes>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">2</property>
+      </packing>
+    </child>
+  </object>
+</interface>

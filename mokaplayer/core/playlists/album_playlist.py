@@ -13,7 +13,7 @@ class AlbumPlaylist(AbstractPlaylist):
 
     @property
     def name(self):
-        return self.album.Name
+        return f'{self.album.Name} ({self.album.Year})'
 
     def collections(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
-        return Song.select().where(Song.Album == self.album.Name)
+        return Song.select().where(Song.Album == self.album.Name).order_by(Song.Discnumber, Song.Tracknumber)

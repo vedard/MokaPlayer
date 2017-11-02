@@ -1,6 +1,7 @@
 import logging
 import mimetypes
 import pathlib
+import peewee
 import time
 
 from mokaplayer.core.database import (Album, Artist, Playlist, Song,
@@ -81,7 +82,7 @@ class Library(object):
 
     def get_album(self, name, albumartist):
         try:
-            return Album.get(Album.Name == name, Album.Artist == albumartist)
+            return Album.get(Album.Name == name, peewee.fn.lower(Album.Artist) == albumartist.lower())
         except:
             return None
 
