@@ -15,5 +15,8 @@ grid:
     desc: No
   font: null
   columns: [ 'Title', 'Artist', 'Album','Length', 'Year', 'Added', 'Played', 'Genre']
+flowbox:
+  image_size: 220
+  margin: 20
 gtk:
   darktheme: No

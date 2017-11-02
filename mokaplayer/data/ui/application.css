@@ -1,0 +1,26 @@
+treeview.transparent:not(:selected) {
+    background-color: transparent;
+}
+
+treeview.transparent:hover:not(:selected) {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+image.cover {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 2px;
+    border-radius: 2px;
+}
+
+label.text110 {
+    font-size: 110%
+}
+
+label.text125 {
+    font-size: 125%
+}
+
+label.text150 {
+    font-size: 150%
+}

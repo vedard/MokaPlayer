@@ -30,6 +30,13 @@
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="visible">1</property>
+                <property name="accelerator">&lt;ctrl&gt;G</property>
+                <property name="title" translatable="yes">Focus the currently playing artist</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">1</property>
                 <property name="accelerator">&lt;ctrl&gt;L</property>
                 <property name="title" translatable="yes">Show lyrics for the currently playing song</property>
               </object>

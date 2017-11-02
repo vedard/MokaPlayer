@@ -2,32 +2,33 @@ import logging
 import threading
 import time
 
-import arrow
 import pkg_resources
 from gi.repository import Gdk, GObject, Gtk, Pango
 from mokaplayer.core.helpers import time_helper
-from mokaplayer.core.library import Library
 from mokaplayer.core.m3u_parser import M3uParser
-from mokaplayer.core.player import Player
-from mokaplayer.core.playlists import (AbstractPlaylist, LibraryPlaylist,
-                                       M3UPlaylist, MostPlayedPlaylist,
-                                       RarelyPlayedPlaylist,
-                                       RecentlyAddedPlaylist,
-                                       RecentlyPlayedPlaylist, UpNextPlaylist)
-from mokaplayer.core.queue import Queue
+from mokaplayer.core.database import Artist, Album
 from mokaplayer.ui.gtk.adapter import AdapterSong
 from mokaplayer.ui.gtk.helper import file_helper, image_helper
+from mokaplayer.ui.gtk.controls import AlbumView, ArtistView
 from mokaplayer.ui.gtk.windows import (AboutWindow, HelpShortcutsWindow,
                                        InputBox, LyricsWindow, TabsWindow,
                                        TagsEditorWindow)
+from mokaplayer.core.playlists import (AbstractPlaylist, SongsPlaylist,
+                                       M3UPlaylist, MostPlayedPlaylist,
+                                       RarelyPlayedPlaylist,
+                                       RecentlyAddedPlaylist,
+                                       RecentlyPlayedPlaylist, UpNextPlaylist,
+                                       AlbumsPlaylist, ArtistsPlaylist,
+                                       AlbumPlaylist, ArtistPlaylist)
 
 
 class MainWindow(Gtk.Window):
     """ Main window
     """
 
-    GLADE_FILE = pkg_resources.resource_filename('mokaplayer',
-                                                 'data/ui/main_window.ui')
+    GLADE_FILE = pkg_resources.resource_filename('mokaplayer', 'data/ui/main_window.ui')
+    CSS_FILE = pkg_resources.resource_filename('mokaplayer', 'data/ui/application.css')
+    ICON_FILE = pkg_resources.resource_filename('mokaplayer', 'data/icons/hicolor/48x48/apps/mokaplayer.png')
 
     def __init__(self, appconfig, userconfig, player):
         super().__init__(title="MokaPlayer", default_width=1366, default_height=768)
@@ -36,8 +37,15 @@ class MainWindow(Gtk.Window):
         self.appconfig = appconfig
         self.userconfig = userconfig
         self.player = player
-        self.current_playlist = LibraryPlaylist()
-        self.set_icon_from_file(pkg_resources.resource_filename('mokaplayer', 'data/mokaplayer.png'))
+        self.current_playlist = SongsPlaylist()
+        self.set_icon_from_file(self.ICON_FILE)
+        self.has_flowbox_album_loaded = False
+        self.has_flowbox_artist_loaded = False
+
+        style_provider = Gtk.CssProvider()
+        style_provider.load_from_path(self.CSS_FILE)
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(
+        ), style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         if self.userconfig['gtk']['darktheme']:
             settings = Gtk.Settings.get_default()
@@ -58,11 +66,10 @@ class MainWindow(Gtk.Window):
         self.player.audio_changed.subscribe(self.on_audio_changed)
         self.player.volume_changed.subscribe(self.on_volume_changed)
 
-        self.__set_model(AdapterSong.create_store())
         self.__set_current_song_info()
         self.on_volume_changed()
 
-        threading.Thread(target=lambda: self.__create_model()).start()
+        self.__show_current_playlist()
 
         GObject.timeout_add(750, self.on_tick, None)
         self.logger.info('Window loaded')
@@ -98,24 +105,24 @@ class MainWindow(Gtk.Window):
                     col.set_visible(True)
                     self.gridview.move_column_after(col, None)
 
-    def __create_model(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
+    def __create_model(self):
         self.logger.info('Creating ListStore')
         start = time.perf_counter()
 
         model = AdapterSong.create_store()
         order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
         desc = self.userconfig['grid']['sort']['desc']
-        songs = self.current_playlist.songs(order, desc)
+        songs = self.current_playlist.collections(order, desc)
 
         for row in songs:
             model.insert_with_valuesv(-1, AdapterSong.create_col_number(), AdapterSong.create_row(row))
 
+        GObject.idle_add(lambda: self.__create_model_finished(model))
+
         end = time.perf_counter()
         self.logger.info('ListStore created in {:.3f} seconds'.format(end - start))
 
-        GObject.idle_add(lambda: self.__set_model(model))
-
-    def __set_model(self, model):
+    def __create_model_finished(self, model):
         self.model = model.filter_new()
         self.model.set_visible_func(self.__model_filter_func)
         self.gridview.set_model(self.model)
@@ -153,7 +160,115 @@ class MainWindow(Gtk.Window):
         self.listbox_playlist = self.builder.get_object('listbox_playlist')
         self.playlist_sidebar = self.builder.get_object('playlist_sidebar')
         self.lbl_playlist = self.builder.get_object('lbl_playlist')
+        self.flowbox_artist = self.builder.get_object('flowbox_artist')
+        self.flowbox_album = self.builder.get_object('flowbox_album')
+        self.stack = self.builder.get_object('stack')
+        self.album_viewport = self.builder.get_object('album_viewport')
         self.add(self.content)
+
+    def __show_current_playlist(self):
+        self.lbl_playlist.set_text(self.current_playlist.name)
+        if isinstance(self.current_playlist, AlbumPlaylist):
+            for child in self.album_viewport.get_children():
+                self.album_viewport.remove(child)
+            self.stack.set_visible_child_name('album_view')
+            self.album_viewport.add(AlbumView(self.current_playlist,
+                                              self.on_gridview_row_activated,
+                                              self.on_gridview_button_press_event,
+                                              hide_header=True).get_view())
+
+        elif isinstance(self.current_playlist, ArtistPlaylist):
+            for child in self.album_viewport.get_children():
+                self.album_viewport.remove(child)
+            self.stack.set_visible_child_name('album_view')
+            self.album_viewport.add(ArtistView(self.current_playlist,
+                                               self.on_gridview_row_activated,
+                                               self.on_gridview_button_press_event).get_view())
+
+        elif isinstance(self.current_playlist, AlbumsPlaylist):
+            self.stack.set_visible_child_name('flowbox_album')
+            self.flowbox_album.unselect_all()
+            if not self.has_flowbox_album_loaded:
+                self.__create_flowbox(self.flowbox_album)
+                self.has_flowbox_album_loaded = True
+
+        elif isinstance(self.current_playlist, ArtistsPlaylist):
+            self.stack.set_visible_child_name('flowbox_artist')
+            self.flowbox_artist.unselect_all()
+            if not self.has_flowbox_artist_loaded:
+                self.__create_flowbox(self.flowbox_artist)
+                self.has_flowbox_artist_loaded = True
+        else:
+            self.gridview.set_model(AdapterSong.create_store())
+            self.stack.set_visible_child_name('gridview')
+            threading.Thread(target=self.__create_model).start()
+
+    def __create_flowbox(self, flowbox):
+        self.logger.info('Creating Flowbox')
+        start = time.perf_counter()
+
+        image_loading_queue = []
+        children = []
+
+        order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
+        desc = self.userconfig['grid']['sort']['desc']
+        image_size = self.userconfig['flowbox']['image_size']
+        margin = self.userconfig['flowbox']['margin']
+        collections = self.current_playlist.collections(order, desc, self.txt_search.get_text())
+
+        for child in flowbox.get_children():
+            flowbox.remove(child)
+
+        for item in collections:
+            image = Gtk.Image()
+            image.set_size_request(image_size, image_size)
+            image.get_style_context().add_class('cover')
+            image_loading_queue.append((image, item.Cover, image_size, image_size))
+
+            if isinstance(item, Album):
+                children.append(self.__create_album_flowboxitem(item, image, margin))
+            elif isinstance(item, Artist):
+                children.append(self.__create_artist_flowboxitem(item, image, margin))
+
+        for child in children:
+            flowbox.add(child)
+        flowbox.show_all()
+
+        image_helper.set_multiple_image(image_loading_queue)
+
+        end = time.perf_counter()
+        self.logger.info('Flowbox created in {:.3f} seconds'.format(end - start))
+
+    def __create_artist_flowboxitem(self, artist, image, margin):
+        label_album = Gtk.Label(artist.Name, max_width_chars=0, justify=Gtk.Justification.LEFT,
+                                ellipsize=Pango.EllipsizeMode.END, xalign=0, margin_top=5)
+        label_album.get_style_context().add_class('text110')
+
+        flowboxchild = Gtk.FlowBoxChild()
+        grid = Gtk.Grid(margin=margin, halign=Gtk.Align.CENTER)
+        grid.attach(image, 0, 0, 1, 1)
+        grid.attach(label_album, 0, 1, 1, 1)
+        flowboxchild.add(grid)
+        flowboxchild.data = artist
+        return flowboxchild
+
+    def __create_album_flowboxitem(self, album, image, margin):
+        label_album = Gtk.Label(f'{album.Name} ({album.Year})', max_width_chars=0,
+                                justify=Gtk.Justification.LEFT, wrap=True,
+                                wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0, margin_top=5)
+        label_artist = Gtk.Label(album.Artist, max_width_chars=0, justify=Gtk.Justification.LEFT,
+                                 ellipsize=Pango.EllipsizeMode.END, xalign=0, margin_top=5)
+
+        label_album.get_style_context().add_class('text110')
+        label_artist.get_style_context().add_class('dim-label')
+        flowboxchild = Gtk.FlowBoxChild(halign=Gtk.Align.CENTER)
+        grid = Gtk.Grid(margin=margin, halign=Gtk.Align.CENTER)
+        grid.attach(image, 0, 0, 1, 1)
+        grid.attach(label_album, 0, 1, 1, 1)
+        grid.attach(label_artist, 0, 2, 1, 1)
+        flowboxchild.add(grid)
+        flowboxchild.data = album
+        return flowboxchild
 
     def __create_sidebar_row(self, playlist):
         list_box_row = Gtk.ListBoxRow()
@@ -176,8 +291,10 @@ class MainWindow(Gtk.Window):
         for child in self.listbox_playlist.get_children():
             self.listbox_playlist.remove(child)
 
-        self.listbox_playlist.add(self.__create_sidebar_header('Collections'))
-        self.listbox_playlist.add(self.__create_sidebar_row(LibraryPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_header('Library'))
+        self.listbox_playlist.add(self.__create_sidebar_row(SongsPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_row(AlbumsPlaylist()))
+        self.listbox_playlist.add(self.__create_sidebar_row(ArtistsPlaylist()))
         self.listbox_playlist.add(self.__create_sidebar_row(UpNextPlaylist(self.player.queue)))
         self.listbox_playlist.add(self.__create_sidebar_row(MostPlayedPlaylist()))
         self.listbox_playlist.add(self.__create_sidebar_row(RarelyPlayedPlaylist()))
@@ -188,7 +305,7 @@ class MainWindow(Gtk.Window):
         for playlist_location in self.player.library.get_playlists():
             m3u = M3uParser(playlist_location)
             menu_item = Gtk.MenuItem(label=m3u.name)
-            menu_item.connect('activate', self.on_menu_gridview_add_to_playlist_activate, m3u)
+            menu_item.connect('activate', self.on_menu_gridview_add_to_playlist_activate, m3u, self.menu_gridview)
             self.menuchild_gridview_playlist.append(menu_item)
             self.listbox_playlist.add(self.__create_sidebar_row(M3UPlaylist(m3u)))
 
@@ -212,8 +329,8 @@ class MainWindow(Gtk.Window):
             self.lbl_current_title.set_text('')
             self.lbl_current_song_infos.set_text('')
 
-        self.img_current_album.set_from_pixbuf(image_helper.load(album.Cover if album else None,
-                                                                 image_size, image_size))
+        args = (self.img_current_album, album.Cover if album else None, image_size, image_size)
+        threading.Thread(target=image_helper.set_image, args=args).start()
 
     def __set_current_play_icon(self):
         if self.player.streamer.state == self.player.streamer.State.PLAYING:
@@ -280,6 +397,10 @@ class MainWindow(Gtk.Window):
             self.__show_sidebar(not self.playlist_sidebar.get_reveal_child())
         elif ctrl and keyval_name == 'o':
             self.__focus_song(self.player.queue.peek())
+        elif ctrl and keyval_name == 'g':
+            if self.player.queue.peek():
+                self.current_playlist = ArtistPlaylist(song_path=self.player.queue.peek())
+                self.__show_current_playlist()
         elif ctrl and keyval_name == 'Left':
             self.player.streamer.volume -= 0.05
         elif ctrl and keyval_name == 'Right':
@@ -295,69 +416,92 @@ class MainWindow(Gtk.Window):
 
     def on_listbox_playlist_row_activated(self, widget, row):
         self.current_playlist = row.playlist
-        self.lbl_playlist.set_text(row.playlist.name)
-        threading.Thread(target=lambda: self.__create_model()).start()
+        self.__show_current_playlist()
+
+    def on_gridview_row_activated(self, widget, path, column):
+        self.player.seek(widget.get_model()[path][0])
 
     def on_gridview_button_press_event(self, sender, event):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
             # if its a m3uPlaylist, offer option to remove selected songs
             self.menu_gridview_remove_from_playlist.set_visible(isinstance(self.current_playlist, M3UPlaylist))
-            self.menu_gridview.popup(None, None, None, None, event.button, event.time)
+            self.menu_gridview.popup(None, None, None, sender, event.button, event.time)
+            self.menu_gridview.sender = sender
             return True
 
     def on_menu_gridview_append_activate(self, widget):
-        self.player.queue.append(self.__get_selected_songs_in_gridview())
+        treeview = widget.get_parent().sender
+        self.player.queue.append(self.__get_selected_songs(treeview))
 
     def on_menu_gridview_insert_activate(self, widget):
-        self.player.queue.prepend(self.__get_selected_songs_in_gridview())
+        treeview = widget.get_parent().sender
+        self.player.queue.prepend(self.__get_selected_songs(treeview))
 
-    def on_menu_gridview_add_to_playlist_activate(self, widget, playlist):
+    def on_menu_gridview_add_to_playlist_activate(self, widget, playlist, menu):
+        treeview = menu.sender
         playlist.read()
-        for path in self.__get_selected_songs_in_gridview():
+        for path in self.__get_selected_songs(treeview):
             playlist.append(path)
         playlist.write()
 
     def on_menu_gridview_remove_from_playlist_activate(self, widget):
+        treeview = widget.get_parent().sender
         if isinstance(self.current_playlist, M3UPlaylist):
             self.current_playlist.m3u_parser.read()
-            for path in self.__get_selected_songs_in_gridview():
+            for path in self.__get_selected_songs(treeview):
                 self.current_playlist.m3u_parser.remove(path)
             self.current_playlist.m3u_parser.write()
-            threading.Thread(target=lambda: self.__create_model()).start()
+            self.__show_current_playlist()
 
     def on_menu_gridview_replace_activate(self, widget):
+        treeview = widget.get_parent().sender
         self.player.queue.clear()
-        self.player.queue.append(self.__get_selected_songs_in_gridview())
+        self.player.queue.append( self.__get_selected_songs(treeview))
 
     def on_menu_gridview_edit_activate(self, widget):
-        selected_songs = self.__get_selected_songs_in_gridview()
+        treeview = widget.get_parent().sender
+        selected_songs = self.__get_selected_songs(treeview)
         if any(selected_songs):
             self.__show_tagseditor(selected_songs)
 
     def on_menu_gridview_tabs_activate(self, widget):
-        selected_songs = self.__get_selected_songs_in_gridview()
+        treeview = widget.get_parent().sender
+        selected_songs = self.__get_selected_songs(treeview)
         if any(selected_songs):
             self.__show_tabs(selected_songs[0])
 
     def on_menu_gridview_lyrics_activate(self, widget):
-        selected_songs = self.__get_selected_songs_in_gridview()
+        treeview = widget.get_parent().sender
+        selected_songs = self.__get_selected_songs(treeview)
         if any(selected_songs):
             self.__show_lyrics(selected_songs[0])
 
     def on_menu_gridview_folder_activate(self, widget):
-        selected_songs = self.__get_selected_songs_in_gridview()
+        treeview = widget.get_parent().sender
+        selected_songs = self.__get_selected_songs(treeview)
         if any(selected_songs):
             file_helper.open_folder(selected_songs[0])
 
-    def __get_selected_songs_in_gridview(self):
-        model, pathlist = self.gridview.get_selection().get_selected_rows()
+    def on_menu_gridview_goto_artist_activate(self, widget):
+        treeview = widget.get_parent().sender
+        selected_songs = self.__get_selected_songs(treeview)
+        if any(selected_songs):
+            self.current_playlist = ArtistPlaylist(None, song_path=selected_songs[0])
+            self.__show_current_playlist()
+
+    def on_menu_gridview_goto_album_activate(self, widget):
+        treeview = widget.get_parent().sender
+        selected_songs = self.__get_selected_songs(treeview)
+        if any(selected_songs):
+            self.current_playlist = AlbumPlaylist(None, song_path=selected_songs[0])
+            self.__show_current_playlist()
+
+    def __get_selected_songs(self, gridview):
+        model, pathlist = gridview.get_selection().get_selected_rows()
         result = []
         for path in pathlist:
             result.append(model[path][0])
         return result
-
-    def on_gridview_row_activated(self, widget, path, column):
-        self.player.seek(self.model[path][0])
 
     def on_btn_next_clicked(self, widget):
         self.player.next()
@@ -389,6 +533,14 @@ class MainWindow(Gtk.Window):
 
     def on_txt_search_search_changed(self, widget):
         self.model.refilter()
+        text_len = len(self.txt_search.get_text())
+        if text_len == 0 or text_len > 2:
+            self.has_flowbox_artist_loaded = False
+            self.has_flowbox_album_loaded = False
+            if isinstance(self.current_playlist, ArtistsPlaylist):
+                self.__show_current_playlist()
+            elif isinstance(self.current_playlist, AlbumsPlaylist):
+                self.__show_current_playlist()
 
     def on_player_open_stream_activate(self, event):
         pass
@@ -403,25 +555,33 @@ class MainWindow(Gtk.Window):
         threading.Thread(target=self.__library_scan).start()
 
     def on_library_scan_finished(self):
-        self.on_sort_radio_toggled(None)
         self.__create_playlist_menus()
+        self.has_flowbox_album_loaded = False
+        self.has_flowbox_artist_loaded = False
+        self.__show_current_playlist()
 
     def on_library_artworks_activate(self, event):
         threading.Thread(target=lambda: self.__library_artwork()).start()
 
     def on_library_artworks_finished(self):
         self.__set_current_song_info()
+        self.has_flowbox_album_loaded = False
+        self.has_flowbox_artist_loaded = False
+        self.__show_current_playlist()
 
     def on_queue_add_activate(self, event):
         self.player.queue.clear()
-        self.player.queue.append([x.Path for x in LibraryPlaylist().songs()])
+        self.player.queue.append([x.Path for x in SongsPlaylist().collections()])
         self.player.queue.seek(self.player.queue.pop())
 
     def on_queue_add_playlist_activate(self, event):
-        order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
-        desc = self.userconfig['grid']['sort']['desc']
-        self.player.queue.clear()
-        self.player.queue.append([x.Path for x in self.current_playlist.songs(order, desc)])
+        try:
+            order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
+            desc = self.userconfig['grid']['sort']['desc']
+            self.player.queue.clear()
+            self.player.queue.append([x.Path for x in self.current_playlist.collections(order, desc)])
+        except AttributeError:
+            pass  # Not all playlist contain songs
 
     def on_queue_clear_activate(self, event):
         self.player.queue.clear()
@@ -526,4 +686,16 @@ class MainWindow(Gtk.Window):
             self.userconfig['grid']['sort']['field'] = order.name
 
             threading.Thread(target=self.userconfig.save).start()
-            threading.Thread(target=lambda: self.__create_model()).start()
+            self.has_flowbox_album_loaded = False
+            self.has_flowbox_artist_loaded = False
+            self.__show_current_playlist()
+
+    def on_flowbox_selected_children_changed(self, widget):
+        selected = widget.get_selected_children()
+        if any(selected):
+            if isinstance(selected[0].data, Album):
+                self.current_playlist = AlbumPlaylist(selected[0].data)
+            elif isinstance(selected[0].data, Artist):
+                self.current_playlist = ArtistPlaylist(selected[0].data)
+
+            self.__show_current_playlist()

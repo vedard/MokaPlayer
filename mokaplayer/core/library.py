@@ -1,6 +1,7 @@
 import logging
 import mimetypes
 import pathlib
+import peewee
 import time
 
 from mokaplayer.core.database import (Album, Artist, Playlist, Song,
@@ -81,7 +82,7 @@ class Library(object):
 
     def get_album(self, name, albumartist):
         try:
-            return Album.get(Album.Name == name, Album.Artist == albumartist)
+            return Album.get(Album.Name == name, peewee.fn.lower(Album.Artist) == albumartist.lower())
         except:
             return None
 
@@ -94,18 +95,21 @@ class Library(object):
             self.__sync_playlists()
 
     def sync_artwork(self):
-        """ For every album with a missing cover try to fetch it """
-        list_album = Album.select()
+        """ For every album and artist with a missing cover try to fetch it """
         with database_context.atomic():
-            for index, album in enumerate(list_album):
+            for album in Album.select():
                 if not album.Cover or not pathlib.Path(album.Cover).exists():
                     path = pathlib.Path(album.Path).parent if pathlib.Path(album.Path).is_file else album.Path
                     album.Cover = artworks.get_album_artwork(self.appconfig.LASTFM_SECRET_API_KEY,
                                                              self.artworks_folder, album.Name,
                                                              album.Artist, path)
                     album.save()
-                if index % 10 == 0:
-                    self.logger.info(f'Artworks fetch {index}/{len(list_album)}')
+
+            for artist in Artist.select():
+                if not artist.Cover or not pathlib.Path(artist.Cover).exists():
+                    artist.Cover = artworks.get_artist_artwork(self.appconfig.LASTFM_SECRET_API_KEY,
+                                                               self.artworks_folder, artist.Name)
+                    artist.save()
 
         self.logger.info(f'Artworks fetch completed')
 
