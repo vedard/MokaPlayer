@@ -299,7 +299,7 @@ class MainWindow(Gtk.Window):
         for playlist_location in self.player.library.get_playlists():
             m3u = M3uParser(playlist_location)
             menu_item = Gtk.MenuItem(label=m3u.name)
-            menu_item.connect('activate', self.on_menu_gridview_add_to_playlist_activate, m3u)
+            menu_item.connect('activate', self.on_menu_gridview_add_to_playlist_activate, m3u, self.menu_gridview)
             self.menuchild_gridview_playlist.append(menu_item)
             self.listbox_playlist.add(self.__create_sidebar_row(M3UPlaylist(m3u)))
 
@@ -427,8 +427,8 @@ class MainWindow(Gtk.Window):
         treeview = widget.get_parent().sender
         self.player.queue.prepend(self.__get_selected_songs(treeview))
 
-    def on_menu_gridview_add_to_playlist_activate(self, widget, playlist):
-        treeview = widget.get_parent().sender
+    def on_menu_gridview_add_to_playlist_activate(self, widget, playlist, menu):
+        treeview = menu.sender
         playlist.read()
         for path in self.__get_selected_songs(treeview):
             playlist.append(path)
