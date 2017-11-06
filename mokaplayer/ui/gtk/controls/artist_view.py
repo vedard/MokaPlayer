@@ -8,7 +8,7 @@ class ArtistView:
         self.view = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.view.pack_start(Gtk.Separator(margin_bottom=20, margin_left=10, margin_right=10, margin_top=0), False, True, 0)
 
-        for album_playlist in artist_playlist.collections():
+        for album_playlist in artist_playlist.collections_album():
             self.view.pack_start(AlbumView(album_playlist,
                                            row_activated,
                                            button_press_event).get_view(), False, False, 0)

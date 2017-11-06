@@ -558,35 +558,17 @@
       </packing>
     </child>
     <child>
-      <object class="GtkSearchBar" id="search_bar">
+      <object class="GtkSearchBar" id="goto_bar">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="show_close_button">True</property>
         <child>
-          <object class="GtkBox">
+          <object class="GtkEntry" id="txt_goto">
+            <property name="width_request">400</property>
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkSearchEntry" id="txt_search">
-                <property name="width_request">400</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="valign">center</property>
-                <property name="margin_top">3</property>
-                <property name="margin_bottom">3</property>
-                <property name="primary_icon_name">edit-find-symbolic</property>
-                <property name="primary_icon_activatable">False</property>
-                <property name="primary_icon_sensitive">False</property>
-                <property name="placeholder_text" translatable="yes">Search...</property>
-                <signal name="key-press-event" handler="on_txt_search_key_press_event" swapped="no"/>
-                <signal name="search-changed" handler="on_txt_search_search_changed" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
+            <property name="can_focus">True</property>
+            <property name="placeholder_text" translatable="yes">Go to...</property>
+            <signal name="key-press-event" handler="on_txt_goto_key_press_event" swapped="no"/>
           </object>
         </child>
       </object>
@@ -594,6 +576,34 @@
         <property name="expand">False</property>
         <property name="fill">True</property>
         <property name="position">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkSearchBar" id="search_bar">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="show_close_button">True</property>
+        <child>
+          <object class="GtkSearchEntry" id="txt_search">
+            <property name="width_request">400</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="valign">center</property>
+            <property name="margin_top">3</property>
+            <property name="margin_bottom">3</property>
+            <property name="primary_icon_name">edit-find-symbolic</property>
+            <property name="primary_icon_activatable">False</property>
+            <property name="primary_icon_sensitive">False</property>
+            <property name="placeholder_text" translatable="yes">Search...</property>
+            <signal name="key-press-event" handler="on_txt_search_key_press_event" swapped="no"/>
+            <signal name="search-changed" handler="on_txt_search_search_changed" swapped="no"/>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">2</property>
       </packing>
     </child>
     <child>
@@ -785,7 +795,7 @@
       <packing>
         <property name="expand">False</property>
         <property name="fill">True</property>
-        <property name="position">2</property>
+        <property name="position">3</property>
       </packing>
     </child>
     <child>
@@ -797,7 +807,7 @@
       <packing>
         <property name="expand">False</property>
         <property name="fill">True</property>
-        <property name="position">3</property>
+        <property name="position">4</property>
       </packing>
     </child>
     <child>
@@ -1305,7 +1315,7 @@
       <packing>
         <property name="expand">True</property>
         <property name="fill">True</property>
-        <property name="position">4</property>
+        <property name="position">5</property>
       </packing>
     </child>
   </object>

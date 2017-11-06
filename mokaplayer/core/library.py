@@ -6,6 +6,7 @@ import time
 
 from mokaplayer.core.database import (Album, Artist, Playlist, Song,
                                       database_context)
+from mokaplayer.core import playlists
 from mokaplayer.core.fetchers import artworks
 from mokaplayer.core.m3u_parser import M3uParser
 
@@ -76,6 +77,21 @@ class Library(object):
             return Song.get(Song.Path == path)
         except:
             return None
+
+    def get_playlist(self, name):
+        try:
+            x = Artist.get(Artist.Name == name)
+            return playlists.ArtistPlaylist(x)
+        except peewee.DoesNotExist:
+            pass
+
+        try:
+            x = Album.get(Album.Name == name)
+            return playlists.AlbumPlaylist(x)
+        except peewee.DoesNotExist:
+            pass
+
+        return None
 
     def get_playlists(self):
         return [x.Path for x in Playlist.select(Playlist.Path)]

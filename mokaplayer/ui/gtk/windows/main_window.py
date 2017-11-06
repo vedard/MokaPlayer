@@ -44,8 +44,7 @@ class MainWindow(Gtk.Window):
 
         style_provider = Gtk.CssProvider()
         style_provider.load_from_path(self.CSS_FILE)
-        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(
-        ), style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), style_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         if self.userconfig['gtk']['darktheme']:
             settings = Gtk.Settings.get_default()
@@ -60,6 +59,7 @@ class MainWindow(Gtk.Window):
         self.__init_sort_radio()
         self.__init_gridview_columns()
         self.__init_sidebar()
+        self.__init_txt_goto()
 
         self.builder.connect_signals(self)
         self.player.state_changed.subscribe(self.on_player_state_changed)
@@ -88,6 +88,36 @@ class MainWindow(Gtk.Window):
             self.player.library.musics_folder = dialog.get_filename()
             self.on_library_scan_activate(None)
         dialog.destroy()
+
+    def __manage_goto(self):
+        p = self.player.library.get_playlist(self.txt_goto.get_text())
+        if p:
+            self.current_playlist = p
+            self.__show_current_playlist()
+            self.goto_bar.set_search_mode(False)
+            GObject.idle_add(lambda: self.txt_goto.set_text(''))
+
+    def __init_txt_goto(self):
+        completion = Gtk.EntryCompletion()
+        store = Gtk.ListStore(str)
+
+        artists_name = {x.Name for x in ArtistsPlaylist().collections()}
+        albums_name = {x.Name for x in AlbumsPlaylist().collections()}
+
+        for x in artists_name.union(albums_name):
+            store.append([x])
+
+        completion.set_model(store)
+        completion.set_text_column(0)
+        completion.set_inline_completion(True)
+        completion.set_match_func(self.__txt_goto_match_func)
+        completion.set_inline_selection(True)
+        completion.connect('match_selected', lambda x, y, z: self.__manage_goto())
+        self.txt_goto.set_completion(completion)
+
+    def __txt_goto_match_func(self, completion, key_string, iter):
+        modelstr = completion.get_model()[iter][0].lower()
+        return key_string.lower() in modelstr
 
     def __init_gridview_columns(self):
         columns = self.gridview.get_columns()
@@ -142,6 +172,7 @@ class MainWindow(Gtk.Window):
         self.img_play = self.builder.get_object('img_play')
         self.img_pause = self.builder.get_object('img_pause')
         self.txt_search = self.builder.get_object('txt_search')
+        self.txt_goto = self.builder.get_object('txt_goto')
         self.lbl_current_time = self.builder.get_object('lbl_current_time')
         self.prb_current_time = self.builder.get_object('prb_current_time')
         self.radio_sort_artist = self.builder.get_object('radio_sort_artist')
@@ -155,6 +186,7 @@ class MainWindow(Gtk.Window):
         self.chk_sort_desc = self.builder.get_object('chk_sort_desc')
         self.menu_gridview = self.builder.get_object('menu_gridview')
         self.search_bar = self.builder.get_object('search_bar')
+        self.goto_bar = self.builder.get_object('goto_bar')
         self.menuchild_gridview_playlist = self.builder.get_object('menuchild_gridview_playlist')
         self.menu_gridview_remove_from_playlist = self.builder.get_object('menu_gridview_remove_from_playlist')
         self.listbox_playlist = self.builder.get_object('listbox_playlist')
@@ -391,10 +423,15 @@ class MainWindow(Gtk.Window):
             self.search_bar.set_search_mode(not search_mode)
             if not search_mode:
                 self.txt_search.grab_focus()
+                self.goto_bar.set_search_mode(False)
         elif ctrl and keyval_name == 'l':
             self.__show_lyrics(self.player.queue.peek())
         elif ctrl and keyval_name == 'p':
-            self.__show_sidebar(not self.playlist_sidebar.get_reveal_child())
+            search_mode = self.goto_bar.get_search_mode()
+            self.goto_bar.set_search_mode(not search_mode)
+            if not search_mode:
+                self.txt_goto.grab_focus()
+                self.search_bar.set_search_mode(False)
         elif ctrl and keyval_name == 'o':
             self.__focus_song(self.player.queue.peek())
         elif ctrl and keyval_name == 'g':
@@ -406,7 +443,10 @@ class MainWindow(Gtk.Window):
         elif ctrl and keyval_name == 'Right':
             self.player.streamer.volume += 0.05
         elif keyval_name == "Escape":
+            self.txt_search.set_text('')
+            self.txt_goto.set_text('')
             self.search_bar.set_search_mode(False)
+            self.goto_bar.set_search_mode(False)
         elif keyval_name == "space" and not self.txt_search.has_focus():
             self.player.toggle()
         else:
@@ -526,6 +566,11 @@ class MainWindow(Gtk.Window):
     def on_volume_scale_value_changed(self, widget):
         self.player.streamer.volume = self.volume_scale.get_value() / 100
 
+    def on_txt_goto_key_press_event(self, wiget, event):
+        keyval_name = Gdk.keyval_name(event.keyval)
+        if keyval_name == "Return":
+            self.__manage_goto()
+
     def on_txt_search_key_press_event(self, widget, event):
         keyval_name = Gdk.keyval_name(event.keyval)
         if keyval_name == "Return" and any(self.model):
@@ -607,6 +652,7 @@ class MainWindow(Gtk.Window):
 
     def on_view_toggle_search_activate(self, widget):
         self.search_bar.set_search_mode(not self.search_bar.get_search_mode())
+        self.goto_bar.set_search_mode(False)
 
     def on_view_toggle_sidebar_activate(self, widget):
         self.__show_sidebar(not self.playlist_sidebar.get_reveal_child())
