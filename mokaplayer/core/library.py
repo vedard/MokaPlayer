@@ -94,12 +94,12 @@ class Library(object):
         return None
 
     def get_playlists(self):
-        return [x.Path for x in Playlist.select(Playlist.Path)]
+        return [playlists.M3UPlaylist(x.Path) for x in Playlist.select(Playlist.Path)]
 
     def get_album(self, name, albumartist):
         try:
             return Album.get(Album.Name == name, peewee.fn.lower(Album.Artist) == albumartist.lower())
-        except:
+        except peewee.DoesNotExist:
             return None
 
     def create_playlist(self, name):
@@ -149,6 +149,7 @@ class Library(object):
 
     def __sync_songs(self):
         paths = []
+        # Create a list of every potential file in the music folder
         for x in pathlib.Path(self.musics_folder).glob('**/*'):
             if x.is_dir():
                 continue
@@ -223,18 +224,3 @@ class Library(object):
                             where album.NAME = song.album AND
                                     album.artist LIKE song.albumartist)
         """)
-
-    # def vplayer_library_converter(self):
-    #     import udatetime, json, gzip, os
-    #     with DB.atomic():
-    #         with gzip.open('/run/media/vincent/D-DRV/Documents/Autre/Dotfiles/VPlayer/library.gz', mode="rt") as f:
-    #             json_library = json.loads(f.read())
-    #             songs = json_library["songs"]
-    #             for index, x in enumerate(songs):
-    #                 for real in Song.select().where(Song.Path ** ('%' + x['path'][-20:])):
-    #                     if os.path.samefile(real.Path, x['path']):
-    #                         real.Added = udatetime.from_string(x.get('added', 0))
-    #                         real.save()
-    #                         break
-    #                 if (index % 10 == 0):
-    #                     print(f'{index}/{len(songs)}')

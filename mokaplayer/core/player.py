@@ -6,7 +6,7 @@ import pathlib
 import time
 from threading import Thread
 
-from mokaplayer.core.event import Event
+from mokaplayer.core.helpers.event import Event
 from mokaplayer.core.keyboard import KeyboardClient
 from mokaplayer.core.library import Library
 from mokaplayer.core.queue import Queue

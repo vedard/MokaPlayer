@@ -2,6 +2,12 @@ import logging
 
 
 class KeyboardClient:
+    """ Control the musicplayer with the keyboard using PyHook3 library
+        - XF86AudioNext
+        - XF86AudioPrev
+        - XF86AudioPlay
+    """
+
     def __init__(self, player):
         self.player = player
         self.logger = logging.getLogger('KeyboardClient')

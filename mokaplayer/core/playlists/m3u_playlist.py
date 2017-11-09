@@ -2,19 +2,24 @@ import pathlib
 
 from mokaplayer.core.database import Song
 from mokaplayer.core.playlists import AbstractPlaylist
+from mokaplayer.core.m3u_parser import M3uParser
 
 
 class M3UPlaylist(AbstractPlaylist):
-    def __init__(self, m3u_parser):
-        self.m3u_parser = m3u_parser
+    def __init__(self, path):
+        self._parser = M3uParser(path)
+
+    @property
+    def parser(self):
+        return self._parser
 
     @property
     def name(self):
-        return self.m3u_parser.name
+        return self.parser.name
 
     def collections(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
-        paths = list(self.m3u_parser) if not desc else list(reversed(self.m3u_parser))
-        playlist_folder = pathlib.Path(self.m3u_parser.location).parent
+        paths = list(self.parser) if not desc else list(reversed(self.parser))
+        playlist_folder = pathlib.Path(self.parser.location).parent
         query = Song.select().where(Song.Path << paths |
                                     Song.Path << [playlist_folder / (path) for path in paths])
 

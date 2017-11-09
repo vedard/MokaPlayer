@@ -5,7 +5,6 @@ import time
 import pkg_resources
 from gi.repository import Gdk, GObject, Gtk, Pango
 from mokaplayer.core.helpers import time_helper
-from mokaplayer.core.m3u_parser import M3uParser
 from mokaplayer.core.database import Artist, Album
 from mokaplayer.ui.gtk.adapter import AdapterSong
 from mokaplayer.ui.gtk.helper import file_helper, image_helper
@@ -334,12 +333,12 @@ class MainWindow(Gtk.Window):
         self.listbox_playlist.add(self.__create_sidebar_row(RecentlyAddedPlaylist()))
         self.listbox_playlist.add(self.__create_sidebar_header('Playlists'))
 
-        for playlist_location in self.player.library.get_playlists():
-            m3u = M3uParser(playlist_location)
-            menu_item = Gtk.MenuItem(label=m3u.name)
-            menu_item.connect('activate', self.on_menu_gridview_add_to_playlist_activate, m3u, self.menu_gridview)
+        for playlist in self.player.library.get_playlists():
+            menu_item = Gtk.MenuItem(label=playlist.name)
+            menu_item.connect('activate', self.on_menu_gridview_add_to_playlist_activate,
+                              playlist, self.menu_gridview)
             self.menuchild_gridview_playlist.append(menu_item)
-            self.listbox_playlist.add(self.__create_sidebar_row(M3UPlaylist(m3u)))
+            self.listbox_playlist.add(self.__create_sidebar_row(playlist))
 
         self.menuchild_gridview_playlist.show_all()
         self.listbox_playlist.show_all()
@@ -479,18 +478,18 @@ class MainWindow(Gtk.Window):
 
     def on_menu_gridview_add_to_playlist_activate(self, widget, playlist, menu):
         treeview = menu.sender
-        playlist.read()
+        playlist.parser.read()
         for path in self.__get_selected_songs(treeview):
-            playlist.append(path)
-        playlist.write()
+            playlist.parser.append(path)
+        playlist.parser.write()
 
     def on_menu_gridview_remove_from_playlist_activate(self, widget):
         treeview = widget.get_parent().sender
         if isinstance(self.current_playlist, M3UPlaylist):
-            self.current_playlist.m3u_parser.read()
+            self.current_playlist.parser.read()
             for path in self.__get_selected_songs(treeview):
-                self.current_playlist.m3u_parser.remove(path)
-            self.current_playlist.m3u_parser.write()
+                self.current_playlist.parser.remove(path)
+            self.current_playlist.parser.write()
             self.__show_current_playlist()
 
     def on_menu_gridview_replace_activate(self, widget):
