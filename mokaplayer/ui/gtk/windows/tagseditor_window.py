@@ -94,7 +94,7 @@ class TagsEditorWindow:
                     song.Year = years[index]
                     song.Comment = comments[index]
                     song.Genre = genres[index]
-                    song.Added = arrow.get(addeds[index]).naive
+                    song.Added = arrow.get(addeds[index]).naive.date()
                     song.save()
                     song.write_tags()
 
