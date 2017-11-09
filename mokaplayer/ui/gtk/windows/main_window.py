@@ -496,7 +496,7 @@ class MainWindow(Gtk.Window):
     def on_menu_gridview_replace_activate(self, widget):
         treeview = widget.get_parent().sender
         self.player.queue.clear()
-        self.player.queue.append( self.__get_selected_songs(treeview))
+        self.player.queue.append(self.__get_selected_songs(treeview))
 
     def on_menu_gridview_edit_activate(self, widget):
         treeview = widget.get_parent().sender

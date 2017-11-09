@@ -3,6 +3,7 @@ import peewee
 from mokaplayer.core.database import Artist, Song, Album
 from mokaplayer.core.playlists import AbstractPlaylist, AlbumPlaylist
 
+
 class ArtistPlaylist(AbstractPlaylist):
 
     def __init__(self, artist=None, song_path=None):
@@ -11,7 +12,6 @@ class ArtistPlaylist(AbstractPlaylist):
         elif song_path:
             song = Song.get(Song.Path == song_path)
             self.artist = Artist.get(Artist.Name == song.AlbumArtist)
-
 
     @property
     def name(self):
