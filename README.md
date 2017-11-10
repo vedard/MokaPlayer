@@ -1,11 +1,16 @@
 # MokaPlayer
 
-A simple music player written in python 
+A music player written in python 
     
 ![](mokaplayer/data/screenshot.png)
    
-##  Installation
+## Prerequisites
+-   TagLib
+-   Python 3.6.0
+-   PyGObject
+-   GStreamer
 
+## Installing
 ```sh
 pip install mokaplayer
 ```
@@ -14,7 +19,9 @@ pip install mokaplayer
 -   Support all the most popular music file formats
 -   Gapless playback
 -   Resumes playback on startup
--   Playlist
+-   Playlists
+-   Go to [Artist/Album] with CTRL-P
+-   Filter with CTRL-F
 -   Automatically fetch:
     - Album covers
     - Artist covers
