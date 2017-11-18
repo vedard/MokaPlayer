@@ -18,7 +18,10 @@ class M3UPlaylist(AbstractPlaylist):
         return self.parser.name
 
     def collections(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
-        paths = list(self.parser) if not desc else list(reversed(self.parser))
+        paths = list(self.parser)
+        if desc:
+            paths = list(reversed(self.parser))
+
         playlist_folder = pathlib.Path(self.parser.location).parent
         query = Song.select().where(Song.Path << paths |
                                     Song.Path << [playlist_folder / (path) for path in paths])
