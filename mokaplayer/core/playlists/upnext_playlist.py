@@ -13,5 +13,5 @@ class UpNextPlaylist(AbstractPlaylist):
     def collections(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False):
         result = {x.Path: x for x in Song.select()}
         for path in list(self.queue):
-            if not path == self.queue.peek():
+            if not path == self.queue.peek() and path in result:
                 yield result[path]
