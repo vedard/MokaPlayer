@@ -1,6 +1,6 @@
 from mokaplayer.application import Application
 
-__version__ = '0.5.1.3'
+__version__ = '0.5.1.4'
 
 
 def main():

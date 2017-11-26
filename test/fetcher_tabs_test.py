@@ -4,7 +4,6 @@ import pathlib
 
 from mokaplayer.core.fetchers import tabs as tabsfetcher
 
-@unittest.skip('')
 class FetcherTabsTest(unittest.TestCase):
 
     FOLDER = './test/tabs'
@@ -16,7 +15,7 @@ class FetcherTabsTest(unittest.TestCase):
         shutil.rmtree(FetcherTabsTest.FOLDER)
 
     def test_flow(self):
-        tabs = tabsfetcher.search('Enter Sandman', 'Metallica')
+        tabs = tabsfetcher.search('One', 'Metallica')
         self.assertGreater(len(tabs), 0)
         self.assertIsNotNone(tabs[0])
 
@@ -26,5 +25,5 @@ class FetcherTabsTest(unittest.TestCase):
         ascii_text = tabsfetcher.fetch_ascii_tab(ascii_tab['url'])
         path = tabsfetcher.download_guitar_pro_tab(guitar_pro['url'], FetcherTabsTest.FOLDER)
 
-        self.assertIsNotNone(ascii_tab)
+        self.assertIsNotNone(ascii_text)
         self.assertTrue(pathlib.Path(path).is_file())

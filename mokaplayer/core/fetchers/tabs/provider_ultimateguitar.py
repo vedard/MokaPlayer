@@ -72,26 +72,26 @@ class ProviderUltimateGuitar():
             response = requests.get(url)
             if response.ok:
                 page = html.fromstring(response.content)
-                nodes = page.xpath('//input[@id="tab_id"]/@value')
+                tab_id = page.xpath('//input[@id="tab_id"]/@value')[0]
+                session_id = page.xpath('//input[@name="session_id"]/@value')[0]
 
-                if any(nodes):
-                    try:
-                        response = requests.get(ProviderUltimateGuitar.DOWNLOAD_URL,
-                                                params={
-                                                    'id': nodes[0]
-                                                })
-                        filename = re.findall('filename\s*?=\s?"(.+)"',
-                                              response.headers['Content-Disposition'])[0]
+                response = requests.get(ProviderUltimateGuitar.DOWNLOAD_URL,
+                                        params={
+                                            'id': tab_id,
+                                            'session_id': session_id
+                                        }, headers={
+                                            "Referer": url,
+                                        })
+                print(response.url)
+                filename = re.findall('filename\s*?=\s?"(.+)"',
+                                      response.headers['Content-Disposition'])[0]
 
-                        os.makedirs(directory, exist_ok=True)
-                        path = os.path.join(directory, filename)
+                os.makedirs(directory, exist_ok=True)
+                path = os.path.join(directory, filename)
 
-                        with open(path, 'wb') as f:
-                            f.write(response.content)
-                            return path
-                    except:
-                        logging.exception('Could not download guitar pro tabs for id: ' + nodes[0])
-
+                with open(path, 'wb') as f:
+                    f.write(response.content)
+                    return path
         except:
             logging.exception('Could not download guitar pro tabs for: ' + url)
 
