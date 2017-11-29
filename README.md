@@ -19,6 +19,7 @@ pip install mokaplayer
 -   Support all the most popular music file formats
 -   Gapless playback
 -   Resumes playback on startup
+-   Edit tags for multiple files at the same time
 -   Playlists
 -   Go to [Artist/Album] with CTRL-P
 -   Filter with CTRL-F
