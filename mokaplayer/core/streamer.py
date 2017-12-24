@@ -37,7 +37,23 @@ class Streamer(object):
         WAVESCOPE = 'wavescope'
 
         def __iter__(self):
-            return iter(['Goom', 'Spacescope', 'Spectrascope', 'Synaescope', 'Wavescope'])
+            return iter([
+                'Goom',
+                'Goom2k1',
+                'Spacescope',
+                'Spectrascope',
+                'Synaescope',
+                'Wavescope',
+                # 'Monoscope',
+                "Libvisual Oinksie",
+                "Libvisual Lv Scope",
+                "Libvisual Lv Analyzer",
+                "Libvisual Jakdaw",
+                "Libvisual Infinite",
+                "Libvisual Corona",
+                "Libvisual Bumpscope",
+                "Libvisual Jess",
+            ])
 
     def __init__(self, about_to_finish=None, audio_changed=None, notify_volume=None):
         Gst.init(None)
@@ -96,7 +112,7 @@ class Streamer(object):
 
     @visualizer.setter
     def visualizer(self, value):
-        self._visualizer = value.lower() if value else ''
+        self._visualizer = value.lower().replace(' ', '_') if value else ''
         self.logger.debug(f'Visualizer:{self._visualizer}')
         if value == 'blank' or value is None:
             self._playbin.props.flags = self._playbin.props.flags & ~(1 << 3)
