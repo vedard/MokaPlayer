@@ -1260,6 +1260,9 @@
                   <object class="GtkOverlay">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="margin_left">10</property>
+                    <property name="margin_right">10</property>
+                    <property name="margin_top">10</property>
                     <child>
                       <object class="GtkDrawingArea" id="visualizer">
                         <property name="visible">True</property>
@@ -1273,7 +1276,6 @@
                     </child>
                     <child type="overlay">
                       <object class="GtkComboBox" id="cmb_visualiser">
-                        <property name="width_request">100</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="halign">end</property>
