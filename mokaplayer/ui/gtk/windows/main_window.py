@@ -219,6 +219,9 @@ class MainWindow(Gtk.Window):
         self.add(self.content)
 
     def __show_current_playlist(self):
+        if self.is_visualizer_on():
+            self.turn_visualizer_off()
+
         self.lbl_playlist.set_text(self.current_playlist.name)
         if isinstance(self.current_playlist, AlbumPlaylist):
             for child in self.album_viewport.get_children():
@@ -680,15 +683,23 @@ class MainWindow(Gtk.Window):
         self.__show_sidebar(not self.playlist_sidebar.get_reveal_child())
 
     def on_view_toggle_visualization_activate(self, Widget):
-        is_visible = self.stack.get_visible_child_name() == 'visualizer'
-        if is_visible:
-            self.stack.set_visible_child_name('gridview')
-            self.box_view_title.set_visible(True)
-            self.player.streamer.visualizer = None
+        if self.is_visualizer_on():
+            self.turn_visualizer_off()
         else:
-            self.box_view_title.set_visible(False)
-            self.stack.set_visible_child_name('visualizer')
-            self.player.streamer.visualizer = self.cmb_visualiser.get_child().get_text()
+            self.turn_visualizer_on()
+
+    def is_visualizer_on(self):
+        return self.stack.get_visible_child_name() == 'visualizer'
+
+    def turn_visualizer_on(self):
+        self.box_view_title.set_visible(False)
+        self.stack.set_visible_child_name('visualizer')
+        self.player.streamer.visualizer = self.cmb_visualiser.get_child().get_text()
+
+    def turn_visualizer_off(self):
+        self.stack.set_visible_child_name('gridview')
+        self.box_view_title.set_visible(True)
+        self.player.streamer.visualizer = None
 
     def on_cmb_visualiser_changed(self, widget):
         self.player.streamer.visualizer = self.cmb_visualiser.get_child().get_text()
