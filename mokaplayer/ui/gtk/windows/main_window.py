@@ -454,6 +454,8 @@ class MainWindow(Gtk.Window):
                 self.search_bar.set_search_mode(False)
         elif ctrl and keyval_name == 'o':
             self.__focus_song(self.player.queue.peek())
+        elif ctrl and keyval_name == 'y':
+            self.on_view_toggle_visualization_activate(None)
         elif ctrl and keyval_name == 'g':
             if self.player.queue.peek():
                 self.current_playlist = ArtistPlaylist(song_path=self.player.queue.peek())

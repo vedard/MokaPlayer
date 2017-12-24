@@ -58,6 +58,13 @@
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="visible">1</property>
+                <property name="accelerator">&lt;ctrl&gt;Y</property>
+                <property name="title" translatable="yes">Audio visualization</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">1</property>
                 <property name="accelerator">&lt;ctrl&gt;Right</property>
                 <property name="title" translatable="yes">Lower the volume</property>
               </object>
