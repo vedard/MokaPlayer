@@ -59,6 +59,7 @@ class MainWindow(Gtk.Window):
         self.__init_gridview_columns()
         self.__init_sidebar()
         self.__init_txt_goto()
+        self.__init_cmb_visualiser()
 
         self.builder.connect_signals(self)
         self.player.state_changed.subscribe(self.on_player_state_changed)
@@ -75,6 +76,16 @@ class MainWindow(Gtk.Window):
 
         if not self.player.library.is_musics_folder_valid():
             self.__ask_for_music_folder()
+
+    def on_visualizer_realize(self, data):
+        self.player.streamer.draw_on(self.visualizer.get_property('window').get_xid())
+
+    def on_visualizer_draw(self, widget, data):
+        allocation = widget.get_allocation()
+        data.set_source_rgb(0, 0, 0)
+        data.rectangle(0, 0, allocation.width, allocation.height)
+        data.fill()
+        return False
 
     def __ask_for_music_folder(self):
         dialog = Gtk.FileChooserDialog("Select where is your music", self,
@@ -117,6 +128,13 @@ class MainWindow(Gtk.Window):
     def __txt_goto_match_func(self, completion, key_string, iter):
         modelstr = completion.get_model()[iter][0].lower()
         return key_string.lower() in modelstr
+
+    def __init_cmb_visualiser(self):
+        store = Gtk.ListStore(str)
+        for x in self.player.streamer.Visualizer():
+            store.append([x])
+
+        self.cmb_visualiser.set_model(store)
 
     def __init_gridview_columns(self):
         columns = self.gridview.get_columns()
@@ -195,6 +213,9 @@ class MainWindow(Gtk.Window):
         self.flowbox_album = self.builder.get_object('flowbox_album')
         self.stack = self.builder.get_object('stack')
         self.album_viewport = self.builder.get_object('album_viewport')
+        self.visualizer = self.builder.get_object('visualizer')
+        self.cmb_visualiser = self.builder.get_object('cmb_visualiser')
+        self.box_view_title = self.builder.get_object('box_view_title')
         self.add(self.content)
 
     def __show_current_playlist(self):
@@ -655,6 +676,20 @@ class MainWindow(Gtk.Window):
 
     def on_view_toggle_sidebar_activate(self, widget):
         self.__show_sidebar(not self.playlist_sidebar.get_reveal_child())
+
+    def on_view_toggle_visualization_activate(self, Widget):
+        is_visible = self.stack.get_visible_child_name() == 'visualizer'
+        if is_visible:
+            self.stack.set_visible_child_name('gridview')
+            self.box_view_title.set_visible(True)
+            self.player.streamer.visualizer = None
+        else:
+            self.box_view_title.set_visible(False)
+            self.stack.set_visible_child_name('visualizer')
+            self.player.streamer.visualizer = self.cmb_visualiser.get_child().get_text()
+
+    def on_cmb_visualiser_changed(self, widget):
+        self.player.streamer.visualizer = self.cmb_visualiser.get_child().get_text()
 
     def on_prp_current_time_click(self, widget, event):
         width = self.prb_current_time.get_allocated_width()

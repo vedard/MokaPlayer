@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.1 -->
+<!-- Generated with glade 3.20.2 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkImage" id="img_next">
@@ -477,7 +477,7 @@
                   <object class="GtkMenuItem" id="view_toggle_search">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Toggle Searchbar</property>
+                    <property name="label" translatable="yes">Toggle searchbar</property>
                     <property name="use_underline">True</property>
                     <signal name="activate" handler="on_view_toggle_search_activate" swapped="no"/>
                   </object>
@@ -486,9 +486,18 @@
                   <object class="GtkMenuItem" id="view_toggle_sidebar">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Toggle Sidebar</property>
+                    <property name="label" translatable="yes">Toggle sidebar</property>
                     <property name="use_underline">True</property>
                     <signal name="activate" handler="on_view_toggle_sidebar_activate" swapped="no"/>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="view_toggle_visualization">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Toggle visualization</property>
+                    <property name="use_underline">True</property>
+                    <signal name="activate" handler="on_view_toggle_visualization_activate" swapped="no"/>
                   </object>
                 </child>
               </object>
@@ -950,7 +959,7 @@
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="box_view_title">
                 <property name="name">playlist_title_box</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -1245,6 +1254,51 @@
                     <property name="name">album_view</property>
                     <property name="title" translatable="yes">page0</property>
                     <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkOverlay">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkDrawingArea" id="visualizer">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <signal name="draw" handler="on_visualizer_draw" swapped="no"/>
+                        <signal name="realize" handler="on_visualizer_realize" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="index">-1</property>
+                      </packing>
+                    </child>
+                    <child type="overlay">
+                      <object class="GtkComboBox" id="cmb_visualiser">
+                        <property name="width_request">100</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">end</property>
+                        <property name="valign">start</property>
+                        <property name="margin_left">5</property>
+                        <property name="margin_right">5</property>
+                        <property name="margin_top">5</property>
+                        <property name="margin_bottom">5</property>
+                        <property name="active">1</property>
+                        <property name="has_entry">True</property>
+                        <property name="entry_text_column">0</property>
+                        <property name="id_column">0</property>
+                        <signal name="changed" handler="on_cmb_visualiser_changed" swapped="no"/>
+                        <child internal-child="entry">
+                          <object class="GtkEntry">
+                            <property name="can_focus">False</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="name">visualizer</property>
+                    <property name="title" translatable="yes">page0</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
               </object>

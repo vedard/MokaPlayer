@@ -5,7 +5,8 @@ import pathlib
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstAudio', '1.0')
-from gi.repository import Gst, GstAudio
+gi.require_version('GstVideo', '1.0')
+from gi.repository import Gst, GstAudio, GstVideo
 
 
 class Streamer(object):
@@ -28,11 +29,22 @@ class Streamer(object):
         STOPED = enum.auto()
         PAUSED = enum.auto()
 
+    class Visualizer():
+        GOOM = 'goom'
+        SPACESCOPE = 'spacescope'
+        SPECTRASCOPE = 'spectrascope'
+        SYNAESCOPE = 'synaescope'
+        WAVESCOPE = 'wavescope'
+
+        def __iter__(self):
+            return iter(['Goom', 'Spacescope', 'Spectrascope', 'Synaescope', 'Wavescope'])
+
     def __init__(self, about_to_finish=None, audio_changed=None, notify_volume=None):
         Gst.init(None)
         self.logger = logging.getLogger('Streamer')
         self._state = Streamer.State.STOPED
         self._playbin = Gst.ElementFactory.make('playbin', None)
+        self._playbin.set_property("video-sink", Gst.ElementFactory.make("ximagesink"))
 
         self.audio_changed = audio_changed
 
@@ -73,6 +85,25 @@ class Streamer(object):
         self._playbin.set_state(Gst.State.PLAYING)
         self._state = Streamer.State.PLAYING
         self.logger.debug('PLAYING')
+
+    def draw_on(self, xid):
+        self.logger.debug(f'Surface:{xid}')
+        self._playbin.set_window_handle(xid)
+
+    @property
+    def visualizer(self):
+        return self._visualizer
+
+    @visualizer.setter
+    def visualizer(self, value):
+        self._visualizer = value.lower() if value else ''
+        self.logger.debug(f'Visualizer:{self._visualizer}')
+        if value == 'blank' or value is None:
+            self._playbin.props.flags = self._playbin.props.flags & ~(1 << 3)
+        else:
+            self._playbin.props.flags = self._playbin.props.flags | (1 << 3)
+            self._playbin.set_property('vis-plugin', Gst.ElementFactory.make(self._visualizer))
+
 
     @property
     def stream(self):
