@@ -360,6 +360,15 @@
                   </object>
                 </child>
                 <child>
+                  <object class="GtkMenuItem" id="player_equalizer">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Equalizer...</property>
+                    <property name="use_underline">True</property>
+                    <signal name="activate" handler="on_player_equalizer_activate" swapped="no"/>
+                  </object>
+                </child>
+                <child>
                   <object class="GtkMenuItem" id="player_preferences">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>

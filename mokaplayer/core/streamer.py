@@ -52,11 +52,17 @@ class Streamer(object):
     def __init__(self, about_to_finish=None, audio_changed=None, notify_volume=None):
         Gst.init(None)
         self.logger = logging.getLogger('Streamer')
-        self._state = Streamer.State.STOPED
-        self._playbin = Gst.ElementFactory.make('playbin', None)
-        self._playbin.set_property("video-sink", Gst.ElementFactory.make("ximagesink"))
-        self._visualizer = None
 
+        self._visualizer = None
+        self._state = Streamer.State.STOPED
+        self._playbin = Gst.ElementFactory.make('playbin')
+        self._videosink = Gst.ElementFactory.make('ximagesink')
+        self._equalizer = Gst.ElementFactory.make("equalizer-10bands")
+
+        self._playbin.props.audio_filter = self._equalizer
+        self._playbin.props.video_sink = self._videosink
+
+        # Set  callbacks
         self.audio_changed = audio_changed
 
         if about_to_finish is not None:
@@ -101,6 +107,20 @@ class Streamer(object):
         self.logger.debug(f'Surface:{xid}')
         self._playbin.set_window_handle(xid)
 
+    def get_equalizer_band(self, index):
+        """
+        index: between 0 and 9
+        value: between -24.0 and 12.0
+        """
+        return self._equalizer.get_property("band" + str(index))
+
+    def set_equalizer_band(self, index, value):
+        """
+        index: between 0 and 9
+        value: between -24.0 and 12.0
+        """
+        self._equalizer.set_property("band" + str(index), value)
+
     @property
     def visualizer(self):
         return self._visualizer
@@ -120,7 +140,6 @@ class Streamer(object):
 
         if self._visualizer and need_to_change_vis_plugin:
             self._playbin.props.vis_plugin = Gst.ElementFactory.make(self._visualizer, self._visualizer)
-
 
     @property
     def stream(self):

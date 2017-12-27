@@ -98,14 +98,17 @@ class Player(object):
             if pathlib.Path(self.appconfig.PLAYER_CACHE_FILE).is_file():
                 with gzip.open(self.appconfig.PLAYER_CACHE_FILE, 'rt') as file:
                     data = json.load(file)
-
-                    self.streamer.volume = data['Volume']
+                    self.streamer.volume = data.get('Volume', 50)
                     self.queue.clear()
-                    self.queue.append(data['Queue'])
+                    self.queue.append(data.get('Queue', []))
                     self.seek(data['Current'])
                     self.pause()
                     time.sleep(0.3)
-                    self.streamer.position = data['Position']
+                    self.streamer.position = data.get('Position', 0)
+
+                    for i, x in enumerate(data.get('Equalizer', [])):
+                        self.streamer.set_equalizer_band(i, x)
+
         except Exception as e:
             self.logger.exception('Could not restore player state')
 
@@ -119,6 +122,7 @@ class Player(object):
                     "Current": self.queue.peek(),
                     "Position": self.streamer.position,
                     "Volume": self.streamer.volume,
+                    "Equalizer": [self.streamer.get_equalizer_band(x) for x in range(10)]
                 }, file)
         except Exception as e:
             self.logger.exception('Could not save player state')

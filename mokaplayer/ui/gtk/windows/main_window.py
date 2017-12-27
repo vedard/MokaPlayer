@@ -11,7 +11,7 @@ from mokaplayer.ui.gtk.helper import file_helper, image_helper
 from mokaplayer.ui.gtk.controls import AlbumView, ArtistView
 from mokaplayer.ui.gtk.windows import (AboutWindow, HelpShortcutsWindow,
                                        InputBox, LyricsWindow, TabsWindow,
-                                       TagsEditorWindow)
+                                       TagsEditorWindow, EqualizerWindow)
 from mokaplayer.core.playlists import (AbstractPlaylist, SongsPlaylist,
                                        M3UPlaylist, MostPlayedPlaylist,
                                        RarelyPlayedPlaylist,
@@ -624,6 +624,11 @@ class MainWindow(Gtk.Window):
                 self.__show_current_playlist()
             elif isinstance(self.current_playlist, AlbumsPlaylist):
                 self.__show_current_playlist()
+
+    def on_player_equalizer_activate(self, event):
+        w = EqualizerWindow(self.player.streamer)
+        w.get_window().set_transient_for(self)
+        w.get_window().show()
 
     def on_player_open_stream_activate(self, event):
         pass

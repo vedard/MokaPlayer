@@ -22,6 +22,7 @@ pip install mokaplayer
 -   Edit tags for multiple files at the same time
 -   Playlists
 -   Audio visualization
+-   10 Band Equalizer
 -   Go to [Artist/Album] with CTRL-P
 -   Filter with CTRL-F
 -   Automatically fetch:
