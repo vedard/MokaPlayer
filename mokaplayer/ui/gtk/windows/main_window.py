@@ -40,6 +40,7 @@ class MainWindow(Gtk.Window):
         self.set_icon_from_file(self.ICON_FILE)
         self.has_flowbox_album_loaded = False
         self.has_flowbox_artist_loaded = False
+        self.is_fullscreen = False
 
         style_provider = Gtk.CssProvider()
         style_provider.load_from_path(self.CSS_FILE)
@@ -51,6 +52,7 @@ class MainWindow(Gtk.Window):
 
         self.connect("destroy", self.on_window_destroy)
         self.connect("key-press-event", self.on_window_key_press)
+        self.connect("window-state-event", self.on_window_state_event)
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(self.GLADE_FILE)
@@ -437,6 +439,9 @@ class MainWindow(Gtk.Window):
         self.player.save()
         Gtk.main_quit()
 
+    def on_window_state_event(self, widget, event):
+        self.is_fullscreen = bool(event.new_window_state & Gdk.WindowState.FULLSCREEN)
+
     def on_window_key_press(self, widget, event):
         keyval_name = Gdk.keyval_name(event.keyval)
         ctrl = (event.state & Gdk.ModifierType.CONTROL_MASK)
@@ -474,10 +479,18 @@ class MainWindow(Gtk.Window):
             self.goto_bar.set_search_mode(False)
         elif keyval_name == "space" and not self.txt_search.has_focus():
             self.player.toggle()
+        elif keyval_name == "F11":
+            self.toggle_fullscreen()
         else:
             return False
 
         return True
+
+    def toggle_fullscreen(self):
+        if self.is_fullscreen:
+            self.unfullscreen()
+        else:
+            self.fullscreen()
 
     def on_listbox_playlist_row_activated(self, widget, row):
         self.current_playlist = row.playlist
@@ -681,6 +694,9 @@ class MainWindow(Gtk.Window):
 
     def on_view_toggle_sidebar_activate(self, widget):
         self.__show_sidebar(not self.playlist_sidebar.get_reveal_child())
+
+    def on_view_toggle_fullscreen_activate(self, widget):
+        self.toggle_fullscreen()
 
     def on_view_toggle_visualization_activate(self, Widget):
         if self.is_visualizer_on():

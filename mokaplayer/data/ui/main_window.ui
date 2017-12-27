@@ -395,7 +395,7 @@
                   <object class="GtkMenuItem" id="library_scan">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Scan</property>
+                    <property name="label" translatable="yes">Update music</property>
                     <property name="use_underline">True</property>
                     <signal name="activate" handler="on_library_scan_activate" swapped="no"/>
                   </object>
@@ -498,6 +498,15 @@
                     <property name="label" translatable="yes">Toggle visualization</property>
                     <property name="use_underline">True</property>
                     <signal name="activate" handler="on_view_toggle_visualization_activate" swapped="no"/>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="view_toggle_fullscreen">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Toggle fullscreen</property>
+                    <property name="use_underline">True</property>
+                    <signal name="activate" handler="on_view_toggle_fullscreen_activate" swapped="no"/>
                   </object>
                 </child>
               </object>
