@@ -29,31 +29,25 @@ class Streamer(object):
         STOPED = enum.auto()
         PAUSED = enum.auto()
 
-    class Visualizer():
-        GOOM = 'goom'
-        SPACESCOPE = 'spacescope'
-        SPECTRASCOPE = 'spectrascope'
-        SYNAESCOPE = 'synaescope'
-        WAVESCOPE = 'wavescope'
+    VISUALIZER_FLAG = (1 << 3)
 
-        def __iter__(self):
-            return iter([
-                'Goom',
-                'Goom2k1',
-                'Spacescope',
-                'Spectrascope',
-                'Synaescope',
-                'Wavescope',
-                # 'Monoscope',
-                "Libvisual Oinksie",
-                "Libvisual Lv Scope",
-                "Libvisual Lv Analyzer",
-                "Libvisual Jakdaw",
-                "Libvisual Infinite",
-                "Libvisual Corona",
-                "Libvisual Bumpscope",
-                "Libvisual Jess",
-            ])
+    Visualizers = [
+        'Goom',
+        'Goom2k1',
+        'Spacescope',
+        'Spectrascope',
+        'Synaescope',
+        'Wavescope',
+        # 'Monoscope',
+        "Libvisual Oinksie",
+        "Libvisual Lv Scope",
+        "Libvisual Lv Analyzer",
+        "Libvisual Jakdaw",
+        "Libvisual Infinite",
+        "Libvisual Corona",
+        "Libvisual Bumpscope",
+        "Libvisual Jess",
+    ]
 
     def __init__(self, about_to_finish=None, audio_changed=None, notify_volume=None):
         Gst.init(None)
@@ -61,6 +55,7 @@ class Streamer(object):
         self._state = Streamer.State.STOPED
         self._playbin = Gst.ElementFactory.make('playbin', None)
         self._playbin.set_property("video-sink", Gst.ElementFactory.make("ximagesink"))
+        self._visualizer = None
 
         self.audio_changed = audio_changed
 
@@ -114,11 +109,17 @@ class Streamer(object):
     def visualizer(self, value):
         self._visualizer = value.lower().replace(' ', '_') if value else ''
         self.logger.debug(f'Visualizer:{self._visualizer}')
-        if value == 'blank' or value is None:
-            self._playbin.props.flags = self._playbin.props.flags & ~(1 << 3)
+
+        need_to_change_vis_plugin = (self._playbin.props.vis_plugin.name != self._visualizer
+                                     if self._playbin.props.vis_plugin else True)
+
+        if self._visualizer:
+            self._playbin.props.flags = self._playbin.props.flags | self.VISUALIZER_FLAG
         else:
-            self._playbin.props.flags = self._playbin.props.flags | (1 << 3)
-            self._playbin.set_property('vis-plugin', Gst.ElementFactory.make(self._visualizer))
+            self._playbin.props.flags = self._playbin.props.flags & ~self.VISUALIZER_FLAG
+
+        if self._visualizer and need_to_change_vis_plugin:
+            self._playbin.props.vis_plugin = Gst.ElementFactory.make(self._visualizer, self._visualizer)
 
 
     @property
@@ -165,4 +166,5 @@ class Streamer(object):
 
     @position.setter
     def position(self, value):
+        self.logger.debug(f'Seeking:{value}')
         self._playbin.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, value * Gst.SECOND)

@@ -131,7 +131,7 @@ class MainWindow(Gtk.Window):
 
     def __init_cmb_visualiser(self):
         store = Gtk.ListStore(str)
-        for x in self.player.streamer.Visualizer():
+        for x in self.player.streamer.Visualizers:
             store.append([x])
 
         self.cmb_visualiser.set_model(store)
