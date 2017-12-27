@@ -21,6 +21,7 @@ pip install mokaplayer
 -   Resumes playback on startup
 -   Edit tags for multiple files at the same time
 -   Playlists
+-   Audio visualization
 -   Go to [Artist/Album] with CTRL-P
 -   Filter with CTRL-F
 -   Automatically fetch:
