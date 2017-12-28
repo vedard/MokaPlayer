@@ -48,7 +48,7 @@ setup(
     ],
     data_files= list(get_data_files()),
     entry_points={
-        'console_scripts': [
+        'gui_scripts': [
             'mokaplayer=mokaplayer:main',
         ],
     },

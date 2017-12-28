@@ -151,11 +151,15 @@ class Library(object):
         paths = []
         # Create a list of every potential file in the music folder
         for x in pathlib.Path(self.musics_folder).glob('**/*'):
-            if x.is_dir():
-                continue
-            if x.suffix.lower() in self.INGORE_EXTENSION:
-                continue
-            paths.append(str(x.resolve(False)))
+            try:
+                if x.is_dir():
+                    continue
+                if x.suffix.lower() in self.INGORE_EXTENSION:
+                    continue
+                paths.append(str(x.resolve(False)))
+            except OSError:
+                self.logger.exception('Error while scanning songs')
+
 
         all_paths = set(paths)
         known_paths = {x.Path for x in Song.select(Song.Path)}
