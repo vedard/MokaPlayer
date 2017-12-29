@@ -58,9 +58,18 @@ class Streamer(object):
         self._playbin = Gst.ElementFactory.make('playbin')
         self._videosink = Gst.ElementFactory.make('ximagesink')
         self._equalizer = Gst.ElementFactory.make("equalizer-10bands")
+        self._scaletempo = Gst.ElementFactory.make("scaletempo")
+        self._audio_filter = Gst.Bin()
 
-        self._playbin.props.audio_filter = self._equalizer
+        self._audio_filter.add(self._scaletempo)
+        self._audio_filter.add(self._equalizer)
+        self._scaletempo.link(self._equalizer)
+        self._audio_filter.add_pad(Gst.GhostPad.new('sink', self._scaletempo.get_static_pad('sink')))
+        self._audio_filter.add_pad(Gst.GhostPad.new('src', self._equalizer.get_static_pad('src')))
+
+        self._playbin.props.audio_filter = self._audio_filter
         self._playbin.props.video_sink = self._videosink
+        self._scaletempo.props.search = 5
 
         # Set  callbacks
         self.audio_changed = audio_changed
@@ -187,3 +196,8 @@ class Streamer(object):
     def position(self, value):
         self.logger.debug(f'Seeking:{value}')
         self._playbin.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH, value * Gst.SECOND)
+
+    def set_playback_speed(self, value):
+        self._playbin.seek(value, Gst.Format.TIME, Gst.SeekFlags.FLUSH,
+                           Gst.SeekType.SET, self.position * Gst.SECOND, Gst.SeekType.NONE, 0)
+

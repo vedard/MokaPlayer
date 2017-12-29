@@ -354,18 +354,9 @@
                   <object class="GtkMenuItem" id="player_open_stream">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Open stream</property>
+                    <property name="label" translatable="yes">Open stream...</property>
                     <property name="use_underline">True</property>
                     <signal name="activate" handler="on_player_open_stream_activate" swapped="no"/>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkMenuItem" id="player_equalizer">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Equalizer...</property>
-                    <property name="use_underline">True</property>
-                    <signal name="activate" handler="on_player_equalizer_activate" swapped="no"/>
                   </object>
                 </child>
                 <child>
@@ -539,6 +530,38 @@
                     <property name="label" translatable="yes">Create...</property>
                     <property name="use_underline">True</property>
                     <signal name="activate" handler="on_playlist_create_activate" swapped="no"/>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkMenuItem">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">_Tools</property>
+            <property name="use_underline">True</property>
+            <child type="submenu">
+              <object class="GtkMenu">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkMenuItem" id="tools_equalizer">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Equalizer...</property>
+                    <property name="use_underline">True</property>
+                    <signal name="activate" handler="on_tools_equalizer_activate" swapped="no"/>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="tools_tempo">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Tempo...</property>
+                    <property name="use_underline">True</property>
+                    <signal name="activate" handler="on_tools_speed_activate" swapped="no"/>
                   </object>
                 </child>
               </object>
@@ -1355,7 +1378,7 @@
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
-                    <property name="position">0</property>
+                    <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
@@ -1368,7 +1391,7 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>

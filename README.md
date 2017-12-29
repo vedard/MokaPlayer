@@ -23,6 +23,7 @@ pip install mokaplayer
 -   Playlists
 -   Audio visualization
 -   10 Band Equalizer
+-   Change playback speed while maintaining pitch
 -   Go to [Artist/Album] with CTRL-P
 -   Filter with CTRL-F
 -   Automatically fetch:
