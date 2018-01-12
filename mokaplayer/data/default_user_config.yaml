@@ -8,7 +8,8 @@ library:
   music_directory:
   playlist_directory:
 player:
-  restore_state: Yes
+  restore_song_progress: Yes
+  restore_queue: Yes
 grid:
   sort:
     field: DEFAULT

@@ -100,11 +100,13 @@ class Player(object):
                     data = json.load(file)
                     self.streamer.volume = data.get('Volume', 50)
                     self.queue.clear()
-                    self.queue.append(data.get('Queue', []))
-                    self.seek(data['Current'])
-                    self.pause()
-                    time.sleep(0.3)
-                    self.streamer.position = data.get('Position', 0)
+                    if self.userconfig['player']['restore_queue']:
+                        self.queue.append(data.get('Queue', []))
+                        self.seek(data['Current'])
+                        self.pause()
+                        time.sleep(0.3)
+                        if self.userconfig['player']['restore_song_progress']:
+                            self.streamer.position = data.get('Position', 0)
 
                     for i, x in enumerate(data.get('Equalizer', [])):
                         self.streamer.set_equalizer_band(i, x)

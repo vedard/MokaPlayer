@@ -82,7 +82,6 @@ class ProviderUltimateGuitar():
                                         }, headers={
                                             "Referer": url,
                                         })
-                print(response.url)
                 filename = re.findall('filename\s*?=\s?"(.+)"',
                                       response.headers['Content-Disposition'])[0]
 

@@ -42,6 +42,7 @@ class UserConfig(object):
                 self._data = yaml.load(stream)
             with open(self.get_file(), 'rt') as stream:
                 merge(self._data, yaml.load(stream))
+            self.save()
         except:
             logging.critical('Could not read the user configuration file', exc_info=True)
 
