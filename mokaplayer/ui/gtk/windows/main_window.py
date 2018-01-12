@@ -211,6 +211,7 @@ class MainWindow(Gtk.Window):
         self.menu_gridview_remove_from_playlist = self.builder.get_object('menu_gridview_remove_from_playlist')
         self.listbox_playlist = self.builder.get_object('listbox_playlist')
         self.playlist_sidebar = self.builder.get_object('playlist_sidebar')
+        self.playlist_buttons = self.builder.get_object('playlist_buttons')
         self.lbl_playlist = self.builder.get_object('lbl_playlist')
         self.flowbox_artist = self.builder.get_object('flowbox_artist')
         self.flowbox_album = self.builder.get_object('flowbox_album')
@@ -260,6 +261,11 @@ class MainWindow(Gtk.Window):
             self.gridview.set_model(AdapterSong.create_store())
             self.stack.set_visible_child_name('gridview')
             threading.Thread(target=self.__create_model).start()
+
+        if isinstance(self.current_playlist, UpNextPlaylist):
+            self.playlist_buttons.set_visible(False)
+        else:
+            self.playlist_buttons.set_visible(True)
 
     def __create_flowbox(self, flowbox):
         self.logger.info('Creating Flowbox')
@@ -591,6 +597,27 @@ class MainWindow(Gtk.Window):
 
     def on_btn_previous_clicked(self, widget):
         self.player.prev()
+
+    def on_btn_shuffle_playlist_clicked(self, widget):
+        try:
+            order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
+            desc = self.userconfig['grid']['sort']['desc']
+            self.player.queue.clear()
+            self.player.queue.append([x.Path for x in self.current_playlist.collections(order, desc)])
+            self.player.queue.shuffle()
+            self.player.next()
+        except AttributeError:
+            pass  # Not all playlist contain songs
+
+    def on_btn_start_playlist_clicked(self, widget):
+        try:
+            order = AbstractPlaylist.OrderBy[self.userconfig['grid']['sort']['field']]
+            desc = self.userconfig['grid']['sort']['desc']
+            self.player.queue.clear()
+            self.player.queue.append([x.Path for x in self.current_playlist.collections(order, desc)])
+            self.player.next()
+        except AttributeError:
+            pass  # Not all playlist contain songs
 
     def on_audio_changed(self):
         GObject.idle_add(self.__set_current_song_info)

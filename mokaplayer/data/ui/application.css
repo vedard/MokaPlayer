@@ -24,3 +24,8 @@ label.text125 {
 label.text150 {
     font-size: 150%
 }
+
+button.mini {
+    min-height: 0px;
+    min-width: 0px
+}

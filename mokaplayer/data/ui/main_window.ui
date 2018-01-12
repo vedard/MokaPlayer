@@ -25,6 +25,16 @@
     <property name="icon_name">media-skip-backward</property>
     <property name="icon_size">1</property>
   </object>
+  <object class="GtkImage" id="img_shuffle_playlist">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">media-playlist-shuffle</property>
+  </object>
+  <object class="GtkImage" id="img_start_playlist">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-media-play</property>
+  </object>
   <object class="GtkMenu" id="menu_gridview">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -1014,6 +1024,7 @@
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
                     <property name="valign">end</property>
+                    <property name="margin_right">5</property>
                     <property name="label" translatable="yes">Library</property>
                     <property name="selectable">True</property>
                     <attributes>
@@ -1028,25 +1039,86 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkMenuButton">
+                  <object class="GtkBox" id="playlist_buttons">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="relief">none</property>
-                    <property name="popover">popup_sort</property>
+                    <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkButton" id="btn_start_playlist">
+                        <property name="height_request">20</property>
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="stock">gtk-sort-ascending</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_text" translatable="yes">Start the selected playlist</property>
+                        <property name="valign">end</property>
+                        <property name="margin_left">3</property>
+                        <property name="margin_right">3</property>
+                        <property name="image">img_start_playlist</property>
+                        <property name="relief">none</property>
+                        <property name="image_position">bottom</property>
+                        <property name="always_show_image">True</property>
+                        <signal name="clicked" handler="on_btn_start_playlist_clicked" swapped="no"/>
+                        <style>
+                          <class name="mini"/>
+                        </style>
                       </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="btn_shuffle_playlist">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_text" translatable="yes">Shuffle and start the selected playlist </property>
+                        <property name="margin_left">3</property>
+                        <property name="margin_right">3</property>
+                        <property name="image">img_shuffle_playlist</property>
+                        <property name="relief">none</property>
+                        <signal name="clicked" handler="on_btn_shuffle_playlist_clicked" swapped="no"/>
+                        <style>
+                          <class name="mini"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkMenuButton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="relief">none</property>
+                        <property name="popover">popup_sort</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="stock">gtk-sort-ascending</property>
+                          </object>
+                        </child>
+                        <style>
+                          <class name="mini"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">2</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
+                    <property name="expand">True</property>
                     <property name="fill">True</property>
                     <property name="pack_type">end</property>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>
