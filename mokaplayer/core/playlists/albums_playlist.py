@@ -11,12 +11,12 @@ class AlbumsPlaylist(AbstractPlaylist):
         return "Albums"
 
     def collections(self, order=AbstractPlaylist.OrderBy.DEFAULT, desc=False, search=''):
-        if order == self.OrderBy.ARTIST or order == self.OrderBy.DEFAULT:
-            fields = [peewee.fn.strip_articles(Album.Artist), Album.Year]
-        elif order == self.OrderBy.ALBUM:
+        if order == self.OrderBy.ALBUM:
             fields = [peewee.fn.strip_articles(Album.Name)]
         elif order == self.OrderBy.YEAR:
             fields = [Album.Year, peewee.fn.strip_articles(Album.Artist)]
+        else:
+            fields = [peewee.fn.strip_articles(Album.Artist), Album.Year]
 
         if desc:
             fields[0] = -fields[0]

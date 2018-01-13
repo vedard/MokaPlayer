@@ -51,7 +51,10 @@ class AbstractPlaylist:
             fields = [peewee.fn.strip_articles(Song.AlbumArtist), Song.Year,
                       peewee.fn.strip_articles(Song.Album), Song.Discnumber, Song.Tracknumber]
 
-        if desc:
+
+        if desc and fields[0]._ordering == 'DESC':
+            fields[0] = fields[0].asc()
+        elif desc:
             fields[0] = -fields[0]
 
         return fields
