@@ -1,7 +1,7 @@
 [Desktop Entry]
 StartupNotify=true
 Name=MokaPlayer
-Exec=/bin/mokaplayer
+Exec=mokaplayer
 Icon=mokaplayer
 Terminal=false
 Type=Application
