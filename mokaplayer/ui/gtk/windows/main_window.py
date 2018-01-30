@@ -387,8 +387,8 @@ class MainWindow(Gtk.Window):
 
         if song:
             album = self.player.library.get_album(song.Album, song.AlbumArtist)
-            self.lbl_current_title.set_text(line1.format(**song._data))
-            self.lbl_current_song_infos.set_text(line2.format(**song._data))
+            self.lbl_current_title.set_text(line1.format(**song.__data__))
+            self.lbl_current_song_infos.set_text(line2.format(**song.__data__))
         else:
             self.lbl_current_title.set_text('')
             self.lbl_current_song_infos.set_text('')

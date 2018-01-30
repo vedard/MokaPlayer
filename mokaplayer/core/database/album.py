@@ -3,7 +3,7 @@ from mokaplayer.core.database import database_context
 
 
 class Album(peewee.Model):
-    AlbumId = peewee.PrimaryKeyField()
+    AlbumId = peewee.AutoField()
     Name = peewee.CharField(index=True)
     Path = peewee.CharField(index=True)
     Year = peewee.CharField(null=True)

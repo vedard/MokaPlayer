@@ -8,7 +8,7 @@ import taglib
 
 
 class Song(peewee.Model):
-    songId = peewee.PrimaryKeyField()
+    songId = peewee.AutoField()
     Path = peewee.CharField(index=True)
     Title = peewee.CharField(null=True, index=True)
     Album = peewee.CharField(null=True, index=True)
