@@ -160,7 +160,6 @@ class Library(object):
             except OSError:
                 self.logger.exception('Error while scanning songs')
 
-
         all_paths = set(paths)
         known_paths = {x.Path for x in Song.select(Song.Path)}
         new_paths = all_paths - known_paths

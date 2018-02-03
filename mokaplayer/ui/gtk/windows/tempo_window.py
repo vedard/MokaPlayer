@@ -21,6 +21,5 @@ class TempoWindow():
     def on_normal_clicked(self, widget):
         self.streamer.set_playback_speed(1.0)
 
-
     def get_window(self):
         return self.window

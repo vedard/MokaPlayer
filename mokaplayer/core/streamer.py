@@ -200,4 +200,3 @@ class Streamer(object):
     def set_playback_speed(self, value):
         self._playbin.seek(value, Gst.Format.TIME, Gst.SeekFlags.FLUSH,
                            Gst.SeekType.SET, self.position * Gst.SECOND, Gst.SeekType.NONE, 0)
-
