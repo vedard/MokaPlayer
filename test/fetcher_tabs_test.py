@@ -4,7 +4,7 @@ import pathlib
 
 from mokaplayer.core.fetchers import tabs as tabsfetcher
 
-@unittest.skip('')
+
 class FetcherTabsTest(unittest.TestCase):
 
     FOLDER = './test/tabs'
@@ -20,7 +20,7 @@ class FetcherTabsTest(unittest.TestCase):
         self.assertGreater(len(tabs), 0)
         self.assertIsNotNone(tabs[0])
 
-        guitar_pro = [x for x in tabsS if x['type'] == 'guitar pro'].pop()
+        guitar_pro = [x for x in tabs if x['type'] == 'guitar pro'].pop()
         ascii_tab = [x for x in tabs if x['type'] == 'tab'].pop()
 
         ascii_text = tabsfetcher.fetch_ascii_tab(ascii_tab['url'])

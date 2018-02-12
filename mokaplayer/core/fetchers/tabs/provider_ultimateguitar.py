@@ -20,6 +20,9 @@ class ProviderUltimateGuitar():
                                     'band_name': artist,
                                     'song_name': title,
                                     'type[]': ['200', '500'],  # tab and guitar pro
+                                },
+                                cookies={
+                                    'back_to_classic_ug': '1'
                                 })
 
         if response.ok:
@@ -53,7 +56,9 @@ class ProviderUltimateGuitar():
     def fetch_ascii_tab(url):
         """Retrieve the ascii tab from a url"""
         try:
-            response = requests.get(url)
+            response = requests.get(url, cookies={
+                                    'back_to_classic_ug': '1'
+                                    })
             if response.ok:
                 page = html.fromstring(response.content)
                 nodes = page.xpath('//pre[contains(@class, "js-tab-content")]/text()')
@@ -69,7 +74,9 @@ class ProviderUltimateGuitar():
     def download_guitar_pro_tab(url, directory):
         """Retrieve and download the guitar pro tab (file) from a url"""
         try:
-            response = requests.get(url)
+            response = requests.get(url, cookies={
+                                    'back_to_classic_ug': '1'
+                                    })
             if response.ok:
                 page = html.fromstring(response.content)
                 tab_id = page.xpath('//input[@id="tab_id"]/@value')[0]
