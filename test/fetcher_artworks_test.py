@@ -5,7 +5,6 @@ import pathlib
 from mokaplayer.core.fetchers import artworks as artworksfetcher
 from mokaplayer.config import appconfig
 
-@unittest.skip('')
 class FetcherArtworkTest(unittest.TestCase):
 
     FOLDER = './test/artworks'
