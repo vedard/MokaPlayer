@@ -20,8 +20,8 @@ class FetcherTabsTest(unittest.TestCase):
         self.assertGreater(len(tabs), 0)
         self.assertIsNotNone(tabs[0])
 
-        guitar_pro = [x for x in tabs if x['type'] == 'guitar pro'].pop()
-        ascii_tab = [x for x in tabs if x['type'] == 'tab'].pop()
+        guitar_pro = [x for x in tabs if x['type'] == 'Guitar Pro'].pop()
+        ascii_tab = [x for x in tabs if x['type'] == 'Tab'].pop()
 
         ascii_text = tabsfetcher.fetch_ascii_tab(ascii_tab['url'])
         path = tabsfetcher.download_guitar_pro_tab(guitar_pro['url'], FetcherTabsTest.FOLDER)

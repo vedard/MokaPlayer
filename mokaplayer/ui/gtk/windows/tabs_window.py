@@ -47,12 +47,12 @@ class TabsWindow():
         text = ''
         tab_type = self.model[path][0]
         name = self.model[path][1]
-        url = self.model[path][3]
+        url = self.model[path][4]
 
-        if tab_type == 'tab':
+        if tab_type == 'Tab':
             text = tabs_fetcher.fetch_ascii_tab(url)
 
-        elif tab_type == 'guitar pro':
+        elif tab_type == 'Guitar Pro':
             path = tabs_fetcher.download_guitar_pro_tab(url, '/tmp/')
 
             if path is not None:

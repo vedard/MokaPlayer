@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+import json
 
 import requests
 from lxml import html
@@ -20,29 +21,24 @@ class ProviderUltimateGuitar():
                                     'band_name': artist,
                                     'song_name': title,
                                     'type[]': ['200', '500'],  # tab and guitar pro
-                                },
-                                cookies={
-                                    'back_to_classic_ug': '1'
                                 })
 
         if response.ok:
             try:
-                page = html.fromstring(response.content)
-                rows = page.xpath('//tr[.//a[contains(@class, "song") and contains(@class ,"result-link")]]')
                 tabs = []
+                page = html.fromstring(response.content)
+                json_data = page.xpath("//script[contains(text(),'window.UGAPP.store.page')]")[0].text;
+                json_data = json_data[json_data.find('{'):json_data.rfind('}') + 1]
+                json_data = json.loads(json_data)
 
-                for row in rows:
-                    song = row.xpath('.//a[contains(@class, "song") and contains(@class ,"result-link")]')[0]
-                    tab_type = row.xpath('./td[last()]//strong//text()')[0]
-                    rating = row.xpath('.//b[contains(@class, "ratdig")]//text()')
-                    rating = rating[0] if any(rating) else '0'
-
-                    if tab_type == 'guitar pro' or tab_type == 'tab':
+                for tab_json in json_data['data']['results']:
+                    if 'type_name' in tab_json and (tab_json['type_name'] == 'Tab' or tab_json['type_name'] == 'Guitar Pro'):
                         tabs.append({
-                            'name': ' '.join(song.xpath('.//text()')).strip(),
-                            'url': song.attrib['href'],
-                            'rating': int(str(rating)),
-                            'type': tab_type
+                            'name': tab_json['song_name'],
+                            'url': tab_json['tab_url'],
+                            'rating': tab_json['rating'],
+                            'votes': tab_json['votes'],
+                            'type': tab_json['type_name'],
                         })
 
                 return sorted(tabs, key=lambda tab: (tab['type'],
@@ -56,15 +52,13 @@ class ProviderUltimateGuitar():
     def fetch_ascii_tab(url):
         """Retrieve the ascii tab from a url"""
         try:
-            response = requests.get(url, cookies={
-                                    'back_to_classic_ug': '1'
-                                    })
+            response = requests.get(url)
             if response.ok:
                 page = html.fromstring(response.content)
-                nodes = page.xpath('//pre[contains(@class, "js-tab-content")]/text()')
-
-                if any(nodes):
-                    return nodes[0]
+                json_data = page.xpath("//script[contains(text(),'window.UGAPP.store.page')]")[0].text;
+                json_data = json_data[json_data.find('{'):json_data.rfind('}') + 1]
+                json_data = json.loads(json_data)
+                return json_data['data']['tab_view']['wiki_tab']['content']
         except:
             logging.exception('Could not fetch ascii tabs for: ' + url)
 
@@ -79,13 +73,13 @@ class ProviderUltimateGuitar():
                                     })
             if response.ok:
                 page = html.fromstring(response.content)
-                tab_id = page.xpath('//input[@id="tab_id"]/@value')[0]
-                session_id = page.xpath('//input[@name="session_id"]/@value')[0]
+                json_data = page.xpath("//script[contains(text(),'window.UGAPP.store.page')]")[0].text
+                json_data = json_data[json_data.find('{'):json_data.rfind('}') + 1]
+                json_data = json.loads(json_data)
 
                 response = requests.get(ProviderUltimateGuitar.DOWNLOAD_URL,
                                         params={
-                                            'id': tab_id,
-                                            'session_id': session_id
+                                            'id': json_data['data']['tab']['id'],
                                         }, headers={
                                             "Referer": url,
                                         })
