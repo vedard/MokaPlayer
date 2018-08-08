@@ -1,6 +1,7 @@
 import enum
 import logging
 import pathlib
+import sys
 
 import gi
 gi.require_version('Gst', '1.0')
@@ -69,6 +70,12 @@ class Streamer(object):
 
         self._playbin.props.audio_filter = self._audio_filter
         self._playbin.props.video_sink = self._videosink
+
+        if sys.platform.startswith('win'):
+            # On windows the default sink currently has distortion problem
+            self._audiosink = Gst.ElementFactory.make('directsoundsink')
+            self._playbin.props.audio_sink = self._audiosink
+
         self._scaletempo.props.search = 5
 
         # Set  callbacks
