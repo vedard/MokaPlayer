@@ -674,6 +674,18 @@ class MainWindow(Gtk.Window):
 
     def on_library_scan_activate(self, event):
         threading.Thread(target=self.__library_scan).start()
+    
+    def on_library_songs_stats(self, event):
+        dialog = Gtk.FileChooserDialog("Select a database file", self,
+                                       Gtk.FileChooserAction.OPEN,
+                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                        "Select", Gtk.ResponseType.OK))
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            self.player.library.import_song_statistic_from(dialog.get_filename())
+            self.__show_current_playlist()
+        dialog.destroy()
 
     def on_library_scan_finished(self):
         self.__create_playlist_menus()

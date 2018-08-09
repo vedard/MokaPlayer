@@ -227,3 +227,18 @@ class Library(object):
                             where album.NAME = song.album AND
                                     album.artist LIKE song.albumartist)
         """)
+    
+    def import_song_statistic_from(self, database_file):
+        self.logger.info('Importing database songs statistics')
+        try:
+            from playhouse.sqlite_ext import SqliteExtDatabase
+            other_database = SqliteExtDatabase(database_file)
+            cursor = other_database.execute_sql("SELECT TITLE, ARTIST, ALBUM, ADDED, LAST_PLAYED, PLAYED FROM SONG");
+            for row in cursor.fetchall():
+                database_context.execute_sql("UPDATE SONG SET ADDED = ?, LAST_PLAYED = ?, PLAYED = ? WHERE TITLE = ? AND ARTIST = ? AND ALBUM = ?",
+                                            (row[3], row[4], row[5], row[0], row[1], row[2]))
+
+            other_database.close()
+        except:
+            self.logger.exception('Error while importing database songs statistics')
+            

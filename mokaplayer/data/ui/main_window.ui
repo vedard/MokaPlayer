@@ -419,6 +419,15 @@
                     <signal name="activate" handler="on_library_artworks_activate" swapped="no"/>
                   </object>
                 </child>
+                <child>
+                  <object class="GtkMenuItem" id="library_songs_stats">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Import songs statistics</property>
+                    <property name="use_underline">True</property>
+                    <signal name="activate" handler="on_library_songs_stats" swapped="no"/>
+                  </object>
+                </child>
               </object>
             </child>
           </object>
