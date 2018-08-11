@@ -233,10 +233,10 @@ class Library(object):
         try:
             from playhouse.sqlite_ext import SqliteExtDatabase
             other_database = SqliteExtDatabase(database_file)
-            cursor = other_database.execute_sql("SELECT TITLE, ARTIST, ALBUM, ADDED, LAST_PLAYED, PLAYED FROM SONG");
-            for row in cursor.fetchall():
-                database_context.execute_sql("UPDATE SONG SET ADDED = ?, LAST_PLAYED = ?, PLAYED = ? WHERE TITLE = ? AND ARTIST = ? AND ALBUM = ?",
-                                            (row[3], row[4], row[5], row[0], row[1], row[2]))
+            cursor = other_database.execute_sql("SELECT ADDED, LAST_PLAYED, PLAYED, TITLE, ARTIST, ALBUM FROM SONG");
+            with database_context.atomic():
+                for row in cursor.fetchall():
+                    database_context.execute_sql("UPDATE SONG SET ADDED = ?, LAST_PLAYED = ?, PLAYED = ? WHERE TITLE = ? AND ARTIST = ? AND ALBUM = ?", row)
 
             other_database.close()
         except:
