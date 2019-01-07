@@ -10,7 +10,7 @@ class ProviderMusicmatch(ProviderBase):
                                                                 self.encode(title))
 
     def get_xpath(self, title, artist, album):
-        return '//p[@class="mxm-lyrics__content "]/text()'
+        return '//p[@class="mxm-lyrics__content "]/span/text()'
 
     def get_regex(self, title, artist, album):
         return ''
