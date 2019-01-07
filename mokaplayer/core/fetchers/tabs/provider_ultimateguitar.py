@@ -13,6 +13,15 @@ class ProviderUltimateGuitar():
     DOWNLOAD_URL = 'https://tabs.ultimate-guitar.com/tab/download'
 
     @staticmethod
+    def __get_json_data_in_page(page):
+        json_data = page.xpath("//script[contains(text(),'window.UGAPP.store.page')]")[0].text;
+        json_data = json_data.replace("window.UGAPP.store.i18n = {};", "")
+        json_data = json_data[json_data.find('{'):json_data.rfind('}') + 1]
+        json_data = json.loads(json_data)
+        return json_data
+
+
+    @staticmethod
     def search(title, artist):
         """ Return a list of tabs (a dict with all infos) that can be fetched or downloaded"""
 
@@ -27,9 +36,7 @@ class ProviderUltimateGuitar():
             try:
                 tabs = []
                 page = html.fromstring(response.content)
-                json_data = page.xpath("//script[contains(text(),'window.UGAPP.store.page')]")[0].text;
-                json_data = json_data[json_data.find('{'):json_data.rfind('}') + 1]
-                json_data = json.loads(json_data)
+                json_data = ProviderUltimateGuitar.__get_json_data_in_page(page);
 
                 for tab_json in json_data['data']['results']:
                     if 'type_name' in tab_json and (tab_json['type_name'] == 'Tab' or tab_json['type_name'] == 'Guitar Pro'):
@@ -55,9 +62,7 @@ class ProviderUltimateGuitar():
             response = requests.get(url)
             if response.ok:
                 page = html.fromstring(response.content)
-                json_data = page.xpath("//script[contains(text(),'window.UGAPP.store.page')]")[0].text;
-                json_data = json_data[json_data.find('{'):json_data.rfind('}') + 1]
-                json_data = json.loads(json_data)
+                json_data = ProviderUltimateGuitar.__get_json_data_in_page(page);
                 return json_data['data']['tab_view']['wiki_tab']['content']
         except:
             logging.exception('Could not fetch ascii tabs for: ' + url)
@@ -73,9 +78,7 @@ class ProviderUltimateGuitar():
                                     })
             if response.ok:
                 page = html.fromstring(response.content)
-                json_data = page.xpath("//script[contains(text(),'window.UGAPP.store.page')]")[0].text
-                json_data = json_data[json_data.find('{'):json_data.rfind('}') + 1]
-                json_data = json.loads(json_data)
+                json_data = ProviderUltimateGuitar.__get_json_data_in_page(page);
 
                 response = requests.get(ProviderUltimateGuitar.DOWNLOAD_URL,
                                         params={
