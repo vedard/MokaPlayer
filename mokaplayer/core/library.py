@@ -192,7 +192,7 @@ class Library(object):
                 playlist = M3uParser(path)
                 Playlist(Name=playlist.name, Path=playlist.location).save()
             for path in deleted_paths:
-                Playlist.delete().where(Song.Path == path).execute()
+                Playlist.delete().where(Playlist.Path == path).execute()
 
     def __sync_artists(self):
         self.logger.info('Scanning artists')
