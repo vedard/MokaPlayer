@@ -20,7 +20,6 @@ class ProviderUltimateGuitar():
         json_data = json.loads(json_data)
         return json_data
 
-
     @staticmethod
     def search(title, artist):
         """ Return a list of tabs (a dict with all infos) that can be fetched or downloaded"""

@@ -680,7 +680,7 @@ class MainWindow(Gtk.Window):
         self.has_flowbox_album_loaded = False
         self.has_flowbox_artist_loaded = False
         self.__show_current_playlist()
-    
+
     def on_library_songs_stats(self, event):
         dialog = Gtk.FileChooserDialog("Select a database file", self,
                                        Gtk.FileChooserAction.OPEN,
@@ -691,11 +691,10 @@ class MainWindow(Gtk.Window):
         if response == Gtk.ResponseType.OK:
             threading.Thread(target=lambda: self.library_songs_stats(dialog.get_filename())).start()
         dialog.destroy()
-    
+
     def library_songs_stats(self, filename):
         self.player.library.import_song_statistic_from(filename)
         GObject.idle_add(self.on_library_songs_stats_finished)
-        
 
     def on_library_songs_stats_finished(self):
         self.__show_current_playlist()
