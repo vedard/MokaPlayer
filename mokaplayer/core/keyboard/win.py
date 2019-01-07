@@ -14,9 +14,9 @@ class KeyboardClient:
 
         try:
             import PyHook3
-            hm = PyHook3.HookManager()
-            hm.KeyDown = self._on_pyhook_event
-            hm.HookKeyboard()
+            self.hm = PyHook3.HookManager()
+            self.hm.KeyDown = self._on_pyhook_event
+            self.hm.HookKeyboard()
             return
         except ImportError:
             self.logger.warning('PyHook3 is needed on Window for MediaKey binding')
