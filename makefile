@@ -5,7 +5,7 @@ release:
 	python3 setup.py sdist
 
 publish:
-	python setup.py sdist upload -r pypi
+	python -m twine upload dist/*
 
 format:
 	autopep8 mokaplayer --recursive --in-place --pep8-passes 2000
